@@ -1,4 +1,5 @@
-// /devices라고 요청이 오면, 서비스한테 목록 달라고 해서 HTML로 보내주는 것입니다.
+// 안내 데스크: DeviceController.java
+// 사용자의 요청(URL)을 받아서, 만들어둔 DeviceService에게 일을 시키는 역할입니다.
 
 package com.example.KHTeam3DCIM.controller;
 
