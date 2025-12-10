@@ -1,6 +1,3 @@
-// Device.java (장비 설계도)
-// 파일 설명: "서버 주민등록증"입니다. 실제 데이터센터에 있는 물리적인 서버 하나하나의 정보를 담고 있습니다.
-
 package com.example.KHTeam3DCIM.domain;
 
 import jakarta.persistence.*;
@@ -20,8 +17,8 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class) // "누가 언제 등록했는지 감시해라" (날짜 자동입력용)
 // [3] @SequenceGenerator: 오라클은 번호표 기계(시퀀스)가 따로 필요해서 설정하는 부분입니다.
 @SequenceGenerator(
-        name = "DEVICE_SEQ_GEN",             // 자바에서 부를 별명
-        sequenceName = "SEQ_DEVICE_ID",      // 실제 오라클 DB에 있는 시퀀스 이름
+        name = "DEVICE_SEQ_GEN",      // 자바에서 부를 별명
+        sequenceName = "SEQ_DEVICE_ID", // 실제 오라클 DB에 있는 시퀀스 이름
         initialValue = 1, allocationSize = 1 // 1번부터 시작하고 1씩 증가한다.
 )
 public class Device {
