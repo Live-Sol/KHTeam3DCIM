@@ -22,18 +22,37 @@ public class MemberService {
     }
 
     // 2. 회원 아이디로 조회
-    public Optional<Member> findByMemberId(String memberId) {
-        return memberRepository.findById(memberId);
+    public Member findByMemberIdOrThrow(String memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
     }
 
     // 3. 회원 등록
-    public Member saveMember(Member member) {
+    public Member addMember(Member member) {
         // 필요시 비밀번호 암호화 등 처리
         return memberRepository.save(member);
     }
 
-    // 4. 회원 삭제
+    // 4. 회원 정보 수정
+    @Transactional
+    public Member updateMember(String memberId, Member patch) {
+        return memberRepository.findById(memberId)
+                .map(existing ->{
+                    if(patch.getPassword() != null)
+                        existing.setPassword(patch.getPassword());
+                    if(patch.getName() != null)
+                        existing.setName(patch.getName());
+                    return memberRepository.save(existing);
+                })
+                .orElse(null);
+    }
+
+    // 5. 회원 삭제
     public void deleteMember(String memberId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new RuntimeException("회원이 존재하지 않습니다.");
+        }
         memberRepository.deleteById(memberId);
     }
+
 }
