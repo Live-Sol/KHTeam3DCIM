@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "DC_RAC")
+@Table(name = "DC_RACK")
 @Data
 @Builder
 @AllArgsConstructor
