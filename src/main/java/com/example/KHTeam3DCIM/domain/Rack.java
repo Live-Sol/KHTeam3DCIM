@@ -18,7 +18,7 @@ public class Rack {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rack_seq")
     @SequenceGenerator(name = "rack_seq", sequenceName = "SEQ_RACK_ID", allocationSize = 1)
     @Column(name = "RACK_ID")
-    private Long rackId;
+    private Long id;
 
     @Column(name = "RACK_NAME", nullable = false, length = 50)
     private String rackName;

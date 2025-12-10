@@ -25,7 +25,7 @@ public class MemberController {
 
     // 회원 조회
     @GetMapping("/{memberId}")
-    public ResponseEntity<Member> getMember(@PathVariable String memberId) {
+    public ResponseEntity<Member> getMemberById(@PathVariable String memberId) {
         try{
             Member member = memberService.findByMemberIdOrThrow(memberId);
             return ResponseEntity.ok(member);
@@ -65,7 +65,8 @@ public class MemberController {
 
     // 4. 회원 정보 수정
     @PatchMapping("/{memberId}")
-    public ResponseEntity<Member> patchMember(@PathVariable String memberId, @RequestBody Member patch) {
+    public ResponseEntity<Member> patchMember(@PathVariable String memberId,
+        @RequestBody Member patch) {
         Member updated = memberService.updateMember(memberId, patch);
         if(updated == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(updated);

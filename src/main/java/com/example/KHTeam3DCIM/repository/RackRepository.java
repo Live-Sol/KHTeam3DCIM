@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface RackRepository extends JpaRepository<Rack,Long> {
-    Optional<Rack> findByRackName(String rackName);
+    // Optional<Rack> findByRackName(String rackName);
 }
