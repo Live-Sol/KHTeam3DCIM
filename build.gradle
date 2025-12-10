@@ -27,11 +27,14 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'  // webmvc -> web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+
+    implementation 'com.oracle.database.jdbc:ojdbc11:23.7.0.25.01'
+    // devtools 과 runtimeonly는 충돌이 날 가능성이 있기에 implementation으로 교체
+    //runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
