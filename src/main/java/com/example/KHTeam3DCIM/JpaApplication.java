@@ -15,6 +15,8 @@ import com.example.KHTeam3DCIM.repository.MemberRepository;
 @Slf4j
 @RequiredArgsConstructor
 public class JpaApplication implements ApplicationRunner {
+
+    // 실행시 member 2명, rack 1개 자동 insert 되는 기능 (충돌 발생시 생략 가능)
     private final MemberRepository memberRepository;
     private final RackRepository rackRepository;
     @Override

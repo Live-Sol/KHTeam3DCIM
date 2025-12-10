@@ -34,7 +34,7 @@ public class RackService {
     // 4. 랙 정보 수정 (전체 업데이트)
     // put은 일단 작성했지만, patch가 있기에 생략 필요하다면 활성화해서 이용 가능한 부분
 //    public Rack updateRack(Rack rack) {
-//        if (!rackRepository.existsById(rack.getRackId())) {
+//        if (!rackRepository.existsById(rack.getid())) {
 //            throw new RuntimeException("Rack이 존재하지 않습니다.");
 //        }
 //        return rackRepository.save(rack);
