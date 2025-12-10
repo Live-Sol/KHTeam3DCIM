@@ -40,7 +40,7 @@ public class Request {
     private String modelName;   // 모델명
 
     @Column(name = "HEIGHT_UNIT", nullable = false)
-    private Integer heightUnit; // 2U, 4U 등
+    private Integer heightUnit; // 2U, 4U, 6U 등
 
     @Column(name = "STATUS")
     private String status;      // WAITING, APPROVED
