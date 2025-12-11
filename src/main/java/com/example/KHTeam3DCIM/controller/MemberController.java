@@ -1,7 +1,9 @@
 package com.example.KHTeam3DCIM.controller;
 
+import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.dto.Member.*;
 import com.example.KHTeam3DCIM.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -78,17 +80,36 @@ public class MemberController {
     @PostMapping("/login")
     public String login(@RequestParam String memberId,
                         @RequestParam String password,
-                        Model model) {
+                        Model model, HttpSession session) {
         boolean success = memberService.login(memberId, password);
         if(!success) {
             model.addAttribute("error", "아이디 또는 비밀번호를 확인해주세요.");
             return "member/login";
         }
+        // 로그인 성공 시 세션에 저장
+        session.setAttribute("loginId", memberId);
         return "redirect:/";
     }
 
 
     // 회원 정보 수정
+    @GetMapping("/edit")
+    public String editUserForm(HttpSession session, Model model) {
+
+        String loginId = (String) session.getAttribute("loginId");  // 세션에서 로그인 아이디 가져오기
+
+        if (loginId == null) {
+            return "redirect:/members/login";
+
+//            return "redirect:/login";   // 로그인 안 했으면 로그인 페이지로
+        }
+
+        Member member = memberService.findMember(loginId);
+        model.addAttribute("member", member);
+
+        return "member/editMember";
+    }
+
     @PatchMapping("/{memberId}")
     public ResponseEntity<MemberResponse> patchMember(@PathVariable String memberId,
         @RequestBody MemberUpdateRequest patch) {

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 수정</title>
+    <link rel="stylesheet" th:href="@{/css/memberStyle.css}">
+</head>
+<body>
+
+<h2>회원 정보 수정</h2>
+
+<div>
+    <!-- 출력용 (disabled) -->
+    <label>아이디</label>
+    <input type="text" id="memberIdDisplay" th:value="${member.memberId}" disabled>
+
+    <!-- 서버로 보낼 아이디 -->
+    <input type="hidden" id="memberId" th:value="${member.memberId}">
+</div>
+
+<div>
+    <label>새 비밀번호</label>
+    <input type="password" id="password">
+    <p id="passwordError" style="color:red; display:none;">비밀번호는 4~20글자여야 합니다.</p>
+</div>
+
+<div>
+    <label>새 이름</label>
+    <input type="text" id="name" th:value="${member.name}">
+    <p id="nameError" style="color:red; display:none;">이름은 한글 또는 알파벳 2~10글자여야 합니다.</p>
+</div>
+
+<button onclick="updateMember()">수정하기</button>
+
+<p id="result" style="color:red;"></p>
+
+<script>
+    function updateMember() {
+        const memberId = document.getElementById("memberId").value;
+        const password = document.getElementById("password").value;
+        const name = document.getElementById("name").value;
+
+        let valid = true;
+
+        // 비밀번호 검사
+        const passwordPattern = /^.{4,20}$/; // 4~20글자
+        const passwordError = document.getElementById('passwordError');
+        if (!passwordPattern.test(password)) {
+            passwordError.style.display = 'block';
+            document.getElementById('password').focus();
+            valid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+
+        // 이름 검사
+        const namePattern = /^[a-zA-Z가-힣]{2,10}$/; // 한글, 알파벳, 2~10글자
+        const nameError = document.getElementById('nameError');
+        if (!namePattern.test(name)) {
+            nameError.style.display = 'block';
+            document.getElementById('name').focus();
+            valid = false;
+        } else {
+            nameError.style.display = 'none';
+        }
+
+        if (!valid) return; // 유효성 검사 실패 시 함수 종료
+
+        const data = { password, name };
+
+        fetch(`/members/${memberId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                else throw new Error("수정 실패");
+            })
+            .then(json => {
+                document.getElementById("result").style.color = 'green';
+                document.getElementById("result").innerText = "수정 성공!";
+                setTimeout(() => { window.location.href = "/"; }, 2000); // 2초 후 메인페이지로 이동
+            })
+            .catch(err => {
+                document.getElementById("result").style.color = 'red';
+                document.getElementById("result").innerText = "회원 정보 수정에 실패했습니다.";
+            });
+    }
+</script>
+
+</body>
+</html>

@@ -58,6 +58,11 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
+    // 회원 단건 조회
+    public Member findMember(String memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+    }
 
     // 회원 등록
     public MemberResponse addMember(MemberCreateRequest request) {
