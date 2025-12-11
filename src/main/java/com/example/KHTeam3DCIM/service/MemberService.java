@@ -135,11 +135,15 @@ public class MemberService {
     }
 
     // 회원 삭제
-    public void deleteMember(String memberId) {
-        if (!memberRepository.existsById(memberId)) {
-            throw new RuntimeException("회원이 존재하지 않습니다.");
+    public void deleteMemberWithPassword(String memberId, String password) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        if(!member.getPassword().equals(password)) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
-        memberRepository.deleteById(memberId);
+
+        memberRepository.delete(member);
     }
 
 }

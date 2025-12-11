@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/members")
@@ -121,13 +122,42 @@ public class MemberController {
         }
     }
 
+
+    // 회원 탈퇴 페이지로 이동
+    @GetMapping("/delete")
+    public String deleteUserForm(HttpSession session, Model model) {
+        String loginId = (String) session.getAttribute("loginId");
+
+        if (loginId == null) {
+            return "redirect:/members/login"; // 로그인 안 되어 있으면 로그인 페이지로
+        }
+
+        Member member = memberService.findMember(loginId);
+        model.addAttribute("member", member);
+        //model.addAttribute("memberId", loginId); // 현재 로그인한 아이디를 페이지에 전달
+        return "member/deleteMember"; // deleteMember.html
+    }
     // 회원 정보 삭제
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<Void> deleteMember(@PathVariable String memberId) {
-        memberService.deleteMember(memberId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteMember(
+            @PathVariable String memberId,
+            @RequestBody Map<String, String> body,
+            HttpSession session) {
+
+        String loginId = (String) session.getAttribute("loginId");
+        String password = body.get("password");
+
+        if(loginId == null || !loginId.equals(memberId)) {
+            return ResponseEntity.status(403).body(Map.of("message", "권한이 없습니다."));
+        }
+
+        try {
+            memberService.deleteMemberWithPassword(memberId, password);
+            session.invalidate(); // 탈퇴 후 세션 종료
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
-
-
 
 }
