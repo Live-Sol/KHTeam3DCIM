@@ -38,7 +38,7 @@ public class DeviceController {
         List<Device> devices = deviceService.findAllDevices();
         // 가져온 보따리를 'devices'라는 이름표를 붙여서 HTML로 보냄
         model.addAttribute("devices", devices);
-        return "device/list"; // templates/device/list.html을 찾아가라!
+        return "device/device_list";
     }
 
     // 2. 장비 등록 화면 보여주기 + 자동완성 기능 추가 (대수술)
@@ -68,7 +68,7 @@ public class DeviceController {
         model.addAttribute("device", device); // 장비 객체 넘기기
         model.addAttribute("reqId", reqId); // reqId 넘기기 (자동완성 여부 확인용)
 
-        return "device/form"; // templates/device/form.html을 찾아가라!
+        return "device/device_form";
     }
 
     // 3. 실제 등록 처리하기 (저장 버튼 눌렀을 때)
