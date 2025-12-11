@@ -22,7 +22,7 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REQ_SEQ_GEN")
     @Column(name = "REQ_ID")
-    private Long id;            // 요청 ID
+    private Long id;            // 요청 ID    
 
     @Column(name = "USER_NAME", nullable = false)
     private String userName;    // 요청자 이름

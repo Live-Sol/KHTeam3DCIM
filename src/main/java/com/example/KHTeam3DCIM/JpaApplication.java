@@ -9,6 +9,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
+import com.example.KHTeam3DCIM.domain.Role;
+
 
 
 @Component
@@ -25,12 +27,12 @@ public class JpaApplication implements ApplicationRunner {
                 .memberId("user")
                 .password("1234")
                 .name("김운영")
-                .role(Member.Role.USER).build());
+                .role(Role.USER).build());
         memberRepository.save(Member.builder()
                 .memberId("admin")
                 .password("1234")
                 .name("관리자")
-                .role(Member.Role.ADMIN).build());
+                .role(Role.ADMIN).build());
         rackRepository.save(Rack.builder()
                         .rackName("A-01")
                         .totalUnit((long) 42)

@@ -1,12 +1,16 @@
 package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.Rack;
+import com.example.KHTeam3DCIM.dto.Rack.RackCreateRequest;
+import com.example.KHTeam3DCIM.dto.Rack.RackResponse;
+import com.example.KHTeam3DCIM.dto.Rack.RackUpdateRequest;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -15,35 +19,51 @@ public class RackService {
 
     private final RackRepository rackRepository;
 
-    // 1. 전체 랙 조회
-    public List<Rack> findAllRacks() {
-        return rackRepository.findAll();
+    // 전체 조회
+    public List<RackResponse> findAllRacks() {
+        return rackRepository.findAll()
+                .stream()
+                .map(r -> RackResponse.builder()
+                        .id(r.getId())
+                        .rackName(r.getRackName())
+                        .totalUnit(r.getTotalUnit())
+                        .locationDesc(r.getLocationDesc())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    // 2. 랙 아이디로 조회 (존재하지 않으면 예외 발생)
-    public Rack findByIdOrThrow(Long id) {
-        return rackRepository.findById(id)
+    // 단일 조회
+    public RackResponse findRackById(Long id) {
+        Rack rack = rackRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rack이 존재하지 않습니다."));
+        return RackResponse.builder()
+                .id(rack.getId())
+                .rackName(rack.getRackName())
+                .totalUnit(rack.getTotalUnit())
+                .locationDesc(rack.getLocationDesc())
+                .build();
     }
 
-    // 3. 랙 추가
-    public Rack addRack(Rack rack) {
-        return rackRepository.save(rack);
+    // Rack 추가
+    public RackResponse addRack(RackCreateRequest request) {
+        Rack rack = Rack.builder()
+                .rackName(request.getRackName())
+                .totalUnit(request.getTotalUnit() != null ? request.getTotalUnit() : 42L)
+                .locationDesc(request.getLocationDesc())
+                .build();
+        Rack saved = rackRepository.save(rack);
+        return RackResponse.builder()
+                .id(saved.getId())
+                .rackName(saved.getRackName())
+                .totalUnit(saved.getTotalUnit())
+                .locationDesc(saved.getLocationDesc())
+                .build();
     }
 
-    // 4. 랙 정보 수정 (전체 업데이트)
-    // put은 일단 작성했지만, patch가 있기에 생략 필요하다면 활성화해서 이용 가능한 부분
-//    public Rack updateRack(Rack rack) {
-//        if (!rackRepository.existsById(rack.getid())) {
-//            throw new RuntimeException("Rack이 존재하지 않습니다.");
-//        }
-//        return rackRepository.save(rack);
-//    }
-
-    // 4-1. 랙 부분 수정 (Patch 용)
+    // Rack 부분 수정
     @Transactional
-    public Rack updateRackPartially(Long id, Rack patch) {
-        return rackRepository.findById(id)
+    public RackResponse updateRackPartially(Long id, RackUpdateRequest patch) {
+        Rack updated = rackRepository.findById(id)
                 .map(existing -> {
                     if (patch.getRackName() != null) existing.setRackName(patch.getRackName());
                     if (patch.getTotalUnit() != null) existing.setTotalUnit(patch.getTotalUnit());
@@ -51,9 +71,16 @@ public class RackService {
                     return rackRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("Rack이 존재하지 않습니다."));
+
+        return RackResponse.builder()
+                .id(updated.getId())
+                .rackName(updated.getRackName())
+                .totalUnit(updated.getTotalUnit())
+                .locationDesc(updated.getLocationDesc())
+                .build();
     }
 
-    // 5. 랙 삭제
+    // Rack 삭제
     public void deleteRack(Long id) {
         if (!rackRepository.existsById(id)) {
             throw new RuntimeException("Rack이 존재하지 않습니다.");

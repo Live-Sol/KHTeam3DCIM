@@ -25,9 +25,4 @@ public class Member {
     @Builder.Default
     private Role role = Role.USER;
 
-    public enum Role {
-        ADMIN,
-        USER
-    }
-
 }

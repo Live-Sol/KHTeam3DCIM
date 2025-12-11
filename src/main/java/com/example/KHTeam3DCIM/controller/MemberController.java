@@ -1,15 +1,16 @@
 package com.example.KHTeam3DCIM.controller;
 
-import com.example.KHTeam3DCIM.domain.Member;
-import com.example.KHTeam3DCIM.repository.MemberRepository;
+import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
+import com.example.KHTeam3DCIM.dto.Member.MemberCreateRequest;
+import com.example.KHTeam3DCIM.dto.Member.MemberResponse;
+import com.example.KHTeam3DCIM.dto.Member.MemberUpdateRequest;
 import com.example.KHTeam3DCIM.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/members")
@@ -17,65 +18,53 @@ import java.util.Optional;
 public class MemberController {
     private final MemberService memberService;
 
-    // 전체 회원 조회
+    // 전체 회원 조회(회원용)
     @GetMapping
-    public List<Member> getAllMembers() {
-        return memberService.findAllMembers();
+    public List<MemberResponse> getAllMembersUser() {
+        return memberService.findAllMembersUser();
+    }
+    // 전체 회원 조회 (관리자용)
+    @GetMapping("/admin")
+    public List<MemberAdminResponse> getAllMembersAdmin() {
+        return memberService.findAllMembersAdmin();
     }
 
-    // 회원 조회
+    // 특정 회원 조회
     @GetMapping("/{memberId}")
-    public ResponseEntity<Member> getMemberById(@PathVariable String memberId) {
+    public ResponseEntity<MemberResponse> getMemberById(@PathVariable String memberId) {
         try{
-            Member member = memberService.findByMemberIdOrThrow(memberId);
+            MemberResponse member = memberService.findMemberById(memberId);
             return ResponseEntity.ok(member);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-//    나중에 DTO 생성시 아래의 스크립트 추가 후
-//    public class MemberResponse {
-//        private Member member;
-//        private String message;
-//
-//        // 생성자, getter, setter
-//        public MemberResponse(Member member, String message) {
-//            this.member = member;
-//            this.message = message;
-//        }
-//    }
-
-//    회원 조회를 아래와 같이 하면 조회 실패시 메시지와 함께 null 값 리턴
-//    (현재는 DB에 없는 데이터 조회시 메세지 없이  null 값 리턴 하는 상태)
-//    @GetMapping("/{memberId}")
-//    public MemberResponse getMember(@PathVariable String memberId) {
-//        Optional<Member> member = memberService.findById(memberId);
-//        if (member.isEmpty()) {
-//            return new MemberResponse(null, "조회 불가");
-//        }
-//        return new MemberResponse(member.get(), null); // 조회 성공 메시지는 생략
-//    }
-
-    // 3. 회원 추가
+    // 회원 추가
     @PostMapping
-    public Member createMember(@RequestBody Member member) {
-        return memberService.addMember(member);
+    public ResponseEntity<MemberResponse> createMember(@RequestBody MemberCreateRequest member) {
+        MemberResponse response = memberService.addMember(member);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
     }
 
-    // 4. 회원 정보 수정
+    // 회원 정보 수정
     @PatchMapping("/{memberId}")
-    public ResponseEntity<Member> patchMember(@PathVariable String memberId,
-        @RequestBody Member patch) {
-        Member updated = memberService.updateMember(memberId, patch);
-        if(updated == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<MemberResponse> patchMember(@PathVariable String memberId,
+        @RequestBody MemberUpdateRequest patch) {
+        try{
+            MemberResponse response = memberService.updateMember(memberId, patch);
+            return ResponseEntity.ok(response);
+        }catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // 5. 회원 정보 삭제
+    // 회원 정보 삭제
     @DeleteMapping("/{memberId}")
-    public void deleteMember(@PathVariable String memberId) {
+    public ResponseEntity<Void> deleteMember(@PathVariable String memberId) {
         memberService.deleteMember(memberId);
+        return ResponseEntity.noContent().build();
     }
 
 
