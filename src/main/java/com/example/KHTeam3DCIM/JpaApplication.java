@@ -33,9 +33,9 @@ public class JpaApplication implements ApplicationRunner {
                 .password("1234")
                 .name("관리자")
                 .role(Role.ADMIN).build());
-        rackRepository.save(Rack.builder()
-                        .rackName("A-01")
-                        .totalUnit((long) 42)
-                        .locationDesc("3층 메인 전산실 입구 좌측").build());
+//        rackRepository.save(Rack.builder()
+//                        .rackName("A-01")
+//                        .totalUnit((long) 42)
+//                        .locationDesc("3층 메인 전산실 입구 좌측").build());
     }
 }
