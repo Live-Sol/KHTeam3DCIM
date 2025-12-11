@@ -1,21 +1,128 @@
 <!-- http://localhost:8080/   메인화면   -->
 
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>DCIM Dashboard</title>
+    <!-- 부트스트랩 & 아이콘(Bootstrap Icons) CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .card-hover:hover { transform: translateY(-5px); transition: 0.3s; cursor: pointer;}
+        .stat-card { border-left: 5px solid gray; }
+        .border-primary-left { border-left-color: #0d6efd !important; }
+        .border-success-left { border-left-color: #198754 !important; }
+        .border-warning-left { border-left-color: #ffc107 !important; }
+    </style>
 </head>
-<body>
-<div class="container mt-5 text-center">
-    <h1>🏭   [ DCIM System ]</h1>
-    <p class="lead">데이터센터 통합 관리 시스템에 오신 것을 환영합니다.</p>
+<body class="bg-light">
 
-    <div class="mt-4">
-        <a href="/devices" class="btn btn-lg btn-success">🖥️ Divice장비 관리로 이동</a>
-        <button class="btn btn-lg btn-secondary" disabled>🏢 Rack랙 관리 (준비중)</button>
+<!-- 헤더 (나중에 header.html로 분리 가능) -->
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1">🏭 KHTeam3 DCIM System</span>
+        <span class="text-white">Admin 접속중</span>
     </div>
+</nav>
+
+<div class="container">
+
+    <!-- 1. 통계 카드 영역 -->
+    <div class="row mb-4">
+        <!-- 랙 통계 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm stat-card border-primary-left card-hover">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Racks</h6>
+                    <h2 class="fw-bold text-primary">
+                        <i class="bi bi-hdd-rack"></i>
+                        <span th:text="${totalRacks}">0</span>
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <!-- 장비 통계 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm stat-card border-success-left card-hover">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Devices</h6>
+                    <h2 class="fw-bold text-success">
+                        <i class="bi bi-server"></i>
+                        <span th:text="${totalDevices}">0</span>
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <!-- 대기중인 신청 -->
+        <div class="col-md-4">
+            <div class="card shadow-sm stat-card border-warning-left card-hover"
+                 onclick="location.href='/requests'">
+                <div class="card-body">
+                    <h6 class="text-muted">Waiting Requests</h6>
+                    <h2 class="fw-bold text-warning">
+                        <i class="bi bi-bell"></i>
+                        <span th:text="${waitingRequests}">0</span> 건
+                    </h2>
+                    <small th:if="${waitingRequests > 0}" class="text-danger fw-bold">승인 처리가 필요합니다!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 바로가기 메뉴 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex gap-2">
+                    <a href="/devices" class="btn btn-outline-primary btn-lg flex-grow-1">
+                        <i class="bi bi-pc-display"></i> 장비 관리 (Device)
+                    </a>
+                    <a href="/requests/new" class="btn btn-outline-success btn-lg flex-grow-1">
+                        <i class="bi bi-pencil-square"></i> 입주 신청 (User Mode)
+                    </a>
+                    <a href="/requests" class="btn btn-outline-warning btn-lg flex-grow-1">
+                        <i class="bi bi-check-circle"></i> 승인 관리 (Admin Mode)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 최근 활동 로그 (DcLog) -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> 최근 활동 내역 (Recent Logs)</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>시간</th>
+                    <th>사용자</th>
+                    <th>대상 장비</th>
+                    <th>작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${recentLogs}">
+                    <td th:text="${#temporals.format(log.logDate, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 12:00</td>
+                    <td><span class="badge bg-secondary" th:text="${log.memberId}">admin</span></td>
+                    <td th:text="${log.targetDevice}">SN-1234</td>
+                    <td>
+                        <span th:if="${log.actionType == 'INSERT'}" class="text-primary fw-bold">등록</span>
+                        <span th:if="${log.actionType == 'DELETE'}" class="text-danger fw-bold">삭제</span>
+                        <span th:if="${log.actionType == 'UPDATE'}" class="text-success fw-bold">수정</span>
+                    </td>
+                </tr>
+                <tr th:if="${recentLogs.isEmpty()}">
+                    <td colspan="4" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>
