@@ -111,4 +111,29 @@ public class DeviceController {
         return "redirect:/devices";
     }
 
+    // 5.  수정 화면 보여주기
+    @GetMapping("/devices/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        // 1. 수정할 장비 정보를 가져옴
+        Device device = deviceService.findById(id); // (findById가 없다면 Service에 추가 필요, 혹은 Repo 직접 사용)
+        // ※ Service에 findById가 없다면: deviceRepository.findById(id).get() 사용
+
+        // 2. 드롭다운용 데이터 가져옴
+        model.addAttribute("racks", rackRepository.findAll());
+        model.addAttribute("categories", categoryService.findAllCategories());
+
+        // 3. 화면에 전달
+        model.addAttribute("device", device); // 기존 정보가 채워진 객체
+        model.addAttribute("isEdit", true);   // "지금은 수정 모드야!" 라고 알려줌
+
+        return "device/device_form"; // 등록 화면 재활용!
+    }
+
+    // 6.  실제 수정 처리
+    @PostMapping("/devices/{id}/edit")
+    public String update(@PathVariable Long id, Device device) {
+        deviceService.updateDevice(id, device);
+        return "redirect:/devices";
+    }
+
 }

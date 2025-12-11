@@ -106,6 +106,11 @@ public class DeviceService {
         return deviceRepository.findBySerialNum(serialNum)
                 .orElse(null);
     }
+    // ID로 장비 찾기 (수정 화면용)
+    public Device findById(Long id) {
+        return deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없음"));
+    }
+
 
     // =========================================================
     // 3. ⭐ 랙 실장도(그림)를 그리기 위한 데이터 가공 로직
@@ -199,6 +204,32 @@ public class DeviceService {
 
         // 3. 진짜 삭제
         deviceRepository.delete(device);
+    }
+
+    // ==========================================
+    // 6. ⭐ [신규] 장비 정보 수정 (Dirty Checking)
+    // ==========================================
+    @Transactional
+    public void updateDevice(Long id, Device formDevice) {
+        // 1. 기존 데이터 조회
+        Device target = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 2. 정보 수정 (덮어쓰기)
+        target.setVendor(formDevice.getVendor());
+        target.setModelName(formDevice.getModelName());
+        target.setSerialNum(formDevice.getSerialNum());
+        target.setIpAddr(formDevice.getIpAddr());
+        // (필요하다면 카테고리 등 다른 정보도 여기서 수정)
+
+        // 3. ⭐⭐⭐ 로그 남기기 (이 부분이 있어야 대시보드에 뜹니다!) ⭐⭐⭐
+        DcLog log = DcLog.builder()
+                .memberId("admin")
+                .targetDevice(target.getSerialNum())
+                .actionType("UPDATE") // "UPDATE"라고 적어야 초록색 '수정' 글씨가 뜸
+                .build();
+
+        dcLogRepository.save(log); // <--- 이 줄이 범인일 가능성 99%
     }
 
 

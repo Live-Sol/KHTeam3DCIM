@@ -63,8 +63,12 @@
                 <span class="badge bg-secondary" th:unless="${device.status == 'RUNNING'}" th:text="${device.status}">OFF</span>
             </td>
 
-            <!-- 삭제 버튼 -->
+            <!-- 관리 버튼 영역 (수정 + 삭제) -->
             <td>
+                <!-- 수정 버튼 -->
+                <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-warning">✏️</a>
+
+                <!-- 삭제 버튼 (다시 추가!) -->
                 <a th:href="@{/devices/{id}/delete(id=${device.id})}"
                    class="btn btn-sm btn-danger"
                    onclick="return confirm('정말 이 장비를 폐기(삭제) 하시겠습니까?');">🗑️</a>
