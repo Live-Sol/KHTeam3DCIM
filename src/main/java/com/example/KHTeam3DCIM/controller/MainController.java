@@ -4,10 +4,13 @@
 package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.Device;
+import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.repository.DcLogRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import com.example.KHTeam3DCIM.repository.RequestRepository;
+import com.example.KHTeam3DCIM.service.MemberService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +24,11 @@ public class MainController {
     private final DeviceRepository deviceRepository;
     private final RequestRepository requestRepository;
     private final DcLogRepository dcLogRepository;
+    // 헤더 로그인 관련
+    private final MemberService memberService;
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(Model model, HttpSession session) {  // 헤더 로그인을 위해 HttpSession session 추가
 
         // 1. 상단 카드용 숫자 데이터 조회
         long totalRacks = rackRepository.count();                           // 총 랙 개수
@@ -37,6 +42,18 @@ public class MainController {
         model.addAttribute("totalRacks", totalRacks);           // 총 랙 개수
         model.addAttribute("totalDevices", totalDevices);       // 총 장비 개수
         model.addAttribute("waitingRequests", waitingRequests); // 대기중인 신청 개수
+
+        // 4. 헤더 로그인 표시
+        String loginId = (String) session.getAttribute("loginId");
+        Member loginUser = null;
+        if (loginId != null) {
+            loginUser = memberService.findMember(loginId);
+        }
+
+        // 로그인 상태 변수를 모델에 담아 header.html에 전달합니다.
+        model.addAttribute("isLoggedIn", loginUser != null);
+        model.addAttribute("role", loginUser != null ? loginUser.getRole() : "");
+        model.addAttribute("loginId", loginId != null ? loginId : "");
 
         return "index";
     }

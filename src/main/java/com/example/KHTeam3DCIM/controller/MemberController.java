@@ -91,6 +91,13 @@ public class MemberController {
         session.setAttribute("loginId", memberId);
         return "redirect:/";
     }
+    // 로그아웃
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // 세션 삭제 → 로그인 상태 초기화
+        return "redirect:/";   // 로그아웃 후 메인페이지로 이동
+    }
+
 
 
     // 회원 정보 수정
