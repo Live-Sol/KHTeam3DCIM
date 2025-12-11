@@ -6,14 +6,14 @@ import com.example.KHTeam3DCIM.dto.Member.MemberResponse;
 import com.example.KHTeam3DCIM.dto.Member.MemberUpdateRequest;
 import com.example.KHTeam3DCIM.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
@@ -55,6 +55,11 @@ public class MemberController {
         }
     }
 
+    // 회원가입 폼 페이지
+    @GetMapping("/signup")
+    public String signupForm() {
+        return "member/signup";  // templates/member/signup.html
+    }
     // 회원 등록
     @PostMapping
     public String createMember(@ModelAttribute MemberCreateRequest member, Model model) {

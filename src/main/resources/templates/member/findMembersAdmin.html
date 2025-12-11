@@ -1,4 +1,3 @@
-<!--
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -19,7 +18,7 @@
         </tr>
         </thead>
         <tbody>
-        &lt;!&ndash; 관리자용 회원 목록을 출력 &ndash;&gt;
+        <!-- 관리자용 회원 목록을 출력 -->
         <tr th:each="member : ${members}">
             <td th:text="${member.memberId}"></td>
             <td th:text="${member.name}"></td>
@@ -30,4 +29,3 @@
 </div>
 </body>
 </html>
--->
