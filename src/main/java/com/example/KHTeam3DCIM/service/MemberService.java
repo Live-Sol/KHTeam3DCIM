@@ -100,6 +100,17 @@ public class MemberService {
                 .build();
     }
 
+    // 로그인
+    public boolean login(String memberId, String password){
+        // 회원 존재 여부 확인
+        Member member = memberRepository.findById(memberId).orElse(null);
+        if(member == null){ // 로그인 값
+            return false;   // 로그인 불가
+        }
+        // 비밀번호 일치 확인
+        return member.getPassword().equals(password);
+    }
+
     // 회원 정보 수정
     @Transactional
     public MemberResponse updateMember(String memberId, MemberUpdateRequest patch) {

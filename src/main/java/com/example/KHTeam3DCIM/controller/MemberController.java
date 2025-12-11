@@ -1,9 +1,6 @@
 package com.example.KHTeam3DCIM.controller;
 
-import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
-import com.example.KHTeam3DCIM.dto.Member.MemberCreateRequest;
-import com.example.KHTeam3DCIM.dto.Member.MemberResponse;
-import com.example.KHTeam3DCIM.dto.Member.MemberUpdateRequest;
+import com.example.KHTeam3DCIM.dto.Member.*;
 import com.example.KHTeam3DCIM.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +63,28 @@ public class MemberController {
         try {
             MemberResponse response = memberService.addMember(member);
             model.addAttribute("message", "회원가입 성공");
-            return "redirect:/login";  // 회원가입 성공 후 로그인 페이지로 리다이렉트
+            return "redirect:/members/login";  // 회원가입 성공 후 로그인 페이지로 리다이렉트
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());  // 유효성 검사 오류 메시지 전달
             return "member/signup";  // 오류가 발생하면 회원가입 페이지로 돌아감
         }
+    }
+
+    // 로그인 페이지로 이동
+    @GetMapping("/login")
+    public String loginForm() {
+        return "member/login";
+    }
+    @PostMapping("/login")
+    public String login(@RequestParam String memberId,
+                        @RequestParam String password,
+                        Model model) {
+        boolean success = memberService.login(memberId, password);
+        if(!success) {
+            model.addAttribute("error", "아이디 또는 비밀번호를 확인해주세요.");
+            return "member/login";
+        }
+        return "redirect:/";
     }
 
 
