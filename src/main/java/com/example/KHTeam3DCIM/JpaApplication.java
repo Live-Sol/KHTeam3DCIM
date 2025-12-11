@@ -1,8 +1,8 @@
 package com.example.KHTeam3DCIM;
 
 import com.example.KHTeam3DCIM.domain.Member;
-import com.example.KHTeam3DCIM.domain.Rack;
-import com.example.KHTeam3DCIM.repository.RackRepository;
+//import com.example.KHTeam3DCIM.domain.Rack;
+//import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -20,7 +20,7 @@ public class JpaApplication implements ApplicationRunner {
 
     // 실행시 member 2명, rack 1개 자동 insert 되는 기능 (충돌 발생시 생략 가능)
     private final MemberRepository memberRepository;
-    private final RackRepository rackRepository;
+//    private final RackRepository rackRepository;
     @Override
     public void run(ApplicationArguments args) throws Exception {
         memberRepository.save(Member.builder()
