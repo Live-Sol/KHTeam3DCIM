@@ -22,12 +22,20 @@
         <!-- 0. 신청서 번호를 몰래 넘겨주기 위한 히든 필드 -->
         <input type="hidden" name="reqId" th:value="${reqId}">
 
-        <!-- 1. 랙 선택(림시로 숫자 입력) -->
+        <!-- 팀원 A의 데이터와 연동된 드롭다운 -->
         <div class="mb-3">
-            <label class="form-label">설치할 랙 ID 부여 (관리자)</label> <!-- 수정해야할 부분입니다. -->
-            <!-- 최소 숫자 1부터 입력 가능 -->
-            <input type="number" name="rackId" class="form-control" min="1" value="1" required>
-            <div class="form-text">DB에 존재하는 RACK_ID를 입력해야 합니다.</div>
+            <label class="form-label">설치할 랙 선택 (관리자)</label>
+            <select name="rackId" class="form-select" required>
+                <option value="" disabled selected>--- 설치할 랙을 선택하세요 ---</option>
+
+                <!-- 컨트롤러에서 보낸 racks 리스트를 하나씩 꺼내서 보여줌 -->
+                <option th:each="rack : ${racks}"
+                        th:value="${rack.id}"
+                        th:text="|${rack.rackName} (${rack.locationDesc})|">
+                    A-01 (3층 전산실)
+                </option>
+            </select>
+            <div class="form-text">현재 등록된 랙 목록입니다.</div>
         </div>
 
         <!-- 2. 장비 종류 (신청서 기반이면 수정 불가) -->

@@ -18,13 +18,13 @@ import java.util.List;
 public class RackController {
     private final RackService rackService;
 
-    // 전체 조회
+    // 1. 전체 랙 조회
     @GetMapping
     public List<RackResponse> getAllRacks() {
         return rackService.findAllRacks();
     }
 
-    // 단일 조회
+    // 2. 단일 랙 조회
     @GetMapping("/{id}")
     public ResponseEntity<RackResponse> getRackById(@PathVariable Long id) {
         try {
@@ -35,14 +35,14 @@ public class RackController {
         }
     }
 
-    // Rack 추가
+    // 3. 랙 생성
     @PostMapping
     public ResponseEntity<RackResponse> createRack(@RequestBody RackCreateRequest request) {
         RackResponse response = rackService.addRack(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Rack 부분 수정
+    // 4. 랙 부분 수정
     @PatchMapping("/{id}")
     public ResponseEntity<RackResponse> patchRack(@PathVariable Long id,
                                                   @RequestBody RackUpdateRequest patch) {
@@ -54,7 +54,7 @@ public class RackController {
         }
     }
 
-    // Rack 삭제
+    // 5. 랙 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRack(@PathVariable Long id) {
         rackService.deleteRack(id);

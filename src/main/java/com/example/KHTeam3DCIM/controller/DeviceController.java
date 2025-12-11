@@ -5,7 +5,9 @@ package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.Category;
 import com.example.KHTeam3DCIM.domain.Device;
+import com.example.KHTeam3DCIM.domain.Rack;
 import com.example.KHTeam3DCIM.domain.Request;
+import com.example.KHTeam3DCIM.repository.RackRepository;
 import com.example.KHTeam3DCIM.repository.RequestRepository;
 import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.DeviceService;
@@ -26,6 +28,8 @@ public class DeviceController {
     private final DeviceService deviceService;
     private final CategoryService categoryService;
     private final RequestRepository requestRepostory;
+    private final RackRepository rackRepository;
+
 
     // 1. 장비 목록 페이지 보여주기
     @GetMapping("/devices")
@@ -58,10 +62,11 @@ public class DeviceController {
             }
         }
 
-        List<Category> categories = categoryService.findAllCategories(); // 카테고리 목록도 서비스에 시켜서 가져오기
-        model.addAttribute("categories", categories); // 카테고리 목록도 뷰로 보내기
-        model.addAttribute("device", device); // 빈 껍데기 장비 객체
-        model.addAttribute("reqId", reqId); // reqId도 뷰로 보내기 (자동완성 여부 확인용)
+        List<Rack> racks = rackRepository.findAll(); // 모든 랙 정보 가져오기
+        model.addAttribute("racks", racks); // 랙 정보 넘기기
+        model.addAttribute("categories", categoryService.findAllCategories()); // 모든 카테고리 정보 넘기기
+        model.addAttribute("device", device); // 장비 객체 넘기기
+        model.addAttribute("reqId", reqId); // reqId 넘기기 (자동완성 여부 확인용)
 
         return "device/form"; // templates/device/form.html을 찾아가라!
     }

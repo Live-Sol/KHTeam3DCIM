@@ -18,8 +18,8 @@ public class Rack {
     @Column(name = "RACK_ID")
     private Long id;
 
-    @Column(name = "RACK_NAME", nullable = false, length = 50)
-    private String rackName;
+    @Column(name = "RACK_NAME", nullable = false, length = 50, unique = true)   // 이름 중복을 맏는 '제약 조건' 입니다.
+    private String rackName;                                                    // unique=true 추가
 
     @Column(name = "TOTAL_UNIT", nullable = false)
     @Builder.Default
