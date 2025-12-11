@@ -4,10 +4,12 @@ import com.example.KHTeam3DCIM.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member,String> {
-//    Optional<Member> findByName(String name);   // 이름으로 멤버 조회
-//    Optional<Member> findByRole(Member.Role role);  // 역할로 멤버 조회
+    // 회원 아이디로 부분 일치 검색 (LIKE 쿼리)
+    List<Member> findByMemberIdLike(String memberId);
+    // 아이디 중복 여부 확인
+    boolean existsByMemberId(String memberId);  // 자동으로 구현됩니다.
 }

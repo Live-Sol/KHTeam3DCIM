@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,26 +44,56 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    // 회원 아이디로 조회
-    public MemberResponse findMemberById(String memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
-        return MemberResponse.builder()
-                .name(member.getName())
-                .role(member.getRole())
-                .build();
-
+    // 회원 아이디로 회원 조회
+    public List<MemberResponse> findMemberByIdOrLike(String memberId) {
+        List<Member> members = memberRepository.findByMemberIdLike("%" + memberId + "%");  // 부분 일치 검색
+        if (members.isEmpty()) {
+            throw new RuntimeException("회원이 존재하지 않습니다.");  // 예외 처리
+        }
+        return members.stream()
+                .map(m -> MemberResponse.builder()
+                        .name(m.getName())
+                        .role(m.getRole())
+                        .build())
+                .collect(Collectors.toList());
     }
+
 
     // 회원 등록
     public MemberResponse addMember(MemberCreateRequest request) {
+        // 아이디 유효성 검사
+        String memberId = request.getMemberId();
+        if (!Pattern.matches("^[a-z0-9]{4,20}$", memberId)) {
+            throw new RuntimeException("아이디는 알파벳 소문자와 숫자만 가능하며, 4~20글자여야 합니다.");
+        }
+        // 아이디 중복 검사
+        if (memberRepository.existsByMemberId(memberId)) {
+            throw new RuntimeException("이미 존재하는 아이디입니다.");
+        }
+
+        // 비밀번호 유효성 검사
+        String password = request.getPassword();
+        if (password.length() < 4 || password.length() > 20) {
+            throw new RuntimeException("비밀번호는 4~20글자 사이여야 합니다.");
+        }
+
+        // 이름 유효성 검사
+        String name = request.getName();
+        if (!Pattern.matches("^[a-zA-Z가-힣]{2,10}$", name)) {
+            throw new RuntimeException("이름은 한글과 알파벳만 가능하며, 2~10글자여야 합니다.");
+        }
+
+        // 회원 객체 생성 및 저장
         Member member = Member.builder()
-                .memberId(request.getMemberId())
-                .password(request.getPassword())    // 필요시 암호화
-                .name(request.getName())
-                .role(Role.USER)    // 가입시 기본값 USER로 가입
+                .memberId(memberId)
+                .password(password)  // 필요시 암호화
+                .name(name)
+                .role(Role.USER)  // 기본값 USER로 설정
                 .build();
+
         Member saved = memberRepository.save(member);
+
+        // 회원 응답 반환
         return MemberResponse.builder()
                 .name(saved.getName())
                 .role(saved.getRole())

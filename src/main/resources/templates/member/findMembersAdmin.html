@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전체 회원 조회 (관리자)</title>
+    <link rel="stylesheet" href="/static/css/memberStyle.css">
+</head>
+<body>
+<div class="container">
+    <h2>전체 회원 조회 (관리자)</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>회원 ID</th>
+            <th>이름</th>
+            <th>역할</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 관리자용 회원 목록을 출력 -->
+        <tr th:each="member : ${members}">
+            <td th:text="${member.memberId}"></td>
+            <td th:text="${member.name}"></td>
+            <td th:text="${member.role}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

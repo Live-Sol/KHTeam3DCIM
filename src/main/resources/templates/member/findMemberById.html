@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 조회</title>
+    <link rel="stylesheet" href="/static/css/memberStyle.css">
+</head>
+<body>
+<div class="container">
+    <h2>회원 조회</h2>
+    <!-- 오류 메시지 -->
+    <div th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+
+    <!-- 회원 정보가 여러 명 조회된 경우 -->
+    <div th:if="${members}">
+        <h3>검색된 회원 목록</h3>
+        <ul>
+            <li th:each="member : ${members}">
+                <span th:text="${member.name}"></span> - <span th:text="${member.role}"></span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 회원 정보가 정확히 한 명 조회된 경우 -->
+    <div th:if="${member}">
+        <h3>회원 정보</h3>
+        <p>이름: <span th:text="${member.name}"></span></p>
+        <p>역할: <span th:text="${member.role}"></span></p>
+    </div>
+</div>
+</body>
+</html>
