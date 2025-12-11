@@ -10,6 +10,7 @@ import com.example.KHTeam3DCIM.domain.Category;
 import com.example.KHTeam3DCIM.domain.DcLog;
 import com.example.KHTeam3DCIM.domain.Device;
 import com.example.KHTeam3DCIM.domain.Rack;
+import com.example.KHTeam3DCIM.dto.Rack.RackDetailDto; // [추가] DTO 위치 확인!
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import com.example.KHTeam3DCIM.repository.DcLogRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -95,15 +97,75 @@ public class DeviceService {
     public List<Device> findAllDevices() {
         return deviceRepository.findAll();
     }
-
     // 특정 랙에 있는 장비만 가져오기
     public List<Device> findDevicesByRack(Long rackId) {
         return deviceRepository.findByRackId(rackId);
     }
-
     // 시리얼 넘버로 찾기 (검색)
     public Device findBySerial(String serialNum) {
         return deviceRepository.findBySerialNum(serialNum)
                 .orElse(null);
     }
+
+    // =========================================================
+    // 3. ⭐ 랙 실장도(그림)를 그리기 위한 데이터 가공 로직
+    // =========================================================
+    public List<RackDetailDto> getRackViewData(Long rackId) {
+
+        // 1. 해당 랙의 총 높이(42U) 가져오기
+        Rack rack = rackRepository.findById(rackId)
+                .orElseThrow(() -> new IllegalArgumentException("없는 랙입니다."));
+        int totalHeight = rack.getTotalUnit().intValue();
+
+        // 2. 42칸짜리 빈 배열(리스트) 만들기 (인덱스 1~42를 편하게 쓰기 위해 크기+1)
+        RackDetailDto[] slots = new RackDetailDto[totalHeight + 1];
+
+        // 3. 일단 전부 '빈 슬롯'으로 초기화
+        for (int i = 1; i <= totalHeight; i++) {
+            slots[i] = RackDetailDto.builder()
+                    .unitNum(i)
+                    .status("EMPTY") // 빈 칸
+                    .deviceName("")
+                    .rowSpan(1)
+                    .build();
+        }
+
+        // 4. DB에서 실제 장비들 가져와서 배치하기
+        List<Device> devices = deviceRepository.findByRackId(rackId);
+
+        for (Device d : devices) {
+            int start = d.getStartUnit();
+            int height = d.getHeightUnit();
+
+            // (1) 장비가 시작되는 칸 (예: 10번) -> 정보 채우기
+            if (start <= totalHeight) {
+                slots[start].setStatus("FULL");
+                slots[start].setDeviceName(d.getVendor() + " " + d.getModelName());
+                // category가 null일 수 있으니 안전하게 처리
+                if (d.getCategory() != null) {
+                    slots[start].setType(d.getCategory().getId());
+                } else {
+                    slots[start].setType("ETC");
+                }
+                slots[start].setRowSpan(height); // 2칸 차지하면 rowspan=2
+                slots[start].setDeviceId(d.getId());
+            }
+
+            // (2) 장비가 차지하는 나머지 칸들 (예: 11번) -> 'SKIP' 처리
+            for (int j = 1; j < height; j++) {
+                if (start + j <= totalHeight) {
+                    slots[start + j].setStatus("SKIP");
+                }
+            }
+        }
+
+        // 5. 배열을 리스트로 변환 (화면은 42번부터 1번 순서로 그려야 하니까 뒤집기!)
+        List<RackDetailDto> result = new ArrayList<>();
+        for (int i = totalHeight; i >= 1; i--) { // 42, 41, 40 ... 1
+            result.add(slots[i]);
+        }
+
+        return result;
+    }
+
 }

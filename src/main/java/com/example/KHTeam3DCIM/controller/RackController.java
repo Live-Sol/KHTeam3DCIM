@@ -1,7 +1,9 @@
 package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.dto.Rack.RackCreateRequest;
+import com.example.KHTeam3DCIM.dto.Rack.RackDetailDto;
 import com.example.KHTeam3DCIM.dto.Rack.RackResponse;
+import com.example.KHTeam3DCIM.service.DeviceService;
 import com.example.KHTeam3DCIM.service.RackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import java.util.List;
 public class RackController {
 
     private final RackService rackService;
+    private final DeviceService deviceService;
 
     // 1. 랙 목록 페이지 (http://localhost:8080/racks)
     @GetMapping("/racks")
@@ -48,5 +51,24 @@ public class RackController {
     public String delete(@PathVariable Long id) {
         rackService.deleteRack(id);
         return "redirect:/racks";
+    }
+
+    // ==========================================
+    // ⭐ [신규 추가] 랙 실장도 화면 연결
+    // ==========================================
+    @GetMapping("/racks/{id}/view")
+    public String viewRack(@PathVariable Long id, Model model) {
+
+        // 1. DeviceService에게 "42칸짜리 그림 데이터" 요청
+        List<RackDetailDto> rackView = deviceService.getRackViewData(id);
+
+        // 2. RackService에게 "이 랙 이름이랑 정보" 요청
+        RackResponse rack = rackService.findRackById(id);
+
+        // 3. 화면으로 보내기
+        model.addAttribute("rackView", rackView);
+        model.addAttribute("rack", rack);
+
+        return "rack/rack_view"; // templates/rack/rack_view.html 파일로 이동
     }
 }

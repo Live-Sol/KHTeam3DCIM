@@ -31,6 +31,7 @@ public class DeviceController {
     private final RackRepository rackRepository;
 
 
+
     // 1. 장비 목록 페이지 보여주기
     @GetMapping("/devices")
     public String list(Model model) {
@@ -92,4 +93,6 @@ public class DeviceController {
         }
         return "redirect:/devices"; // 저장이 끝나면 목록 페이지로 강제 이동(Redirect)
     }
+
+
 }
