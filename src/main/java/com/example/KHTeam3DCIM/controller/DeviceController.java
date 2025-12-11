@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,13 +33,22 @@ public class DeviceController {
 
 
 
-    // 1. 장비 목록 페이지 보여주기
+    // 1. 장비 목록 페이지 보여주기 (+ 검색 기능)
     @GetMapping("/devices")
-    public String list(Model model) {
-        // 서비스한테 "장비 다 가져와" 시키기
-        List<Device> devices = deviceService.findAllDevices();
-        // 가져온 보따리를 'devices'라는 이름표를 붙여서 HTML로 보냄
-        model.addAttribute("devices", devices);
+    public String list(Model model, @RequestParam(required = false) String keyword) {
+
+        List<Device> devices;
+
+        // 검색어가 있으면 검색하고, 없으면 전체 조회
+        if (keyword != null && !keyword.isEmpty()) {
+            devices = deviceService.searchDevices(keyword);
+        } else {
+            devices = deviceService.findAllDevices();
+        }
+
+        model.addAttribute("devices", devices); // 장비 목록 넘기기
+        model.addAttribute("keyword", keyword); // 검색창에 검색어 유지하려고
+
         return "device/device_list";
     }
 
@@ -94,5 +104,11 @@ public class DeviceController {
         return "redirect:/devices"; // 저장이 끝나면 목록 페이지로 강제 이동(Redirect)
     }
 
+    // 4.  장비 삭제 처리
+    @GetMapping("/devices/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        deviceService.deleteDevice(id);
+        return "redirect:/devices";
+    }
 
 }

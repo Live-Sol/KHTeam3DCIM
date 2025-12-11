@@ -17,8 +17,8 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 2. 시리얼 번호로 장비 찾기 (검색용)
     Optional<Device> findBySerialNum(String serialNum);
 
-    // 3. 제조사별로 몇 대인지 세어줘 (메인화면 통계용)
-    // 예: Dell 5대, HP 3대...
-    // (나중에 추가할 부분이라 지금은 비워두겠습니다)
-
+    // 3. 통합 검색 (제조사 OR 모델명 OR 시리얼번호 포함 검색)
+    // Containing: 앞뒤로 % 붙여서 검색 (LIKE %keyword%)
+    // IgnoreCase: 대소문자 구분 안 함
+    List<Device> findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(String vendor, String modelName, String serialNum);
 }

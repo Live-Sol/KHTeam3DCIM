@@ -12,40 +12,69 @@
 <body>
 <div class="container mt-5">
     <h2 class="mb-4">🖥️ 자산(Device) 관리 리스트</h2>
-    <div class="d-flex justify-content-end mb-3">
-        <a href="/devices/new" class="btn btn-primary">➕ 새 장비 등록</a>
+
+    <!-- 검색창 및 버튼 영역 -->
+    <div class="d-flex justify-content-between mb-3">
+        <!-- 검색 폼 -->
+        <form action="/devices" method="get" class="d-flex" style="width: 400px;">
+            <input type="text" name="keyword" class="form-control me-2"
+                   placeholder="모델명, 제조사, 시리얼 검색..." th:value="${keyword}">
+            <button type="submit" class="btn btn-outline-dark">🔍검색</button>
+        </form>
+
+        <div>
+            <a href="/" class="btn btn-secondary me-2">🏠 홈으로</a>
+            <a href="/devices/new" class="btn btn-primary">➕ 새 장비 등록</a>
+        </div>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>위치(Rack)</th>
-                <th>구분</th>
-                <th>제조사/모델</th>
-                <th>시리얼번호</th>
-                <th>설치위치</th>
-                <th>상태</th>
-            </tr>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>위치(Rack)</th>
+            <th>구분</th>
+            <th>제조사/모델</th>
+            <th>시리얼번호</th>
+            <th>설치위치</th>
+            <th>상태</th>
+            <th>관리</th> <!-- [추가] 관리 컬럼 -->
+        </tr>
         </thead>
         <tbody>
-            <tr th:each="device : ${devices}">
-                <td th:text="${device.id}">1</td>
-                <!-- 랙 정보가 없으면 '미정' 출력 (null 처리) -->
-                <td th:text="${device.rack != null ? device.rack.rackName : '미배정'}">A-01</td>
-                <td th:text="${device.category.name}">서버</td>
-                <td>
-                    <span th:text="${device.vendor}">Dell</span>
-                    <span th:text="${device.modelName}">R740</span>
-                </td>
-                <td th:text="${device.serialNum}">SN-1234</td>
-                <td>
-                    <span th:text="${device.startUnit}">10</span>U ~
-                    <span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
-                </td>
-                <td>
-                    <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">가동중</span>
-                    <span class="badge bg-secondary" th:unless="${device.status == 'RUNNING'}" th:text="${device.status}">OFF</span>
-                </td>
+        <tr th:each="device : ${devices}">
+            <td th:text="${device.id}">1</td>
+            <td th:text="${device.rack != null ? device.rack.rackName : '미배정'}">A-01</td>
+            <td>
+                <span th:if="${device.category != null}" th:text="${device.category.name}">서버</span>
+                <span th:unless="${device.category != null}" class="text-muted">-</span>
+            </td>
+            <td>
+                <span th:text="${device.vendor}">Dell</span>
+                <span th:text="${device.modelName}">R740</span>
+            </td>
+            <td th:text="${device.serialNum}">SN-1234</td>
+            <td>
+                <span th:text="${device.startUnit}">10</span>U ~
+                <span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
+            </td>
+            <td>
+                <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">가동중</span>
+                <span class="badge bg-secondary" th:unless="${device.status == 'RUNNING'}" th:text="${device.status}">OFF</span>
+            </td>
+
+            <!-- 삭제 버튼 -->
+            <td>
+                <a th:href="@{/devices/{id}/delete(id=${device.id})}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('정말 이 장비를 폐기(삭제) 하시겠습니까?');">🗑️</a>
+            </td>
+        </tr>
+        <!-- 데이터 없을 때 안내 메시지 -->
+        <tr th:if="${devices.isEmpty()}">
+            <td colspan="8" class="text-center py-4 text-muted">
+                데이터가 없습니다.
+            </td>
         </tr>
         </tbody>
     </table>

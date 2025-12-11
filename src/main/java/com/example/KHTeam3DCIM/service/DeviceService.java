@@ -168,4 +168,38 @@ public class DeviceService {
         return result;
     }
 
+
+    // ==========================================
+    // 4. 장비 검색 기능
+    // ==========================================
+    public List<Device> searchDevices(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findAllDevices(); // 검색어 없으면 전체 조회
+        }
+        // 제조사, 모델명, 시리얼 3군데서 다 찾아봄
+        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(keyword, keyword, keyword);
+    }
+
+    // ==========================================
+    // 5. 장비 삭제 기능
+    // ==========================================
+    @Transactional
+    public void deleteDevice(Long id) {
+        // 1. 장비가 있는지 확인
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+
+        // 2. 로그 남기기 (삭제 이력)
+        DcLog log = DcLog.builder()
+                .memberId("admin") // 나중엔 실제 로그인한 ID
+                .targetDevice(device.getSerialNum())
+                .actionType("DELETE")
+                .build();
+        dcLogRepository.save(log);
+
+        // 3. 진짜 삭제
+        deviceRepository.delete(device);
+    }
+
+
 }
