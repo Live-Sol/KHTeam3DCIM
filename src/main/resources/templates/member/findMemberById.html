@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,12 +10,12 @@
 <body>
 <div class="container">
     <h2>회원 조회</h2>
-    <!-- 오류 메시지 -->
+    &lt;!&ndash; 오류 메시지 &ndash;&gt;
     <div th:if="${error}">
         <p th:text="${error}"></p>
     </div>
 
-    <!-- 회원 정보가 여러 명 조회된 경우 -->
+    &lt;!&ndash; 회원 정보가 여러 명 조회된 경우 &ndash;&gt;
     <div th:if="${members}">
         <h3>검색된 회원 목록</h3>
         <ul>
@@ -24,7 +25,7 @@
         </ul>
     </div>
 
-    <!-- 회원 정보가 정확히 한 명 조회된 경우 -->
+    &lt;!&ndash; 회원 정보가 정확히 한 명 조회된 경우 &ndash;&gt;
     <div th:if="${member}">
         <h3>회원 정보</h3>
         <p>이름: <span th:text="${member.name}"></span></p>
@@ -33,3 +34,4 @@
 </div>
 </body>
 </html>
+-->
