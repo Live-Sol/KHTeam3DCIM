@@ -11,51 +11,82 @@
 <div class="container mt-5" style="max-width: 600px;">
     <h2 class="mb-4">➕신규 장비 등록</h2>
 
+    <!-- 만약if 승인 건이라면 안내 메시지 표시 -->
+    <div class="alert alert-success" th:if="${reqId != null}">
+        🔔 <strong>장비 신청 승인</strong> 건입니다. 정보가 자동으로 입력되었습니다.<br>
+        랙 위치와 시리얼 번호만 입력하고 등록하세요.
+    </div>
+
     <form action="/devices/new" method="post">
+
+        <!-- 0. 신청서 번호를 몰래 넘겨주기 위한 히든 필드 -->
+        <input type="hidden" name="reqId" th:value="${reqId}">
 
         <!-- 1. 랙 선택(림시로 숫자 입력) -->
         <div class="mb-3">
-            <label class="form-label">설치할 랙 ID (숫자)</label>
+            <label class="form-label">설치할 랙 ID 부여 (관리자)</label> <!-- 수정해야할 부분입니다. -->
             <!-- 최소 숫자 1부터 입력 가능 -->
             <input type="number" name="rackId" class="form-control" min="1" value="1" required>
             <div class="form-text">DB에 존재하는 RACK_ID를 입력해야 합니다.</div>
         </div>
 
-        <!-- 2. 장비 종류 구분 (드롭다운) -->
-        <div class="mb-3">
+        <!-- 2. 장비 종류 (신청서 기반이면 수정 불가) -->
+        <div class="mb-3" th:if="${reqId == null}"> <!-- 일반 등록일 때 -->
             <label class="form-label">장비 종류</label>
             <select name="cateId" class="form-select">
-                <option th:each="cate : ${categories}"
-                        th:value="${cate.id}"
-                        th:text="${cate.name}">서버</option>
+                <option th:each="cate : ${categories}" th:value="${cate.id}" th:text="${cate.name}">서버</option>
             </select>
         </div>
+        <div class="mb-3" th:if="${reqId != null}"> <!-- 승인 건일 때 (읽기전용) -->
+            <label class="form-label">장비 종류 (수정불가)</label>
+            <select class="form-select bg-light" disabled>
+                <option th:each="cate : ${categories}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${cate.id == selectedCateId}">서버</option>
+            </select>
+            <input type="hidden" name="cateId" th:value="${selectedCateId}">
+        </div>
 
-        <!-- 3. 기본 정보 -->
-        <div class="mb-3">
-            <label class="form-label">제조사</label>
-            <input type="text" name="vendor" class="form-control" placeholder="예: Dell, HP" required>
+        <!-- 3. 제조사 & 모델명 (신청서 기반이면 수정 불가) -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">제조사</label>
+                <!-- reqId가 있으면 readonly 속성 추가 & 배경색 회색(bg-light) 처리 -->
+                <input type="text" name="vendor" class="form-control"
+                       placeholder="Dell" th:value="${device.vendor}"
+                       th:readonly="${reqId != null}"
+                       th:classappend="${reqId != null} ? 'bg-light'">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">모델명</label>
+                <input type="text" name="modelName" class="form-control"
+                       placeholder="R740" th:value="${device.modelName}"
+                       th:readonly="${reqId != null}"
+                       th:classappend="${reqId != null} ? 'bg-light'">
+            </div>
         </div>
-        <div class="mb-3">
-            <label class="form-label">모델명</label>
-            <input type="text" name="modelName" class="form-control" placeholder="예: R740, ProLiant DL380" required>
-        </div>
+
+        <!-- 4. 시리얼 번호 -->
         <div class="mb-3">
             <label class="form-label">시리얼 번호</label>
             <input type="text" name="serialNum" class="form-control" placeholder="예: SN-123456" required>
         </div>
 
-        <!-- 4. 설치 위치 -->
-        <div class="mb-3">
-            <label class="form-label">시작 위치 (U)</label>
-            <input type="number" name="startUnit" class="form-control" min="1" max="42"  placeholder="예: 1~42" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">장비 높이 (U)</label>
-            <input type="number" name="heightUnit" class="form-control" min="1" value="1" required>
+        <!-- 5. 설치 위치 -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">설치될 랙의 시작 위치 (U)</label>
+                <input type="number" name="startUnit" class="form-control" min="1" max="42"  placeholder="'장비 높이' 고려, 1~42 U" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">장비 높이 (U)</label>
+                <!-- 높이는 장비 스펙이므로 수정 불가 -->
+                <input type="number" name="heightUnit" class="form-control"
+                       value="1" th:value="${device.heightUnit != null ? device.heightUnit : 1}" required
+                       th:readonly="${reqId != null}"
+                       th:classappend="${reqId != null} ? 'bg-light'">
+            </div>
         </div>
 
-        <!-- 5. 기타 정보 -->
+        <!-- 6. 기타 정보 -->
         <div class="mb-3">
             <label class="form-label">관리 IP 주소</label>
             <input type="text" name="ipAddr" class="form-control" placeholder="예: 192.168.x.x" required>
