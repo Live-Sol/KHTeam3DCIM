@@ -156,10 +156,12 @@ public class DeviceService {
             }
             slots[end].setRowSpan(height);
             slots[end].setDeviceId(d.getId());
+            slots[end].setRunStatus(d.getStatus()); // 장비 상태(RUNNING/OFF)
 
             // (2) 나머지 아래쪽 칸들은 'SKIP' (Top 칸이 덮어주므로 비워둠)
             for (int j = start; j < end; j++) {
                 slots[j].setStatus("SKIP");
+                slots[j].setRunStatus(d.getStatus()); // 아래쪽 칸들도 "형님(맨 윗칸)"을 따라서 상태 정보를 가짐
             }
         }
 
@@ -206,7 +208,7 @@ public class DeviceService {
     }
 
     // ==========================================
-    // 6. ⭐ [신규] 장비 정보 수정 (Dirty Checking)
+    // 6. 장비 정보 수정 (Dirty Checking)
     // ==========================================
     @Transactional
     public void updateDevice(Long id, Device formDevice) {
@@ -220,16 +222,44 @@ public class DeviceService {
         target.setSerialNum(formDevice.getSerialNum());
         target.setIpAddr(formDevice.getIpAddr());
         // (필요하다면 카테고리 등 다른 정보도 여기서 수정)
+        // target.setCategory(categoryRepository.findById(formDevice.getCategory().getId())...);
 
-        // 3. ⭐⭐⭐ 로그 남기기 (이 부분이 있어야 대시보드에 뜹니다!) ⭐⭐⭐
+        // 3. ⭐ 로그 남기기 (이 부분이 있어야 대시보드에 뜹니다!) ⭐
         DcLog log = DcLog.builder()
                 .memberId("admin")
                 .targetDevice(target.getSerialNum())
                 .actionType("UPDATE") // "UPDATE"라고 적어야 초록색 '수정' 글씨가 뜸
                 .build();
 
-        dcLogRepository.save(log); // <--- 이 줄이 범인일 가능성 99%
+        dcLogRepository.save(log);
+
+        // 4. save() 호출 안 해도 트랜잭션이 끝나면 알아서 DB에 반영됨 (Dirty Checking)
     }
 
+    // ==========================================
+    // 7. 전원 스위치 (ON <-> OFF)
+    // ==========================================
+    @Transactional
+    public String toggleStatus(Long id) {
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 현재 상태가 RUNNING이면 OFF로, 아니면 RUNNING으로 변경
+        if ("RUNNING".equals(device.getStatus())) {
+            device.setStatus("OFF");
+        } else {
+            device.setStatus("RUNNING");
+        }
+
+        // 로그 남기기
+        dcLogRepository.save(DcLog.builder()
+                .memberId("admin")
+                .targetDevice(device.getSerialNum())
+                .actionType("POWER_" + device.getStatus())
+                .build());
+
+
+        return device.getStatus(); // 변경된 상태 리턴
+    }
 
 }

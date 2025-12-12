@@ -38,7 +38,7 @@
             <th>시리얼번호</th>
             <th>설치위치</th>
             <th>상태</th>
-            <th>관리</th> <!-- [추가] 관리 컬럼 -->
+            <th>관리</th>
         </tr>
         </thead>
         <tbody>
@@ -59,7 +59,7 @@
                 <span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
             </td>
             <td>
-                <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">가동중</span>
+                <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">ON</span>
                 <span class="badge bg-secondary" th:unless="${device.status == 'RUNNING'}" th:text="${device.status}">OFF</span>
             </td>
 
@@ -77,7 +77,7 @@
         <!-- 데이터 없을 때 안내 메시지 -->
         <tr th:if="${devices.isEmpty()}">
             <td colspan="8" class="text-center py-4 text-muted">
-                데이터가 없습니다.
+                등록된 장비(서버)가 없습니다.
             </td>
         </tr>
         </tbody>

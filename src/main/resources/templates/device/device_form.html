@@ -19,29 +19,31 @@
         랙 위치와 시리얼 번호만 입력하고 등록하세요.
     </div>
 
-    <!--
-        ⭐ 핵심: th:action 동적 처리
-        isEdit이 true면 수정 주소로, false면 등록 주소로 보냄
-    -->
+    <!--⭐ 핵심: th:action 동적 처리
+        isEdit이 true면 수정 주소로, false면 등록 주소로 보냄-->
     <form th:action="${isEdit == true} ? @{/devices/{id}/edit(id=${device.id})} : @{/devices/new}" method="post">
 
+        <!-- 신청서 번호 (히든) -->
         <input type="hidden" name="reqId" th:value="${reqId}">
 
         <!-- 1. 랙 & 위치 (수정 모드에서는 변경 불가 - 복잡성 방지) -->
         <div class="mb-3">
             <label class="form-label">설치된 랙</label>
 
-            <!-- 수정 모드: 읽기 전용 (보여주기만 함) -->
-            <input th:if="${isEdit == true}" type="text" class="form-control bg-light"
-                   th:value="${device.rack.rackName}" readonly>
+            <select name="rackId" class="form-select"
+                    th:disabled="${selectedRackId != null or isEdit == true}"
+                    th:classappend="${selectedRackId != null or isEdit == true} ? 'bg-light'">
 
-            <!-- 등록 모드: 선택 가능 -->
-            <select th:unless="${isEdit == true}" name="rackId" class="form-select" required>
                 <option value="" disabled selected>--- 설치할 랙을 선택하세요 ---</option>
+
                 <option th:each="rack : ${racks}"
                         th:value="${rack.id}"
-                        th:text="|${rack.rackName} (${rack.locationDesc})|"></option>
+                        th:text="|${rack.rackName} (${rack.locationDesc})|"
+                        th:selected="${rack.id == selectedRackId or (device.rack != null and device.rack.id == rack.id)}">
+                </option>
             </select>
+
+            <input th:if="${selectedRackId != null}" type="hidden" name="rackId" th:value="${selectedRackId}">
         </div>
 
         <!-- 2. 장비 종류 -->
