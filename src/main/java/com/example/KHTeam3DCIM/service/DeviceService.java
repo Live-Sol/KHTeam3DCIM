@@ -106,66 +106,160 @@ public class DeviceService {
         return deviceRepository.findBySerialNum(serialNum)
                 .orElse(null);
     }
+    // ID로 장비 찾기 (수정 화면용)
+    public Device findById(Long id) {
+        return deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없음"));
+    }
+
 
     // =========================================================
-    // 3. ⭐ 랙 실장도(그림)를 그리기 위한 데이터 가공 로직
+    // ⭐ 3. 랙 실장도 데이터 가공 로직 (HTML 렌더링 순서에 맞춰 수정)
     // =========================================================
     public List<RackDetailDto> getRackViewData(Long rackId) {
 
-        // 1. 해당 랙의 총 높이(42U) 가져오기
+        // 1. 랙 높이 확인
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new IllegalArgumentException("없는 랙입니다."));
         int totalHeight = rack.getTotalUnit().intValue();
 
-        // 2. 42칸짜리 빈 배열(리스트) 만들기 (인덱스 1~42를 편하게 쓰기 위해 크기+1)
+        // 2. 빈 배열 생성
         RackDetailDto[] slots = new RackDetailDto[totalHeight + 1];
-
-        // 3. 일단 전부 '빈 슬롯'으로 초기화
         for (int i = 1; i <= totalHeight; i++) {
             slots[i] = RackDetailDto.builder()
                     .unitNum(i)
-                    .status("EMPTY") // 빈 칸
+                    .status("EMPTY")
                     .deviceName("")
                     .rowSpan(1)
                     .build();
         }
 
-        // 4. DB에서 실제 장비들 가져와서 배치하기
+        // 3. 장비 배치
         List<Device> devices = deviceRepository.findByRackId(rackId);
 
         for (Device d : devices) {
-            int start = d.getStartUnit();
-            int height = d.getHeightUnit();
+            int start = d.getStartUnit();   // 예: 10번
+            int height = d.getHeightUnit(); // 예: 2U
+            int end = start + height - 1;   // 예: 11번 (여기가 Top!)
 
-            // (1) 장비가 시작되는 칸 (예: 10번) -> 정보 채우기
-            if (start <= totalHeight) {
-                slots[start].setStatus("FULL");
-                slots[start].setDeviceName(d.getVendor() + " " + d.getModelName());
-                // category가 null일 수 있으니 안전하게 처리
-                if (d.getCategory() != null) {
-                    slots[start].setType(d.getCategory().getId());
-                } else {
-                    slots[start].setType("ETC");
-                }
-                slots[start].setRowSpan(height); // 2칸 차지하면 rowspan=2
-                slots[start].setDeviceId(d.getId());
+            // 유효성 검사 (범위 넘어가면 패스)
+            if (end > totalHeight) continue;
+
+            // (1) ⭐ 핵심 수정: 가장 위쪽 칸(Top)에 정보를 넣고 rowspan을 건다!
+            // HTML은 위->아래로 그려지므로, 위쪽 칸이 '주인'이 되어야 아래를 덮습니다.
+            slots[end].setStatus("FULL");
+            slots[end].setDeviceName(d.getVendor() + " " + d.getModelName());
+
+            if (d.getCategory() != null) {
+                slots[end].setType(d.getCategory().getId());
+            } else {
+                slots[end].setType("ETC");
             }
+            slots[end].setRowSpan(height);
+            slots[end].setDeviceId(d.getId());
+            slots[end].setRunStatus(d.getStatus()); // 장비 상태(RUNNING/OFF)
 
-            // (2) 장비가 차지하는 나머지 칸들 (예: 11번) -> 'SKIP' 처리
-            for (int j = 1; j < height; j++) {
-                if (start + j <= totalHeight) {
-                    slots[start + j].setStatus("SKIP");
-                }
+            // (2) 나머지 아래쪽 칸들은 'SKIP' (Top 칸이 덮어주므로 비워둠)
+            for (int j = start; j < end; j++) {
+                slots[j].setStatus("SKIP");
+                slots[j].setRunStatus(d.getStatus()); // 아래쪽 칸들도 "형님(맨 윗칸)"을 따라서 상태 정보를 가짐
             }
         }
 
-        // 5. 배열을 리스트로 변환 (화면은 42번부터 1번 순서로 그려야 하니까 뒤집기!)
+        // 4. 리스트로 변환 (42층 -> 1층 순서)
         List<RackDetailDto> result = new ArrayList<>();
-        for (int i = totalHeight; i >= 1; i--) { // 42, 41, 40 ... 1
+        for (int i = totalHeight; i >= 1; i--) {
             result.add(slots[i]);
         }
 
         return result;
+    }
+
+
+    // ==========================================
+    // 4. 장비 검색 기능
+    // ==========================================
+    public List<Device> searchDevices(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findAllDevices(); // 검색어 없으면 전체 조회
+        }
+        // 제조사, 모델명, 시리얼 3군데서 다 찾아봄
+        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(keyword, keyword, keyword);
+    }
+
+    // ==========================================
+    // 5. 장비 삭제 기능
+    // ==========================================
+    @Transactional
+    public void deleteDevice(Long id) {
+        // 1. 장비가 있는지 확인
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+
+        // 2. 로그 남기기 (삭제 이력)
+        DcLog log = DcLog.builder()
+                .memberId("admin") // 나중엔 실제 로그인한 ID
+                .targetDevice(device.getSerialNum())
+                .actionType("DELETE")
+                .build();
+        dcLogRepository.save(log);
+
+        // 3. 진짜 삭제
+        deviceRepository.delete(device);
+    }
+
+    // ==========================================
+    // 6. 장비 정보 수정 (Dirty Checking)
+    // ==========================================
+    @Transactional
+    public void updateDevice(Long id, Device formDevice) {
+        // 1. 기존 데이터 조회
+        Device target = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 2. 정보 수정 (덮어쓰기)
+        target.setVendor(formDevice.getVendor());
+        target.setModelName(formDevice.getModelName());
+        target.setSerialNum(formDevice.getSerialNum());
+        target.setIpAddr(formDevice.getIpAddr());
+        // (필요하다면 카테고리 등 다른 정보도 여기서 수정)
+        // target.setCategory(categoryRepository.findById(formDevice.getCategory().getId())...);
+
+        // 3. ⭐ 로그 남기기 (이 부분이 있어야 대시보드에 뜹니다!) ⭐
+        DcLog log = DcLog.builder()
+                .memberId("admin")
+                .targetDevice(target.getSerialNum())
+                .actionType("UPDATE") // "UPDATE"라고 적어야 초록색 '수정' 글씨가 뜸
+                .build();
+
+        dcLogRepository.save(log);
+
+        // 4. save() 호출 안 해도 트랜잭션이 끝나면 알아서 DB에 반영됨 (Dirty Checking)
+    }
+
+    // ==========================================
+    // 7. 전원 스위치 (ON <-> OFF)
+    // ==========================================
+    @Transactional
+    public String toggleStatus(Long id) {
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 현재 상태가 RUNNING이면 OFF로, 아니면 RUNNING으로 변경
+        if ("RUNNING".equals(device.getStatus())) {
+            device.setStatus("OFF");
+        } else {
+            device.setStatus("RUNNING");
+        }
+
+        // 로그 남기기
+        dcLogRepository.save(DcLog.builder()
+                .memberId("admin")
+                .targetDevice(device.getSerialNum())
+                .actionType("POWER_" + device.getStatus())
+                .build());
+
+
+        return device.getStatus(); // 변경된 상태 리턴
     }
 
 }

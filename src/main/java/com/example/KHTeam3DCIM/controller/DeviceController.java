@@ -16,8 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -27,52 +29,69 @@ public class DeviceController {
 
     private final DeviceService deviceService;
     private final CategoryService categoryService;
-    private final RequestRepository requestRepostory;
+    private final RequestRepository requestRepository;
     private final RackRepository rackRepository;
 
-
-
-    // 1. 장비 목록 페이지 보여주기
+    // ==========================================
+    // 1. 장비 목록 페이지 보여주기 (+ 검색 기능)
+    // ==========================================
     @GetMapping("/devices")
-    public String list(Model model) {
-        // 서비스한테 "장비 다 가져와" 시키기
-        List<Device> devices = deviceService.findAllDevices();
-        // 가져온 보따리를 'devices'라는 이름표를 붙여서 HTML로 보냄
-        model.addAttribute("devices", devices);
+    public String list(Model model, @RequestParam(required = false) String keyword) {
+        List<Device> devices;
+        if (keyword != null && !keyword.isEmpty()) {        // 검색어가 있으면 검색하고, 없으면 전체 조회
+            devices = deviceService.searchDevices(keyword);
+        } else {
+            devices = deviceService.findAllDevices();
+        }
+        model.addAttribute("devices", devices); // 장비 목록 넘기기
+        model.addAttribute("keyword", keyword); // 검색창에 검색어 유지하려고
         return "device/device_list";
     }
 
-    // 2. 장비 등록 화면 보여주기 + 자동완성 기능 추가 (대수술)
+    // ==========================================
+    // 2. 장비 등록 화면 (수정됨: 랙ID, 위치 정보 받기)
+    // ==========================================
     @GetMapping("/devices/new")
-    public String createForm(Model model, @RequestParam(required = false) Long reqId) {
+    public String createForm(Model model,
+                             @RequestParam(required = false) Long reqId,       // 신청서 승인 건에서 옴
+                             @RequestParam(required = false) Long rackId,      // 랙 실장도에서 옴
+                             @RequestParam(required = false) Integer startUnit // 랙 실장도에서 옴
+    ) {
 
-        // 빈 껍데기 장비 객체 생성
         Device device = new Device();
 
-        // 만약 reqId가 있으면(=자동완성 요청이면) 서비스에 "이 reqId에 해당하는 랙 정보 좀 줘" 시키기
+        // 실장도에서 빈칸 클릭하고 왔다면? -> 위치 자동 세팅
+        if (rackId != null && startUnit != null) {
+            device.setStartUnit(startUnit);
+            // rackId는 아래 model.addAttribute("selectedRackId", ...)로 처리
+        }
+
+        // 신청서 승인 건 처리
         if (reqId != null) {
-            Request req = requestRepostory.findById(reqId).orElse(null);
+            Request req = requestRepository.findById(reqId).orElse(null);
             if (req != null) {
-                // 신청서 내용을 장비 객체에 미리 채워넣기 (자동완성)
                 device.setVendor(req.getVendor());
                 device.setModelName(req.getModelName());
                 device.setHeightUnit(req.getHeightUnit());
-                // 카테고리는 객체가 필요해서, 뷰에서 처리하거나 여기서 처리
-                // 편의상 뷰(HTML)에서 처리하도록 여기서는 생략하거나 단순 전달
                 model.addAttribute("selectedCateId", req.getCateId());
             }
         }
+        // 드롭다운용 데이터 가져오기
+        List<Rack> racks = rackRepository.findAll();
+        model.addAttribute("racks", racks);
+        model.addAttribute("categories", categoryService.findAllCategories());
+        model.addAttribute("device", device);
+        model.addAttribute("reqId", reqId);
 
-        List<Rack> racks = rackRepository.findAll(); // 모든 랙 정보 가져오기
-        model.addAttribute("racks", racks); // 랙 정보 넘기기
-        model.addAttribute("categories", categoryService.findAllCategories()); // 모든 카테고리 정보 넘기기
-        model.addAttribute("device", device); // 장비 객체 넘기기
-        model.addAttribute("reqId", reqId); // reqId 넘기기 (자동완성 여부 확인용)
+        // 선택된 랙 ID 전달 (자동 선택용)
+        model.addAttribute("selectedRackId", rackId);
 
         return "device/device_form";
     }
 
+    // ==========================================
     // 3. 실제 등록 처리하기 (저장 버튼 눌렀을 때)
+    // ==========================================
     @PostMapping("/devices/new")
     @Transactional // 상태 변경 때문에 트랜잭션 걸기
     public String create(
@@ -86,7 +105,7 @@ public class DeviceController {
 
         // 만약 신청서 승인건이었다면, 신청서 상태를 '처리 완료'로 변경
         if (reqId != null) {
-            Request req = requestRepostory.findById(reqId).orElse(null);
+            Request req = requestRepository.findById(reqId).orElse(null);
             if (req != null) {
                 req.setStatus("APPROVED"); // JPA기능 덕분에 자동으로 업데이트 처리됨
             }
@@ -94,5 +113,60 @@ public class DeviceController {
         return "redirect:/devices"; // 저장이 끝나면 목록 페이지로 강제 이동(Redirect)
     }
 
+    // ==========================================
+    // 4. 장비 삭제
+    // ==========================================
+    @GetMapping("/devices/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        deviceService.deleteDevice(id);
+        return "redirect:/devices";
+    }
+
+    // ==========================================
+    // 5. 수정 화면 보여주기
+    // ==========================================
+    @GetMapping("/devices/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        // 1. 수정할 장비 정보를 가져옴
+        Device device = deviceService.findById(id); // (findById가 없다면 Service에 추가 필요, 혹은 Repo 직접 사용)
+        // ※ Service에 findById가 없다면: deviceRepository.findById(id).get() 사용
+
+        // 2. 드롭다운용 데이터 가져옴
+        model.addAttribute("racks", rackRepository.findAll());
+        model.addAttribute("categories", categoryService.findAllCategories());
+
+        // 3. 화면에 전달
+        model.addAttribute("device", device); // 기존 정보가 채워진 객체
+        model.addAttribute("isEdit", true);   // "지금은 수정 모드야!" 라고 알려줌
+
+        return "device/device_form"; // 등록 화면 재활용!
+    }
+
+    // ==========================================
+    // 6. 실제 수정 처리
+    // ==========================================
+    @PostMapping("/devices/{id}/edit")
+    public String update(@PathVariable Long id, Device device) {
+        deviceService.updateDevice(id, device);
+        return "redirect:/devices";
+    }
+
+    // ==========================================
+    // [추가] 7. 모달 팝업용 JSON 데이터 반환 API
+    // ==========================================
+    @GetMapping("/api/devices/{id}")
+    @ResponseBody // HTML 파일이 아니라 데이터(JSON) 자체를 달라는 뜻
+    public Device getDeviceDetailApi(@PathVariable Long id) {
+        return deviceService.findById(id);
+    }
+
+    // ==========================================
+    // [추가] 8. 전원 변경 API (AJAX용)
+    // ==========================================
+    @PostMapping("/api/devices/{id}/toggle-status")
+    @ResponseBody
+    public String toggleDeviceStatus(@PathVariable Long id) {
+        return deviceService.toggleStatus(id);
+    }
 
 }

@@ -2,108 +2,122 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>장비 등록</title>
-    <!-- 부트스트랩 적용 -->
+    <title>장비 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="container mt-5" style="max-width: 600px;">
-    <h2 class="mb-4">➕신규 장비 등록</h2>
 
-    <!-- 만약if 승인 건이라면 안내 메시지 표시 -->
+    <!-- 제목: 모드에 따라 다르게 표시 -->
+    <!-- isEdit이 null일 수도 있으므로 안전하게 비교 (isEdit == true) -->
+    <h2 class="mb-4" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h2>
+
+    <!-- 승인 건 안내 (등록 모드일 때만) -->
     <div class="alert alert-success" th:if="${reqId != null}">
         🔔 <strong>장비 신청 승인</strong> 건입니다. 정보가 자동으로 입력되었습니다.<br>
         랙 위치와 시리얼 번호만 입력하고 등록하세요.
     </div>
 
-    <form action="/devices/new" method="post">
+    <!--⭐ 핵심: th:action 동적 처리
+        isEdit이 true면 수정 주소로, false면 등록 주소로 보냄-->
+    <form th:action="${isEdit == true} ? @{/devices/{id}/edit(id=${device.id})} : @{/devices/new}" method="post">
 
-        <!-- 0. 신청서 번호를 몰래 넘겨주기 위한 히든 필드 -->
+        <!-- 신청서 번호 (히든) -->
         <input type="hidden" name="reqId" th:value="${reqId}">
 
-        <!-- 팀원 A의 데이터와 연동된 드롭다운 -->
+        <!-- 1. 랙 & 위치 (수정 모드에서는 변경 불가 - 복잡성 방지) -->
         <div class="mb-3">
-            <label class="form-label">설치할 랙 선택 (관리자)</label>
-            <select name="rackId" class="form-select" required>
+            <label class="form-label">설치된 랙</label>
+
+            <select name="rackId" class="form-select"
+                    th:disabled="${selectedRackId != null or isEdit == true}"
+                    th:classappend="${selectedRackId != null or isEdit == true} ? 'bg-light'">
+
                 <option value="" disabled selected>--- 설치할 랙을 선택하세요 ---</option>
 
-                <!-- 컨트롤러에서 보낸 racks 리스트를 하나씩 꺼내서 보여줌 -->
                 <option th:each="rack : ${racks}"
                         th:value="${rack.id}"
-                        th:text="|${rack.rackName} (${rack.locationDesc})|">
-                    A-01 (3층 전산실)
+                        th:text="|${rack.rackName} (${rack.locationDesc})|"
+                        th:selected="${rack.id == selectedRackId or (device.rack != null and device.rack.id == rack.id)}">
                 </option>
             </select>
-            <div class="form-text">현재 등록된 랙 목록입니다.</div>
+
+            <input th:if="${selectedRackId != null}" type="hidden" name="rackId" th:value="${selectedRackId}">
         </div>
 
-        <!-- 2. 장비 종류 (신청서 기반이면 수정 불가) -->
-        <div class="mb-3" th:if="${reqId == null}"> <!-- 일반 등록일 때 -->
+        <!-- 2. 장비 종류 -->
+        <div class="mb-3">
             <label class="form-label">장비 종류</label>
-            <select name="cateId" class="form-select">
-                <option th:each="cate : ${categories}" th:value="${cate.id}" th:text="${cate.name}">서버</option>
+            <!-- 신청서 승인 or 수정 모드일 때: 수정 불가 -->
+            <!-- isEdit을 안전하게 boolean으로 처리하기 위해 (isEdit == true) 사용 -->
+            <select name="cateId" class="form-select"
+                    th:disabled="${reqId != null or isEdit == true}"
+                    th:classappend="${reqId != null or isEdit == true} ? 'bg-light'">
+                <option th:each="cate : ${categories}"
+                        th:value="${cate.id}"
+                        th:text="${cate.name}"
+                        th:selected="${device.category != null and cate.id == device.category.id}">서버</option>
             </select>
-        </div>
-        <div class="mb-3" th:if="${reqId != null}"> <!-- 승인 건일 때 (읽기전용) -->
-            <label class="form-label">장비 종류 (수정불가)</label>
-            <select class="form-select bg-light" disabled>
-                <option th:each="cate : ${categories}" th:value="${cate.id}" th:text="${cate.name}" th:selected="${cate.id == selectedCateId}">서버</option>
-            </select>
-            <input type="hidden" name="cateId" th:value="${selectedCateId}">
+
+            <!-- disabled 상태일 때 값 전송용 -->
+            <input th:if="${reqId != null or isEdit == true}" type="hidden" name="cateId"
+                   th:value="${device.category != null ? device.category.id : selectedCateId}">
         </div>
 
-        <!-- 3. 제조사 & 모델명 (신청서 기반이면 수정 불가) -->
+        <!-- 3. 제조사 & 모델명 -->
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">제조사</label>
-                <!-- reqId가 있으면 readonly 속성 추가 & 배경색 회색(bg-light) 처리 -->
+                <!-- 수정 모드에서는 수정 가능! -->
                 <input type="text" name="vendor" class="form-control"
-                       placeholder="Dell" th:value="${device.vendor}"
+                       th:value="${device.vendor}"
                        th:readonly="${reqId != null}"
                        th:classappend="${reqId != null} ? 'bg-light'">
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">모델명</label>
                 <input type="text" name="modelName" class="form-control"
-                       placeholder="R740" th:value="${device.modelName}"
+                       th:value="${device.modelName}"
                        th:readonly="${reqId != null}"
                        th:classappend="${reqId != null} ? 'bg-light'">
             </div>
         </div>
 
-        <!-- 4. 시리얼 번호 -->
+        <!-- 4. 시리얼 번호 (언제든 수정 가능) -->
         <div class="mb-3">
             <label class="form-label">시리얼 번호</label>
-            <input type="text" name="serialNum" class="form-control" placeholder="예: SN-123456" required>
+            <input type="text" name="serialNum" class="form-control"
+                   th:value="${device.serialNum}" required>
         </div>
 
-        <!-- 5. 설치 위치 -->
+        <!-- 5. 위치 & 높이 (수정 모드에서는 변경 불가) -->
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="form-label">설치될 랙의 시작 위치 (U)</label>
-                <input type="number" name="startUnit" class="form-control" min="1" max="42"  placeholder="'장비 높이' 고려, 1~42 U" required>
+                <label class="form-label">시작 위치 (U)</label>
+                <input type="number" name="startUnit" class="form-control"
+                       th:value="${device.startUnit}"
+                       th:readonly="${isEdit == true}"
+                       th:classappend="${isEdit == true} ? 'bg-light'" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">장비 높이 (U)</label>
-                <!-- 높이는 장비 스펙이므로 수정 불가 -->
                 <input type="number" name="heightUnit" class="form-control"
-                       value="1" th:value="${device.heightUnit != null ? device.heightUnit : 1}" required
-                       th:readonly="${reqId != null}"
-                       th:classappend="${reqId != null} ? 'bg-light'">
+                       th:value="${device.heightUnit != null ? device.heightUnit : 1}"
+                       th:readonly="${reqId != null or isEdit == true}"
+                       th:classappend="${reqId != null or isEdit == true} ? 'bg-light'" required>
             </div>
         </div>
 
-        <!-- 6. 기타 정보 -->
+        <!-- 6. IP 주소 (언제든 수정 가능) -->
         <div class="mb-3">
             <label class="form-label">관리 IP 주소</label>
-            <input type="text" name="ipAddr" class="form-control" placeholder="예: 192.168.x.x" required>
+            <input type="text" name="ipAddr" class="form-control"
+                   th:value="${device.ipAddr}" required>
         </div>
 
-        <input type="hidden" name="status" value="RUNNING"> <!-- 기본 상태 가동중 -->
-
         <hr>
-        <button type="submit" class="btn btn-primary w-100">등록 완료</button>
+        <button type="submit" class="btn btn-primary w-100" th:text="${isEdit == true} ? '수정 저장' : '등록 완료'"></button>
         <a href="/devices" class="btn btn-secondary w-100 mt-2">취소</a>
     </form>
 </div>
