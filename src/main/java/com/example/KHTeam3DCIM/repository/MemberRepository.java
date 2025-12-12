@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member,String> {
@@ -12,4 +13,7 @@ public interface MemberRepository extends JpaRepository<Member,String> {
     List<Member> findByMemberIdLike(String memberId);
     // 아이디 중복 여부 확인
     boolean existsByMemberId(String memberId);  // 자동으로 구현됩니다.
+    // 회원 ID 조회
+    Optional<Member> findByMemberId(String memberId);
+
 }

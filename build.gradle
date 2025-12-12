@@ -26,6 +26,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Thymeleaf 코어 의존성
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
@@ -37,6 +38,13 @@ dependencies {
     //runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Thymeleaf Security 확장 기능 추가
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    // Spring Boot Validation (Jakarta Bean Validation API 및 Hibernate Validator 구현체)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 }
 
 

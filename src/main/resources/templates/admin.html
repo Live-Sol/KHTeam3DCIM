@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} ?: '관리자 페이지'">관리자 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* 1. 테이블 셀 레이아웃 (공통) */
+        .container table td {
+            white-space: nowrap; /* 셀 내용이 줄바꿈되는 것을 방지 (가장 중요) */
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* 2. 관리 버튼이 있는 마지막 <td> 셀의 너비 확보 */
+        /* 3개의 버튼과 간격을 충분히 확보하기 위해 너비를 300px로 확장합니다. */
+        .container table thead th:last-child,
+        .container table tbody td:last-child {
+            min-width: 300px; /* ⭐️ 너비를 300px로 늘려 충분히 확보 ⭐️ */
+            width: 30%;      /* 전체 너비에서 비중을 높여 확보 */
+        }
+
+        /* 3. 버튼 그룹 정렬 (가장 단순화된 방법) */
+        /* <td> 내부의 모든 요소(버튼, 링크, 폼)를 중앙에 배치하고 간격을 둡니다. */
+        .container table tbody td:last-child {
+            /* <td> 자체를 flex 컨테이너로 만듭니다. */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* <td> 패딩을 좁혀 버튼 공간 확보 */
+            padding: 8px 5px;
+        }
+
+        /* 4. <td> 내부의 모든 버튼과 링크 요소에 마진을 주어 간격을 확보합니다. */
+        .container table tbody td:last-child a,
+        .container table tbody td:last-child button,
+        .container table tbody td:last-child form {
+            margin: 0 3px; /* 좌우 마진을 주어 간격을 만듭니다. */
+            flex-shrink: 0; /* 버튼/폼이 줄어들지 않도록 설정 */
+        }
+
+        /* 5. 삭제 폼 내부의 버튼을 폼에 붙입니다. */
+        .container table tbody td:last-child form {
+            display: contents; /* 폼이 레이아웃에 영향을 주지 않도록 합니다 (Bootstrap 환경에서 잘 작동) */
+        }
+    </style>
+</head>
+<body>
+
+<!-- 상단 헤더 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="d-flex">
+
+    <!-- 사이드바 -->
+    <nav class="sidebar">
+        <div class="position-sticky">
+            <h5 class="text-white text-center mt-3 mb-4">
+                <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+            </h5>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/admin">
+                        <i class="bi bi-house-door me-2"></i> 대시보드 홈
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/requests">
+                        <i class="bi bi-check-circle me-2"></i> 입주 승인 관리
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/devices">
+                        <i class="bi bi-pc-display me-2"></i> 장비/랙 관리
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/members/admin">
+                        <i class="bi bi-people me-2"></i> 회원 관리
+                    </a>
+                </li>
+                <hr class="text-white mx-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-arrow-left-square me-2"></i> 메인 서비스로 이동
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content flex-grow-1">
+        <h1 class="h3 mb-4 text-dark" th:text="${pageTitle} ?: '대시보드 홈'">대시보드 홈</h1>
+
+        <div class="row g-4">
+
+            <!-- 승인 대기 카드 -->
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3 shadow-sm">
+                    <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 승인 대기</div>
+                    <div class="card-body">
+                        <h5 class="card-title"><span th:text="${pendingRequestCount}">0</span> 건</h5>
+                        <p class="card-text">새로운 입주 신청 승인을 기다리고 있습니다.</p>
+                        <a href="/requests" class="btn btn-light btn-sm mt-2">자세히 보기</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 등록 장비 카드 -->
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3 shadow-sm">
+                    <div class="card-header"><i class="bi bi-server me-1"></i> 총 등록 장비</div>
+                    <div class="card-body">
+                        <h5 class="card-title"><span th:text="${totalDeviceCount}">0</span> 대</h5>
+                        <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
+                        <a href="/devices" class="btn btn-light btn-sm mt-2">장비 관리로 이동</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 전체 회원 카드 -->
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3 shadow-sm">
+                    <div class="card-header"><i class="bi bi-person-fill me-1"></i> 전체 회원</div>
+                    <div class="card-body">
+                        <h5 class="card-title"><span th:text="${totalMemberCount}">0</span> 명</h5>
+                        <p class="card-text">일반 이용자 및 관리자 포함 전체 회원 수입니다.</p>
+                        <a href="/members/admin" class="btn btn-light btn-sm mt-2">회원 관리로 이동</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 최근 활동 로그 (가상) -->
+<!--        <div class="card mt-4 shadow-sm">-->
+<!--            <div class="card-header bg-white"><i class="bi bi-activity me-1"></i> 최근 활동 로그</div>-->
+<!--            <div class="card-body p-0">-->
+<!--                <ul class="list-group list-group-flush">-->
+<!--                    <li class="list-group-item">User123 님이 랙 5번의 전원 상태를 변경했습니다. (5분 전)</li>-->
+<!--                    <li class="list-group-item">새로운 입주 신청이 접수되었습니다. (1시간 전)</li>-->
+<!--                    <li class="list-group-item">Admin 님이 User456을 'USER'로 승인했습니다. (2시간 전)</li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+        <!-- 최근 활동 로그 (DB) -->
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-white"><i class="bi bi-activity me-1"></i> 최근 활동 로그</div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+
+                    <li class="list-group-item" th:each="log : ${recentLogs}">
+                        <span th:text="${log.actor} + ' ' + ${log.actionDescription}"></span>
+
+                        <span class="text-muted float-end"
+                              th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">
+                        </span>
+                    </li>
+
+                    <li class="list-group-item text-center text-muted" th:if="${#lists.isEmpty(recentLogs)}">
+                        최근 활동 로그가 없습니다.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

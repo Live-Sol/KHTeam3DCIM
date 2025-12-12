@@ -52,9 +52,9 @@ public class MainController {
 
         // 로그인 상태 변수를 모델에 담아 header.html에 전달합니다.
         model.addAttribute("isLoggedIn", loginUser != null);
-        model.addAttribute("role", loginUser != null ? loginUser.getRole() : "");
+        model.addAttribute("role", loginUser != null ? loginUser.getRole().name() : "");
         model.addAttribute("loginId", loginId != null ? loginId : "");
-
+        model.addAttribute("loginName", loginUser != null ? loginUser.getName() : "");
         return "index";
     }
 }

@@ -10,7 +10,14 @@
 <body>
 <div class="container">
     <h2>회원가입</h2>
+
+    <div th:if="${error}" style="color:red; margin-bottom: 15px;">
+        <p th:text="${error}"></p>
+    </div>
+
+
     <form id="signupForm" th:action="@{/members}" method="POST">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div>
             <label for="memberId">아이디</label>
             <input type="text" id="memberId" name="memberId" required>
@@ -78,10 +85,10 @@
             nameError.style.display = 'none';
         }
 
-        // 유효성 검사를 통과하지 못하면 form 제출을 막음
-        if (!valid) {
-            event.preventDefault();
-        }
+        // // 유효성 검사를 통과하지 못하면 form 제출을 막음
+        // if (!valid) {
+        //     event.preventDefault();
+        // }
     });
 </script>
 </body>

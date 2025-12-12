@@ -25,4 +25,12 @@ public class Member {
     @Builder.Default
     private Role role = Role.USER;
 
+    // ⭐️ 관리자용 이름 업데이트 메서드 ⭐️
+    public void updateName(String name) {
+        this.name = name;
+    }
+    // ⭐️ 관리자용 역할 업데이트 메서드 추가 ⭐️
+    public void updateRole(Role role) {
+        this.role = role;
+    }
 }
