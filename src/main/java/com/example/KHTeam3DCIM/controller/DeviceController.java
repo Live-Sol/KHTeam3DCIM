@@ -76,6 +76,12 @@ public class DeviceController {
                 model.addAttribute("selectedCateId", req.getCateId());
             }
         }
+
+        // "대기 중인 신청서 목록" 가져오기 (드롭다운용)
+        // WAITING 상태인 신청서들을 최신순으로 가져와서 모델에 담습니다.
+        model.addAttribute("waitingRequests", requestRepository.findByStatusOrderByReqDateDesc("WAITING"));
+
+
         // 드롭다운용 데이터 가져오기
         List<Rack> racks = rackRepository.findAll();
         model.addAttribute("racks", racks);

@@ -15,6 +15,11 @@
         <a href="/" class="btn btn-secondary ms-2">🏠 홈으로</a>
     </div>
 
+    <div class="alert alert-success border-success" th:if="${reqId != null}">
+        <strong>🚀 자리 배정 모드:</strong> 현재 입주 신청서(No.[[${reqId}]])를 처리 중입니다.
+        장비를 설치할 랙의 <strong>[실장도]</strong> 버튼을 눌러주세요.
+    </div>
+
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-dark">
         <tr>

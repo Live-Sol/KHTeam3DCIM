@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -48,6 +49,22 @@ public class RequestController {
         // 대기 중(WAITING)인 목록만 가져오기
         model.addAttribute("requests", requestRepository.findByStatusOrderByReqDateDesc("WAITING"));
         return "request/RequestList";
+    }
+
+    // =======================================
+    // 4. 신청 반려 처리 (REJECT)
+    // =======================================
+    @GetMapping("/requests/{id}/reject")
+    public String rejectRequest(@PathVariable Long id) {
+        // 1. 신청서 찾기
+        Request req = requestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 신청서입니다."));
+
+        // 2. 상태 변경 (WAITING -> REJECTED)
+        req.setStatus("REJECTED");
+        requestRepository.save(req);
+
+        return "redirect:/requests"; // 목록으로 복귀
     }
 
 

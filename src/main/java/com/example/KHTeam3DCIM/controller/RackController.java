@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -26,9 +27,11 @@ public class RackController {
     // 1. 랙 목록 페이지
     // ==========================================
     @GetMapping("/racks")
-    public String list(Model model) {
+    public String list(Model model, @RequestParam(required = false) Long reqId) {
         List<RackResponse> racks = rackService.findAllRacks();
         model.addAttribute("racks", racks);
+        // 신청서 승인 중이라면 reqId를 화면으로 넘겨줌
+        model.addAttribute("reqId", reqId);
         return "rack/rack_list";
     }
 
@@ -63,11 +66,14 @@ public class RackController {
     // 5. 랙 실장도 화면
     // ==========================================
     @GetMapping("/racks/{id}/view")
-    public String viewRack(@PathVariable Long id, Model model) {
+    public String viewRack(@PathVariable Long id, Model model,
+                           @RequestParam(required = false) Long reqId) {
         List<RackDetailDto> rackView = deviceService.getRackViewData(id);
         RackResponse rack = rackService.findRackById(id);
         model.addAttribute("rackView", rackView);
         model.addAttribute("rack", rack);
+        // 여기까지 들고 온 티켓(reqId)을 화면에 전달
+        model.addAttribute("reqId", reqId);
         return "rack/rack_view";
     }
 

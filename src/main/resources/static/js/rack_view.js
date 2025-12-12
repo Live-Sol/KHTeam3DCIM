@@ -10,11 +10,25 @@ function showDeviceModal(deviceId) {
             document.getElementById('modalModel').innerText = data.modelName;
             document.getElementById('modalSerial').innerText = data.serialNum;
             document.getElementById('modalIp').innerText = data.ipAddr;
-
-            // 상태 표시 업데이트 함수 호출
             updateStatusUI(data.status);
-
             document.getElementById('modalEditBtn').href = '/devices/' + data.id + '/edit';
+
+            // QR 코드 생성
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = ""; // 기존 QR 비우기 (필수!)
+
+            // QR에 담을 내용: JSON 형태의 핵심 정보 (실무에선 보통 장비 조회 URL이나 시리얼번호를 넣습니다)
+            const qrData = `ID:${data.id}\nSN:${data.serialNum}\nIP:${data.ipAddr}`;
+
+            // 라이브러리 사용해 QR 그리기
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 100,
+                height: 100,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
 
             const myModal = new bootstrap.Modal(document.getElementById('deviceModal'));
             myModal.show();

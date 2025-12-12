@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -48,5 +50,14 @@ public class Request {
     @CreatedDate
     @Column(name = "REQ_DATE", updatable = false)
     private LocalDateTime reqDate;  // 요청일자
+
+    @Column(name = "PURPOSE", length = 200)
+    private String purpose; // 입주 목적 (예: 웹 서비스 운영, DB 백업용, 사내 테스트 서버 등)
+
+    @Column(name = "START_DATE")
+    private LocalDate startDate; // 입주 희망 시작일 (언제부터 쓸 건지)
+
+    @Column(name = "TERM_MONTH")
+    private Integer termMonth; // 계약 기간 (개월 수 단위: 12, 24, 36...)
 
 }

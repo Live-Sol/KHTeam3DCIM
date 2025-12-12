@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>입주 신청</title>
+    <title>입고 신청</title>
     <!-- 부트스트랩 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -13,7 +13,7 @@
 <div class="container mt-5" style="max-width: 600px;">
     <div class="card shadow">
         <div class="card-header bg-success text-white">
-            <h3 class="mb-0">📝 장비 입주 신청서</h3>
+            <h3 class="mb-0">📝 장비 입고 신청서</h3>
         </div>
         <div class="card-body">
             <form action="/requests/new" method="post">
@@ -86,6 +86,36 @@
                     </div>
                     <div class="form-text">일반적인 랙 마운트 서버는 1U, 2U, 3U, 4U 규격을 사용합니다.</div>
                 </div>
+
+                <hr>
+
+                <h5 class="mb-3 text-secondary mt-4">3. 입고 계약 정보</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">입고 목적 (상세 사유)</label>
+                    <textarea name="purpose" class="form-control" rows="3"
+                              placeholder="예: 사내 그룹웨어 운영 서버용, 대고객 웹 서비스 등 용도를 상세히 적어주세요." required></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">입고 희망일</label>
+                        <input type="date" name="startDate" class="form-control" required>
+                        <div class="form-text">장비를 반입할 예상 날짜를 선택해주세요.</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">계약 기간 (월 단위)</label>
+                        <select name="termMonth" class="form-select" required>
+                            <option value="12">1년 (12개월)</option>
+                            <option value="24" selected>2년 (24개월) - 표준</option>
+                            <option value="36">3년 (36개월)</option>
+                            <option value="0">기타 (직접 협의)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr>
 
                 <!-- 신청하기 버튼 -->
                 <div class="d-grid gap-2 mt-4">
