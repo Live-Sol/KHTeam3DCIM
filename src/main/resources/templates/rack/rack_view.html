@@ -1,10 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>랙 실장도</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .rack-table { text-align: center; vertical-align: middle; }
+        .unit-col { width: 60px; background-color: #f8f9fa; font-weight: bold; border-right: 2px solid #333; }
+
+        /* 장비 종류별 색상 (DeviceService에서 설정한 type에 따라 적용됨) */
+        .device-svr { background-color: #d1e7dd; color: #0f5132; border-left: 5px solid #198754; } /* 서버: 초록 */
+        .device-net { background-color: #cfe2ff; color: #084298; border-left: 5px solid #0d6efd; } /* 네트워크: 파랑 */
+        .device-sto { background-color: #e2e3e5; color: #41464b; border-left: 5px solid #6c757d; } /* 스토리지: 회색 */
+        .device-ups { background-color: #fff3cd; color: #664d03; border-left: 5px solid #ffc107; } /* UPS: 노랑 */
+        .device-etc { background-color: #f8d7da; color: #842029; border-left: 5px solid #dc3545; } /* 기타: 빨강 */
+
+        .device-empty { color: #ccc; font-size: 0.8em; background-color: #fff; } /* 빈칸 */
+    </style>
 </head>
 <body>
+
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            🏢 랙 실장도 : <span class="text-primary">[[${rack.rackName}]]</span>
+            <br>
+            <small class="text-muted fs-6">📍 [[${rack.locationDesc}]]</small>
+        </h2>
+        <div>
+            <a href="/devices" class="btn btn-outline-primary">📋 장비 목록</a>
+            <a href="/racks" class="btn btn-secondary">🔙 랙 목록</a>
+        </div>
+    </div>
+
+    <div class="card shadow" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-header bg-dark text-white text-center">
+            <strong>TOP (42U)</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered rack-table mb-0">
+                <tbody>
+                <!-- 42번부터 1번까지 반복 -->
+                <tr th:each="slot : ${rackView}">
+
+                    <!-- 1. 왼쪽 유닛 번호 -->
+                    <td class="unit-col">[[${slot.unitNum}]]U</td>
+
+                    <!-- 2. 장비가 있는 경우 (FULL) -->
+                    <td th:if="${slot.status == 'FULL'}"
+                        th:rowspan="${slot.rowSpan}"
+                        th:classappend="|device-${#strings.toLowerCase(slot.type)}|">
+
+                        <div class="fw-bold">[[${slot.deviceName}]]</div>
+                        <span class="badge bg-dark">[[${slot.rowSpan}]] U</span>
+                    </td>
+
+                    <!-- 3. 빈 칸인 경우 (EMPTY) -->
+                    <td th:if="${slot.status == 'EMPTY'}" class="device-empty">
+                        Empty Slot
+                    </td>
+
+                    <!-- 4. 합쳐진 칸 (SKIP)은 아예 렌더링 안 함! -->
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-dark text-white text-center">
+            <strong>BOTTOM (1U)</strong>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

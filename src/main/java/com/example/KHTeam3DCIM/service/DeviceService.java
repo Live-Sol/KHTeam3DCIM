@@ -113,60 +113,59 @@ public class DeviceService {
 
 
     // =========================================================
-    // 3. ⭐ 랙 실장도(그림)를 그리기 위한 데이터 가공 로직
+    // ⭐ 3. 랙 실장도 데이터 가공 로직 (HTML 렌더링 순서에 맞춰 수정)
     // =========================================================
     public List<RackDetailDto> getRackViewData(Long rackId) {
 
-        // 1. 해당 랙의 총 높이(42U) 가져오기
+        // 1. 랙 높이 확인
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new IllegalArgumentException("없는 랙입니다."));
         int totalHeight = rack.getTotalUnit().intValue();
 
-        // 2. 42칸짜리 빈 배열(리스트) 만들기 (인덱스 1~42를 편하게 쓰기 위해 크기+1)
+        // 2. 빈 배열 생성
         RackDetailDto[] slots = new RackDetailDto[totalHeight + 1];
-
-        // 3. 일단 전부 '빈 슬롯'으로 초기화
         for (int i = 1; i <= totalHeight; i++) {
             slots[i] = RackDetailDto.builder()
                     .unitNum(i)
-                    .status("EMPTY") // 빈 칸
+                    .status("EMPTY")
                     .deviceName("")
                     .rowSpan(1)
                     .build();
         }
 
-        // 4. DB에서 실제 장비들 가져와서 배치하기
+        // 3. 장비 배치
         List<Device> devices = deviceRepository.findByRackId(rackId);
 
         for (Device d : devices) {
-            int start = d.getStartUnit();
-            int height = d.getHeightUnit();
+            int start = d.getStartUnit();   // 예: 10번
+            int height = d.getHeightUnit(); // 예: 2U
+            int end = start + height - 1;   // 예: 11번 (여기가 Top!)
 
-            // (1) 장비가 시작되는 칸 (예: 10번) -> 정보 채우기
-            if (start <= totalHeight) {
-                slots[start].setStatus("FULL");
-                slots[start].setDeviceName(d.getVendor() + " " + d.getModelName());
-                // category가 null일 수 있으니 안전하게 처리
-                if (d.getCategory() != null) {
-                    slots[start].setType(d.getCategory().getId());
-                } else {
-                    slots[start].setType("ETC");
-                }
-                slots[start].setRowSpan(height); // 2칸 차지하면 rowspan=2
-                slots[start].setDeviceId(d.getId());
+            // 유효성 검사 (범위 넘어가면 패스)
+            if (end > totalHeight) continue;
+
+            // (1) ⭐ 핵심 수정: 가장 위쪽 칸(Top)에 정보를 넣고 rowspan을 건다!
+            // HTML은 위->아래로 그려지므로, 위쪽 칸이 '주인'이 되어야 아래를 덮습니다.
+            slots[end].setStatus("FULL");
+            slots[end].setDeviceName(d.getVendor() + " " + d.getModelName());
+
+            if (d.getCategory() != null) {
+                slots[end].setType(d.getCategory().getId());
+            } else {
+                slots[end].setType("ETC");
             }
+            slots[end].setRowSpan(height);
+            slots[end].setDeviceId(d.getId());
 
-            // (2) 장비가 차지하는 나머지 칸들 (예: 11번) -> 'SKIP' 처리
-            for (int j = 1; j < height; j++) {
-                if (start + j <= totalHeight) {
-                    slots[start + j].setStatus("SKIP");
-                }
+            // (2) 나머지 아래쪽 칸들은 'SKIP' (Top 칸이 덮어주므로 비워둠)
+            for (int j = start; j < end; j++) {
+                slots[j].setStatus("SKIP");
             }
         }
 
-        // 5. 배열을 리스트로 변환 (화면은 42번부터 1번 순서로 그려야 하니까 뒤집기!)
+        // 4. 리스트로 변환 (42층 -> 1층 순서)
         List<RackDetailDto> result = new ArrayList<>();
-        for (int i = totalHeight; i >= 1; i--) { // 42, 41, 40 ... 1
+        for (int i = totalHeight; i >= 1; i--) {
             result.add(slots[i]);
         }
 
