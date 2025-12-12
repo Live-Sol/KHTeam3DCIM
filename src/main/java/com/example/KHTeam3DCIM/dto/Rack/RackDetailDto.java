@@ -18,4 +18,9 @@ public class RackDetailDto {
     private String type;       // 장비 종류 (SVR, NET...) - 색깔 다르게 하려고
     private int rowSpan;       // 몇 칸 차지하는지 (HTML rowspan용)
     private Long deviceId;     // 클릭하면 상세페이지로 이동하려고
+
+    // ⭐ [신규 추가] 상세 정보를 위한 필드들
+    private String serialNum;  // 시리얼 번호 (툴팁용)
+    private String ipAddr;     // IP 주소 (툴팁용)
+    private String runStatus;  // 가동 상태 (RUNNING, OFF) -> LED 표시용
 }

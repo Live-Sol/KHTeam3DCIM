@@ -4,6 +4,7 @@ import com.example.KHTeam3DCIM.domain.Rack;
 import com.example.KHTeam3DCIM.dto.Rack.RackCreateRequest;
 import com.example.KHTeam3DCIM.dto.Rack.RackResponse;
 import com.example.KHTeam3DCIM.dto.Rack.RackUpdateRequest;
+import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,33 +19,52 @@ import java.util.stream.Collectors;
 public class RackService {
 
     private final RackRepository rackRepository;
+    private final DeviceRepository deviceRepository; // [추가] 사용량 계산 위해 필요
 
-    // 전체 조회
+    // ==========================================
+    // 1. 전체 조회 (사용량 계산 로직 추가)
+    // ==========================================
+    @Transactional(readOnly = true)
     public List<RackResponse> findAllRacks() {
         return rackRepository.findAll()
                 .stream()
-                .map(r -> RackResponse.builder()
-                        .id(r.getId())
-                        .rackName(r.getRackName())
-                        .totalUnit(r.getTotalUnit())
-                        .locationDesc(r.getLocationDesc())
-                        .build())
+                .map(r -> {
+                    // DB에서 이 랙의 사용량(높이 합계) 계산해오기
+                    Integer used = deviceRepository.getUsedUnitByRackId(r.getId());
+
+                    return RackResponse.builder()
+                            .id(r.getId())
+                            .rackName(r.getRackName())
+                            .totalUnit(r.getTotalUnit())
+                            .locationDesc(r.getLocationDesc())
+                            .usedUnit(used) // DTO에 담기
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
-    // 단일 조회
+    // ==========================================
+    // 2. 단일 조회 (사용량 계산 로직 추가)
+    // ==========================================
+    @Transactional(readOnly = true)
     public RackResponse findRackById(Long id) {
         Rack rack = rackRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rack이 존재하지 않습니다."));
+
+        Integer used = deviceRepository.getUsedUnitByRackId(rack.getId());
+
         return RackResponse.builder()
                 .id(rack.getId())
                 .rackName(rack.getRackName())
                 .totalUnit(rack.getTotalUnit())
                 .locationDesc(rack.getLocationDesc())
+                .usedUnit(used) // DTO에 담기
                 .build();
     }
 
-    // Rack 추가
+    // ==========================================
+    // 3. Rack 추가
+    // ==========================================
     public RackResponse addRack(RackCreateRequest request) {
         Rack rack = Rack.builder()
                 .rackName(request.getRackName())
@@ -60,7 +80,9 @@ public class RackService {
                 .build();
     }
 
-    // Rack 부분 수정
+    // ==========================================
+    // 4. Rack 부분 수정
+    // ==========================================
     @Transactional
     public RackResponse updateRackPartially(Long id, RackUpdateRequest patch) {
         Rack updated = rackRepository.findById(id)
@@ -80,7 +102,9 @@ public class RackService {
                 .build();
     }
 
-    // Rack 삭제
+    // ==========================================
+    // 5. Rack 삭제
+    // ==========================================
     public void deleteRack(Long id) {
         if (!rackRepository.existsById(id)) {
             throw new RuntimeException("Rack이 존재하지 않습니다.");

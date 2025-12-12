@@ -15,31 +15,52 @@
         <a href="/" class="btn btn-secondary ms-2">🏠 홈으로</a>
     </div>
 
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-hover align-middle">
         <thead class="table-dark">
         <tr>
-            <th>ID</th>
-            <th>랙 이름</th>
-            <th>총 유닛(U)</th>
-            <th>위치 설명</th>
-            <th>관리</th>
+            <th style="width: 5%">ID</th>
+            <th style="width: 15%">랙 이름</th>
+            <th style="width: 15%">위치 설명</th>
+            <th style="width: 35%">가동률 (Utilization)</th>
+            <th style="width: 30%">관리</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="rack : ${racks}">
             <td th:text="${rack.id}">1</td>
             <td>
-                <span th:text="${rack.rackName}" class="fw-bold">A-01</span>
+                <span th:text="${rack.rackName}" class="fw-bold">[위치 코드]</span>
             </td>
-            <td><span class="badge bg-secondary">[[${rack.totalUnit}]] U</span></td>
-            <td th:text="${rack.locationDesc}">3층 전산실</td>
+            <td th:text="${rack.locationDesc}">[건물내 랙 장비 위치]</td>
+
+            <!-- 가동률 진행바 -->
             <td>
-                <!-- 실장도 보기 버튼 -->
-                <a th:href="@{/racks/{id}/view(id=${rack.id})}" class="btn btn-sm btn-info text-white">👁️ 실장도</a>
-                <!-- 삭제 버튼 -->
+                <!-- 퍼센트 계산 (소수점 없이 정수로) -->
+                <!-- th:with 변수 선언: 퍼센트 = (사용량 * 100) / 총량 -->
+                <div th:with="percent=${rack.totalUnit > 0 ? (rack.usedUnit * 100 / rack.totalUnit) : 0}">
+
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
+                        <small class="fw-bold">[[${percent}]]%</small>
+                    </div>
+
+                    <div class="progress" style="height: 10px;">
+                        <!-- style width에 퍼센트 적용 -->
+                        <!-- 퍼센트에 따라 색상 변경 (80% 넘으면 빨간색, 50% 넘으면 노란색, 그 외 초록색) -->
+                        <div class="progress-bar" role="progressbar"
+                             th:style="'width: ' + ${percent} + '%'"
+                             th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}">
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td>
+                <a th:href="@{/racks/{id}/view(id=${rack.id})}" class="btn btn-sm btn-info text-white">실장도</a>
+                <a th:href="@{/racks/{id}/edit(id=${rack.id})}" class="btn btn-sm btn-warning">수정</a>
                 <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
                    class="btn btn-sm btn-danger"
-                   onclick="return confirm('정말 이 랙을 삭제하시겠습니까? 안에 있는 장비도 다 사라집니다!');">🗑️ 삭제</a>
+                   onclick="return confirm('정말 이 랙을 삭제하시겠습니까? 안에 있는 장비도 다 사라집니다!');">삭제</a>
             </td>
         </tr>
         </tbody>
