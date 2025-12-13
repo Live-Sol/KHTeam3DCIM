@@ -36,15 +36,19 @@ public class DeviceController {
     // 1. 장비 목록 페이지 보여주기 (+ 검색 기능)
     // ==========================================
     @GetMapping("/devices")
-    public String list(Model model, @RequestParam(required = false) String keyword) {
-        List<Device> devices;
-        if (keyword != null && !keyword.isEmpty()) {        // 검색어가 있으면 검색하고, 없으면 전체 조회
-            devices = deviceService.searchDevices(keyword);
-        } else {
-            devices = deviceService.findAllDevices();
-        }
-        model.addAttribute("devices", devices); // 장비 목록 넘기기
-        model.addAttribute("keyword", keyword); // 검색창에 검색어 유지하려고
+    public String list(Model model,
+                       @RequestParam(required = false) String keyword,
+                       @RequestParam(required = false, defaultValue = "latest") String sort,
+                       @RequestParam(required = false, defaultValue = "desc") String sortDir) { // ⬅️ sortDir 추가!
+
+        // 서비스에 sortDir까지 같이 전달
+        List<Device> devices = deviceService.searchDevices(keyword, sort, sortDir);
+
+        model.addAttribute("devices", devices);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
+        model.addAttribute("sortDir", sortDir); // ⬅️ 화면에서도 기억할 수 있게 모델에 담기
+
         return "device/device_list";
     }
 
@@ -95,6 +99,8 @@ public class DeviceController {
         return "device/device_form";
     }
 
+
+
     // ==========================================
     // 3. 실제 등록 처리하기 (저장 버튼 눌렀을 때)
     // ==========================================
@@ -134,7 +140,8 @@ public class DeviceController {
     @GetMapping("/devices/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         // 1. 수정할 장비 정보를 가져옴
-        Device device = deviceService.findById(id); // (findById가 없다면 Service에 추가 필요, 혹은 Repo 직접 사용)
+        Device device = deviceService.findById(id);
+        // (findById가 없다면 Service에 추가 필요, 혹은 Repo 직접 사용)
         // ※ Service에 findById가 없다면: deviceRepository.findById(id).get() 사용
 
         // 2. 드롭다운용 데이터 가져옴

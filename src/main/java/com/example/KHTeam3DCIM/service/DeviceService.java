@@ -6,9 +6,11 @@ import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder; // ⭐️ 추가
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +52,16 @@ public class DeviceService {
             }
         }
 
+        // 통과했으면 관계 맺어주기
         newDevice.setRack(rack);
         newDevice.setCategory(category);
+
+        // 상태가 없으면 기본값 'OFF'로 설정
+        if (newDevice.getStatus() == null || newDevice.getStatus().isEmpty()) {
+            newDevice.setStatus("OFF");
+        }
+
+        // 장비 저장 (DB에 INSERT)
         deviceRepository.save(newDevice);
 
         // ⭐️ AuditLog 저장 (팀원 코드 활용)
@@ -64,10 +74,44 @@ public class DeviceService {
     // ==========================================
     // 2. 조회 기능들
     // ==========================================
-    public List<Device> findAllDevices() { return deviceRepository.findAll(); }
-    public List<Device> findDevicesByRack(Long rackId) { return deviceRepository.findByRackId(rackId); }
-    public Device findBySerial(String serialNum) { return deviceRepository.findBySerialNum(serialNum).orElse(null); }
-    public Device findById(Long id) { return deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없음")); }
+// [1] 수정: 정렬 옵션(무엇을)과 방향(어떻게)을 모두 받아서 처리
+    private Sort createSort(String sortOption, String sortDir) {
+
+        // 1. 방향 결정 (기본값은 DESC)
+        // 화면에서 "asc"라고 보내면 오름차순(ASC), 아니면 내림차순(DESC)
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        // 2. 정렬할 속성(필드명) 결정
+        String property = switch (sortOption) {
+            case "id_asc" -> "id"; // ID 기준
+            case "rack" -> "rack.rackName"; // 랙 이름 기준
+            case "category" -> "category.name"; // 카테고리 이름 기준
+            case "serial" -> "serialNum"; // 시리얼 번호 기준
+            case "location" -> "startUnit"; // 위치(Unit) 기준
+            case "status" -> "status"; // 상태 기준
+            default -> "id"; // 기본값(latest 등)은 ID 기준
+        };
+
+        // 3. Sort 객체 생성 (방향 + 속성)
+        return Sort.by(direction, property);
+    }
+
+    // [2] 전체 조회 (파라미터 추가)
+    public List<Device> findAllDevices(String sortOption, String sortDir) {
+        Sort sort = createSort(sortOption, sortDir);
+        return deviceRepository.findAll(sort);
+    }
+
+    // [3] 검색 조회 (파라미터 추가)
+    public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
+        Sort sort = createSort(sortOption, sortDir);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findAllDevices(sortOption, sortDir);
+        }
+        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(
+                keyword, keyword, keyword, sort);
+    }
+
 
     // ==========================================
     // 3. 랙 실장도 데이터 가공
@@ -109,15 +153,10 @@ public class DeviceService {
     }
 
     // ==========================================
-    // 4. 검색/삭제/수정/전원
+    // 4. 삭제/수정/전원
     // ==========================================
-    public List<Device> searchDevices(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) return findAllDevices();
-        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(keyword, keyword, keyword);
-    }
-
     @Transactional
-    public void deleteDevice(Long id) {
+    public void deleteDevice(Long id) { // 장비 삭제
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
         deviceRepository.delete(device);
 
@@ -126,7 +165,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public void updateDevice(Long id, Device formDevice) {
+    public void updateDevice(Long id, Device formDevice) { // 장비 수정
         Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
         target.setVendor(formDevice.getVendor());
         target.setModelName(formDevice.getModelName());
@@ -138,7 +177,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public String toggleStatus(Long id) {
+    public String toggleStatus(Long id) { // 전원 토글
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
         if ("RUNNING".equals(device.getStatus())) device.setStatus("OFF");
         else device.setStatus("RUNNING");
@@ -146,5 +185,13 @@ public class DeviceService {
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "전원 변경(" + device.getStatus() + "): " + device.getSerialNum(), LogType.DEVICE_OPERATION);
         return device.getStatus();
+    }
+
+    // ==========================================
+    // [추가] 단건 조회 (Controller에서 호출함)
+    // ==========================================
+    public Device findById(Long id) {
+        return deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 장비가 존재하지 않습니다."));
     }
 }

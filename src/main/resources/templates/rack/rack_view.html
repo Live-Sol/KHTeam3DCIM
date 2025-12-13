@@ -70,7 +70,7 @@
 
                     <td th:if="${slot.status == 'EMPTY'}"
                         class="device-empty"
-                        th:onclick="|location.href='@{/devices/new(rackId=${rack.id}, startUnit=${slot.unitNum})}'|">
+                        th:onclick="|location.href='@{/devices/new(rackId=${rack.id}, startUnit=${slot.unitNum}, reqId=${reqId})}'|">
                         <i class="bi bi-plus-circle-dotted"></i> 빈 슬롯 (등록)
                     </td>
 

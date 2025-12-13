@@ -61,7 +61,8 @@
             </td>
 
             <td>
-                <a th:href="@{/racks/{id}/view(id=${rack.id})}" class="btn btn-sm btn-info text-white">실장도</a>
+                <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
+                   class="btn btn-sm btn-info text-white">실장도</a>
                 <a th:href="@{/racks/{id}/edit(id=${rack.id})}" class="btn btn-sm btn-warning">수정</a>
                 <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
                    class="btn btn-sm btn-danger"

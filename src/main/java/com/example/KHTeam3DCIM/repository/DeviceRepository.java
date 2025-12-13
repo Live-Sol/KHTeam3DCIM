@@ -4,6 +4,7 @@
 package com.example.KHTeam3DCIM.repository;
 
 import com.example.KHTeam3DCIM.domain.Device;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,7 +29,7 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // ==========================================
     /*Containing: 앞뒤로 % 붙여서 검색 (LIKE %keyword%)
     * IgnoreCase: 대소문자 구분 안 함*/
-    List<Device> findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(String vendor, String modelName, String serialNum);
+    List<Device> findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(String vendor, String modelName, String serialNum, Sort sort);
 
     // ==========================================
     // 4. 랙별 사용량(높이 합계) 계산 쿼리
