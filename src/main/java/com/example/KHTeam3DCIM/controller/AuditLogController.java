@@ -1,7 +1,7 @@
 /*
 package com.example.KHTeam3DCIM.controller;
 
-import com.example.KHTeam3DCIM.entity.AuditLog;
+import com.example.KHTeam3DCIM.domain.AuditLog;
 import com.example.KHTeam3DCIM.service.AuditLogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

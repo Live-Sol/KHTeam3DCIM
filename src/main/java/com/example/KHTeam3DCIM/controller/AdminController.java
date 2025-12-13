@@ -1,6 +1,6 @@
 package com.example.KHTeam3DCIM.controller;
 
-import com.example.KHTeam3DCIM.entity.AuditLog;
+import com.example.KHTeam3DCIM.domain.AuditLog;
 import com.example.KHTeam3DCIM.service.AuditLogService;
 import com.example.KHTeam3DCIM.service.MemberService;
 import lombok.RequiredArgsConstructor; // ⭐️ Lombok의 RequiredArgsConstructor 사용 ⭐️

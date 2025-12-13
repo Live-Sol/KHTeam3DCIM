@@ -104,23 +104,18 @@
                 <tr>
                     <th>시간</th>
                     <th>사용자</th>
-                    <th>대상 장비</th>
-                    <th>작업</th>
-                </tr>
+                    <th>활동 내용</th> </tr>
                 </thead>
                 <tbody>
                 <tr th:each="log : ${recentLogs}">
-                    <td th:text="${#temporals.format(log.logDate, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 12:00</td>
-                    <td><span class="badge bg-secondary" th:text="${log.memberId}">admin</span></td>
-                    <td th:text="${log.targetDevice}">SN-1234</td>
-                    <td>
-                        <span th:if="${log.actionType == 'INSERT'}" class="text-primary fw-bold">등록</span>
-                        <span th:if="${log.actionType == 'DELETE'}" class="text-danger fw-bold">삭제</span>
-                        <span th:if="${log.actionType == 'UPDATE'}" class="text-success fw-bold">수정</span>
-                    </td>
+                    <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 12:00</td>
+
+                    <td><span class="badge bg-secondary" th:text="${log.actor}">admin</span></td>
+
+                    <td th:text="${log.actionDescription}">장비 등록: SN-1234</td>
                 </tr>
                 <tr th:if="${recentLogs.isEmpty()}">
-                    <td colspan="4" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>
+                    <td colspan="3" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>
                 </tr>
                 </tbody>
             </table>

@@ -3,7 +3,7 @@ package com.example.KHTeam3DCIM.service;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Role;
 import com.example.KHTeam3DCIM.dto.Member.*;
-import com.example.KHTeam3DCIM.entity.LogType;
+import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

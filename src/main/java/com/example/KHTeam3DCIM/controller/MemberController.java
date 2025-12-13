@@ -2,7 +2,7 @@ package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.dto.Member.*;
-import com.example.KHTeam3DCIM.entity.AuditLog;
+import com.example.KHTeam3DCIM.domain.AuditLog;
 import com.example.KHTeam3DCIM.service.AuditLogService;
 import com.example.KHTeam3DCIM.service.MemberService;
 import jakarta.servlet.http.HttpSession;

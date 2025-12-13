@@ -1,4 +1,4 @@
-package com.example.KHTeam3DCIM.entity;
+package com.example.KHTeam3DCIM.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

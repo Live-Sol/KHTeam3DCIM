@@ -1,4 +1,4 @@
-package com.example.KHTeam3DCIM.entity;
+package com.example.KHTeam3DCIM.domain;
 
 public enum LogType {
     REQUEST_APPLY,      // 입주 신청 접수

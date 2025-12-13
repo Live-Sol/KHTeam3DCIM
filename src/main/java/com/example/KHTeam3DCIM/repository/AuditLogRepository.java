@@ -1,6 +1,6 @@
 package com.example.KHTeam3DCIM.repository;
 
-import com.example.KHTeam3DCIM.entity.AuditLog; // AuditLog의 실제 패키지 경로로 수정 필요
+import com.example.KHTeam3DCIM.domain.AuditLog; // AuditLog의 실제 패키지 경로로 수정 필요
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;

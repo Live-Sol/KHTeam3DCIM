@@ -17,6 +17,7 @@
     </div>
 
     <form th:action="${isEdit == true} ? @{/devices/{id}/edit(id=${device.id})} : @{/devices/new}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
         <div class="card bg-light mb-4 border-primary" th:if="${waitingRequests != null and !waitingRequests.isEmpty()}">
             <div class="card-body p-3">

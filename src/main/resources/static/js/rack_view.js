@@ -42,17 +42,26 @@ function showDeviceModal(deviceId) {
 // 전원 버튼 클릭 시 실행
 function togglePower() {
     if(!currentDeviceId) return;
-
     if(!confirm("장비의 전원 상태를 변경하시겠습니까?")) return;
 
+    // 👇 HTML 머리(head)에 심어둔 도장을 꺼내옵니다.
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     fetch('/api/devices/' + currentDeviceId + '/toggle-status', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            // 👇 헤더에 도장을 같이 붙여서 보냅니다!
+            [header]: token
+        }
     })
-    .then(response => response.text())
+    .then(response => {
+        if (response.ok) return response.text();
+        throw new Error("전원 변경 실패"); // 에러 처리
+    })
     .then(newStatus => {
-        // 알림을 띄우고 -> 확인 누르면 -> 페이지 새로고침
         alert("전원 상태가 변경되었습니다.");
-        location.reload(); // 이 한 줄이 '새로고침' 마법입니다!
+        location.reload();
     })
     .catch(error => {
         console.error(error);
