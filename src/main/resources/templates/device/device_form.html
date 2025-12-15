@@ -161,7 +161,7 @@
                     <input type="number" name="startUnit" class="form-control"
                            th:value="${device.startUnit}"
                            th:readonly="${reqId != null}"
-                           th:classappend="${reqId != null} ? 'bg-light'" required>
+                           th:classappend="${reqId != null} ? 'bg-light'" min="1" value="1" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">장비 높이 (U)</label>

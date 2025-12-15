@@ -45,4 +45,5 @@ public class Member {
         this.companyPhone = companyPhone;
         this.role = role;
     }
+
 }

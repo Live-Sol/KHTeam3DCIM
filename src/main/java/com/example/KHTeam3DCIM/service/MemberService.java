@@ -4,7 +4,6 @@ import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Role;
 import com.example.KHTeam3DCIM.dto.Member.*;
-import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
 import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,26 +24,13 @@ public class MemberService {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
 
-    // ⭐️ 마스킹 처리 헬퍼 메서드 수정 ⭐️
-    private String maskString(String input) {
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
-        // 입력 문자열의 첫 글자를 가져옵니다.
-        String firstChar = input.substring(0, 1);
-        // ⭐️ 첫 글자 뒤에 고정된 별표 두 개를 붙여 반환합니다. ⭐️
-        return firstChar + "**";
-    }
-    // 1. 회원 전체 조회 (회원용 - 이름, 회사명, role 표기 및 마스킹)
-    @Transactional(readOnly = true)
+    // 전체 회원 조회 (회원용 - 이름, role 표기)
     public List<MemberResponse> findAllMembersUser() {
         return memberRepository.findAll()
                 .stream()
                 .map(m -> MemberResponse.builder()
-                        // ⭐️ 이름 마스킹 적용 ⭐️
-                        .name(maskString(m.getName()))
-                        // ⭐️ 회사명 마스킹 적용 ⭐️
-                        .companyName(maskString(m.getCompanyName()))
+                        .name(m.getName())
+                        .role(m.getRole())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -69,6 +55,7 @@ public class MemberService {
         return members.stream()
                 .map(m -> MemberResponse.builder()
                         .name(m.getName())
+                        .role(m.getRole())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -122,6 +109,7 @@ public class MemberService {
         // 회원 응답 반환
         return MemberResponse.builder()
                 .name(saved.getName())
+                .role(saved.getRole())
                 .build();
     }
 
@@ -141,6 +129,7 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         return MemberResponse.builder()
                 .name(updated.getName())
+                .role(updated.getRole())
                 .build();
     }
 

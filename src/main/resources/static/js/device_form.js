@@ -1,18 +1,73 @@
-/* device_form.js */
+/* device_form.js - 신청서 불러오기 및 폼 제어 스크립트 */
 
 function loadRequestData(selectObj) {
     const selectedOption = selectObj.options[selectObj.selectedIndex];
+    const reqId = selectObj.value; // 선택된 신청서 ID
 
-    if (selectObj.value === "") {
-        return;
+    // 1. 신청서가 선택되었는지 여부 (선택되면 true -> 잠금 모드)
+    const isLocked = (reqId !== "");
+
+    // 헬퍼 함수: 텍스트 입력칸 값 넣기 & 잠금 토글
+    const setInput = (name, value) => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            if (value !== undefined) input.value = value;
+
+            // 잠금 모드면 readonly 설정, 아니면 해제
+            input.readOnly = isLocked;
+
+            // 시각적 효과 (회색 배경)
+            if (isLocked) input.classList.add('bg-light');
+            else input.classList.remove('bg-light');
+        }
+    };
+
+    // 헬퍼 함수: 드롭다운(Select) 값 넣기 & 잠금 토글 (Hidden 처리 포함)
+    const setSelect = (name, value) => {
+        const select = document.querySelector(`select[name="${name}"]`);
+        if (select) {
+            if (value !== undefined) select.value = value;
+
+            // 드롭다운은 disabled로 잠금
+            select.disabled = isLocked;
+
+            if (isLocked) {
+                select.classList.add('bg-light');
+                // disabled 되면 값이 전송 안 되므로, hidden input을 동적으로 생성
+                let hidden = document.querySelector(`input[type="hidden"][name="${name}"]`);
+                if (!hidden) {
+                    hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = name;
+                    select.parentNode.appendChild(hidden);
+                }
+                hidden.value = select.value;
+            } else {
+                select.classList.remove('bg-light');
+                // 잠금 해제 시 hidden input 제거 (중복 전송 방지)
+                const hidden = document.querySelector(`input[type="hidden"][name="${name}"]`);
+                if (hidden) hidden.remove();
+            }
+        }
+    };
+
+    // 헬퍼 함수: 텍스트영역(TextArea) 값 넣기 & 잠금
+    const setTextarea = (name, value) => {
+        const area = document.querySelector(`textarea[name="${name}"]`);
+        if (area) {
+            if (value !== undefined) area.value = value;
+            area.readOnly = isLocked;
+            if (isLocked) area.classList.add('bg-light');
+            else area.classList.remove('bg-light');
+        }
     }
 
-    // 1. data-* 속성 읽어오기
-    const company = selectedOption.getAttribute('data-company');      // 회사명
-    const companyPhone = selectedOption.getAttribute('data-company-phone'); // 회사번호
-    const userName = selectedOption.getAttribute('data-username');    // 담당자명
-    const contact = selectedOption.getAttribute('data-contact');      // 담당자번호
-    const purpose = selectedOption.getAttribute('data-purpose');      // 용도
+    // 2. data-* 속성 읽어오기
+    const company = selectedOption.getAttribute('data-company');
+    const companyPhone = selectedOption.getAttribute('data-company-phone');
+    const userName = selectedOption.getAttribute('data-username');
+    const contact = selectedOption.getAttribute('data-contact');
+    const purpose = selectedOption.getAttribute('data-purpose');
 
     const vendor = selectedOption.getAttribute('data-vendor');
     const model = selectedOption.getAttribute('data-model');
@@ -20,55 +75,36 @@ function loadRequestData(selectObj) {
     const height = selectedOption.getAttribute('data-height');
     const cdate = selectedOption.getAttribute('data-cdate');
     const cmonth = selectedOption.getAttribute('data-cmonth');
-    const reqId = selectedOption.value;
 
-    // 2. 입력 칸에 값 채워넣기
 
-    // [1] 소유자 정보 매핑 (수정됨)
-    // 🚑 [수술 완료] selector 이름을 HTML name 속성과 일치시킴
-    // input[name="ownerName"] -> input[name="companyName"]
-    const ownerInput = document.querySelector('input[name="companyName"]');
-    if(ownerInput && company) ownerInput.value = company;
+    // 3. 값 적용 및 잠금 실행
 
-    // [회사 대표 번호]
-    const companyPhoneInput = document.querySelector('input[name="companyPhone"]');
-    if(companyPhoneInput && companyPhone) companyPhoneInput.value = companyPhone;
+    // [소유자 정보] - 잠금 대상
+    setInput('companyName', company);
+    setInput('companyPhone', companyPhone);
+    setInput('userName', userName);
+    setInput('contact', contact);
 
-    // [담당자 성함]
-    const userNameInput = document.querySelector('input[name="userName"]');
-    if(userNameInput && userName) userNameInput.value = userName;
+    // [장비 정보] - 일부 잠금 대상
+    setSelect('cateId', cateId);      // 종류 (잠금)
+    setInput('vendor', vendor);       // 제조사 (잠금)
+    setInput('modelName', model);     // 모델명 (잠금)
+    setInput('heightUnit', height);   // 높이 (잠금)
 
-    // [담당자 연락처]
-    // 🚑 [수술 완료] input[name="contactInfo"] -> input[name="contact"]
-    const contactInput = document.querySelector('input[name="contact"]');
-    if(contactInput && contact) contactInput.value = contact;
+    // ※ 시리얼번호, IP주소, 랙 위치(RackId), 시작위치(StartUnit)는
+    //    신청서에 없는 정보이므로 잠그지 않음 (직접 입력해야 함)
 
-    // [2] 장비 정보 매핑
-    const vendorInput = document.querySelector('input[name="vendor"]');
-    if(vendorInput) vendorInput.value = vendor;
+    // [계약 정보] - 잠금 대상
+    setTextarea('description', purpose);
+    setInput('contractDate', cdate);
+    setSelect('contractMonth', cmonth);
 
-    const modelInput = document.querySelector('input[name="modelName"]');
-    if(modelInput) modelInput.value = model;
-
-    const heightInput = document.querySelector('input[name="heightUnit"]');
-    if(heightInput) heightInput.value = height;
-
-    const cateSelect = document.querySelector('select[name="cateId"]');
-    if (cateSelect) cateSelect.value = cateId;
-
-    // [3] 계약 및 설명 매핑
-    const descInput = document.querySelector('textarea[name="description"]');
-    if(descInput && purpose) descInput.value = purpose;
-
-    const dateInput = document.querySelector('input[name="contractDate"]');
-    if(dateInput && cdate) dateInput.value = cdate;
-
-    const monthSelect = document.querySelector('select[name="contractMonth"]');
-    if(monthSelect && cmonth) monthSelect.value = cmonth;
-
-    // [4] 히든 필드 (reqId) 업데이트
+    // [히든 필드 업데이트]
     const reqField = document.getElementById('reqIdField');
     if(reqField) reqField.value = reqId;
 
-    alert("신청서 내용이 불러와졌습니다.\n'랙 위치'와 '시리얼 번호', 'IP'를 입력 후 등록하세요.");
+    // 4. 사용자 알림
+    if (isLocked) {
+        alert("신청서 내용이 불러와졌습니다.\n데이터 보호를 위해 신청서 관련 정보는 수정할 수 없습니다.\n\n'랙 위치', '시리얼 번호', 'IP'를 입력 후 등록하세요.");
+    }
 }
