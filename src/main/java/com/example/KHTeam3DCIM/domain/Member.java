@@ -19,11 +19,20 @@ public class Member {
     @Column(name = "PASSWORD", nullable = false, length = 100)
     private String password;    // 암호
     @Column(name = "NAME", nullable = false, length = 50)
-    private String name;        // 이름
+    private String name;        // 담당자 성함
+    @Column(name = "CONTACT", length = 20)
+    private String contact;     // 담당자 직통 번호
     @Enumerated(EnumType.STRING)
     @Column(name = "ROLE", length = 20)
     @Builder.Default
     private Role role = Role.USER;
+
+    // ⭐ [추가] 회사 정보 및 연락처
+    @Column(name = "COMPANY_NAME", length = 50)
+    private String companyName; // 회사명
+    @Column(name = "COMPANY_PHONE", length = 20)
+    private String companyPhone; // 회사 대표 번호
+
 
     // ⭐️ 관리자용 이름 업데이트 메서드 ⭐️
     public void updateName(String name) {
@@ -33,4 +42,5 @@ public class Member {
     public void updateRole(Role role) {
         this.role = role;
     }
+
 }

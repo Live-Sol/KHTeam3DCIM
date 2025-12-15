@@ -104,15 +104,16 @@
                 <tr>
                     <th>시간</th>
                     <th>사용자</th>
-                    <th>활동 내용</th> </tr>
+                    <th>활동 내용</th>
+                </tr>
                 </thead>
                 <tbody>
                 <tr th:each="log : ${recentLogs}">
-                    <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">2026-01-01 12:00</td>
+                    <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">수정시간(NULL)</td>
 
-                    <td><span class="badge bg-secondary" th:text="${log.actor}">admin</span></td>
+                    <td><span class="badge bg-secondary" th:text="${log.actor}">변경자(NULL)</span></td>
 
-                    <td th:text="${log.actionDescription}">장비 등록: SN-1234</td>
+                    <td th:text="${log.actionDescription}">변견사항(NULL)</td>
                 </tr>
                 <tr th:if="${recentLogs.isEmpty()}">
                     <td colspan="3" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>

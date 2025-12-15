@@ -2,10 +2,13 @@
 
 package com.example.KHTeam3DCIM.controller;
 
+import java.security.Principal;
 import com.example.KHTeam3DCIM.domain.Request;
 import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.RequestRepository;
 import com.example.KHTeam3DCIM.service.CategoryService;
+import com.example.KHTeam3DCIM.service.MemberService;
+import com.example.KHTeam3DCIM.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,14 +22,27 @@ public class RequestController {
 
     private final RequestRepository requestRepository;
     private final CategoryService categoryService;
+    private final MemberService memberService;
 
     // =======================================
-    // 1. [고객] 입주 신청서 작성 화면
+    // 1. [고객] 입주 신청서 작성 화면 (수정됨)
     // =======================================
     @GetMapping("/requests/new")
-    public String requestForm(Model model) {
-        // 장비 종류(서버, 스위치 등) 선택해야 하니까 카테고리 정보 넘김
+    public String requestForm(Model model, Principal principal) {
+        // 1. 카테고리 목록 전달
         model.addAttribute("categories", categoryService.findAllCategories());
+
+        // 2. 로그인한 사용자 정보 가져오기 (자동완성용)
+        if (principal != null) {
+            String memberId = principal.getName();
+            try {
+                Member member = memberService.findMember(memberId);
+                model.addAttribute("member", member); // ⭐️ 회원 정보를 모델에 담아 보냄
+            } catch (Exception e) {
+                // 회원을 못 찾으면 그냥 빈칸으로 두기 위해 아무것도 안 함
+            }
+        }
+
         return "request/RequestForm";
     }
 
@@ -66,6 +82,8 @@ public class RequestController {
 
         return "redirect:/requests"; // 목록으로 복귀
     }
+
+
 
 
 }

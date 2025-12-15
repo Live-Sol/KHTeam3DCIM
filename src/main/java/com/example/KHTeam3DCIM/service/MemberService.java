@@ -1,9 +1,9 @@
 package com.example.KHTeam3DCIM.service;
 
+import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Role;
 import com.example.KHTeam3DCIM.dto.Member.*;
-import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,9 +67,6 @@ public class MemberService {
 
     // 회원 등록
     public MemberResponse addMember(MemberCreateRequest request) {
-//        // ⭐️ 1. 강제 예외 발생 코드 삽입 ⭐️
-//        throw new RuntimeException("디버깅용 강제 오류 발생.");
-
         // 아이디 유효성 검사
         String memberId = request.getMemberId();
         if (!Pattern.matches("^[a-z0-9]{4,20}$", memberId)) {
@@ -96,9 +93,14 @@ public class MemberService {
         // 회원 객체 생성 및 저장
         Member member = Member.builder()
                 .memberId(memberId)
-                .password(encodedPassword)  // 암호화된 비밀번호
+                .password(encodedPassword)
                 .name(name)
-                .role(Role.USER)  // 기본값 USER로 설정
+                .role(Role.USER)
+                // DTO에서 꺼내서 저장
+                .companyName(request.getCompanyName())
+                // 🚑 [수술 완료] 누락되었던 회사 전화번호 저장 로직 추가!
+                .companyPhone(request.getCompanyPhone())
+                .contact(request.getContact())
                 .build();
 
         Member saved = memberRepository.save(member);
@@ -114,10 +116,8 @@ public class MemberService {
     @Transactional
     public MemberResponse updateMember(String memberId, MemberUpdateRequest patch) {
         Member updated = memberRepository.findById(memberId)
-                // .map(existing -> {...}) 내부가 람다 스코프입니다.
                 .map(existing ->{
                     if(patch.getPassword() != null) {
-                        // ⭐️ 변수를 if문 안에서 선언하고 할당하면, 이 블록 내에서만 유효하므로 문제 없습니다. ⭐️
                         String encodedNewPassword = passwordEncoder.encode(patch.getPassword());
                         existing.setPassword(encodedNewPassword);
                     }
@@ -131,38 +131,28 @@ public class MemberService {
                 .role(updated.getRole())
                 .build();
     }
+
     // 회원 정보 수정 (관리자)
-    /**
-     * 관리자가 특정 회원의 이름과 역할을 수정합니다.
-     * @param memberId 수정 대상 회원의 ID
-     * @param updateRequest 수정 요청 데이터 (이름, 역할)
-     * @param adminActorId 수정을 수행한 관리자의 ID (로그 기록용)
-     */
     @Transactional
     public void updateMemberByAdmin(String memberId,
                                     MemberAdminUpdateRequest updateRequest,
                                     String adminActorId) {
 
-        // 1. 수정할 회원을 찾습니다.
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new RuntimeException("수정하려는 회원이 존재하지 않습니다: " + memberId));
 
-        // 2. 변경 전/후 상태 저장 (로그 기록을 위해)
         String oldRole = member.getRole().name();
         String oldName = member.getName();
 
-        // 3. 엔티티 업데이트 (Member.java에 updateName, updateRole 메서드가 있다고 가정)
+        // Entity 업데이트 메서드 호출
         member.updateName(updateRequest.getName());
         member.updateRole(updateRequest.getRole());
 
-        // 4. 로그 기록
         String logDescription = String.format(
                 "회원 [%s (%s)] 정보 수정 by [%s]: 이름 (%s -> %s), 역할 (%s -> %s)",
                 memberId, member.getName(), adminActorId, oldName, updateRequest.getName(), oldRole, updateRequest.getRole().name()
         );
         auditLogService.saveLog(adminActorId, logDescription, LogType.MEMBER_MANAGEMENT);
-
-        // @Transactional 덕분에 별도의 save 호출 없이 변경 사항이 DB에 반영됩니다.
     }
 
     // 회원 삭제 (회원 본인)
@@ -180,17 +170,12 @@ public class MemberService {
     // 회원 삭제 (관리자가 회원)
     @Transactional
     public void deleteMember(String memberId, String adminActorId) {
-        // 1. 해당 ID의 회원을 찾습니다.
-        Member member = memberRepository.findByMemberId(memberId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 ID의 회원이 존재하지 않습니다."));
 
-        // 2. 실제 삭제를 수행합니다.
         memberRepository.delete(member);
-        // 3. 로그 기록 활성화 및 변수 수정
+
         String actionDescription = "회원 [" + member.getName() + " (" + memberId + ")] 삭제 처리.";
-        // Controller에서 전달받은 adminActorId를 사용하며,
-        // AuditLog 엔티티 구조에 맞춰 3개 인자만 전달하도록 수정합니다.
         auditLogService.saveLog(adminActorId, actionDescription, LogType.MEMBER_MANAGEMENT);
     }
-
 }

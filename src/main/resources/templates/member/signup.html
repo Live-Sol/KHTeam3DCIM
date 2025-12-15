@@ -31,10 +31,27 @@
         </div>
 
         <div>
-            <label for="name">이름</label>
+            <label for="companyName">회사명</label>
+            <input type="text" id="companyName" name="companyName" placeholder="KH전자" required>
+        </div>
+
+        <div>
+            <label for="companyPhone">회사 대표 번호</label>
+            <input type="text" id="companyPhone" name="companyPhone" placeholder="052-000-0000" required>
+        </div>
+
+        <div>
+            <label for="name">담당자 성함</label>
             <input type="text" id="name" name="name" required>
             <div id="nameError" style="color:red; display:none;">이름은 한글과 알파벳만 가능하며, 2~10글자여야 합니다.</div>
         </div>
+
+        <div>
+            <label for="contact">담당자 직통 번호</label>
+            <input type="text" id="contact" name="contact" placeholder="010-0000-0000" required>
+        </div>
+
+
 
         <!-- role 필드는 기본적으로 USER로 설정되며, 폼에서 선택할 수 없습니다 -->
         <input type="hidden" name="role" value="USER">

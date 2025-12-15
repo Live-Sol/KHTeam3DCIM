@@ -1,51 +1,74 @@
-/* device_form.js : 장비 등록/수정 화면 전용 스크립트 */
+/* device_form.js */
 
-/**
- * 대기 중인 신청서(SelectBox) 선택 시,
- * 해당 신청서의 정보를 폼(Input)에 자동 입력하는 함수
- */
 function loadRequestData(selectObj) {
-    // 1. 선택된 옵션 태그 가져오기
     const selectedOption = selectObj.options[selectObj.selectedIndex];
 
-    // 2. '선택 안 함'일 경우: 히든 필드 비우고 종료
     if (selectObj.value === "") {
-        const reqField = document.getElementById('reqIdField');
-        if(reqField) reqField.value = "";
         return;
     }
 
-    // 3. data-* 속성에서 값 꺼내기
-    // (HTML에서 th:data-vendor="..." 처럼 넣어준 값들)
+    // 1. data-* 속성 읽어오기
+    const company = selectedOption.getAttribute('data-company');      // 회사명
+    const companyPhone = selectedOption.getAttribute('data-company-phone'); // 회사번호
+    const userName = selectedOption.getAttribute('data-username');    // 담당자명
+    const contact = selectedOption.getAttribute('data-contact');      // 담당자번호
+    const purpose = selectedOption.getAttribute('data-purpose');      // 용도
+
     const vendor = selectedOption.getAttribute('data-vendor');
     const model = selectedOption.getAttribute('data-model');
     const cateId = selectedOption.getAttribute('data-cate');
     const height = selectedOption.getAttribute('data-height');
+    const cdate = selectedOption.getAttribute('data-cdate');
+    const cmonth = selectedOption.getAttribute('data-cmonth');
     const reqId = selectedOption.value;
 
-    // 4. 폼 필드에 값 채워넣기
-    // 제조사
+    // 2. 입력 칸에 값 채워넣기
+
+    // [1] 소유자 정보 매핑 (수정됨)
+    // 🚑 [수술 완료] selector 이름을 HTML name 속성과 일치시킴
+    // input[name="ownerName"] -> input[name="companyName"]
+    const ownerInput = document.querySelector('input[name="companyName"]');
+    if(ownerInput && company) ownerInput.value = company;
+
+    // [회사 대표 번호]
+    const companyPhoneInput = document.querySelector('input[name="companyPhone"]');
+    if(companyPhoneInput && companyPhone) companyPhoneInput.value = companyPhone;
+
+    // [담당자 성함]
+    const userNameInput = document.querySelector('input[name="userName"]');
+    if(userNameInput && userName) userNameInput.value = userName;
+
+    // [담당자 연락처]
+    // 🚑 [수술 완료] input[name="contactInfo"] -> input[name="contact"]
+    const contactInput = document.querySelector('input[name="contact"]');
+    if(contactInput && contact) contactInput.value = contact;
+
+    // [2] 장비 정보 매핑
     const vendorInput = document.querySelector('input[name="vendor"]');
     if(vendorInput) vendorInput.value = vendor;
 
-    // 모델명
     const modelInput = document.querySelector('input[name="modelName"]');
     if(modelInput) modelInput.value = model;
 
-    // 높이 (HeightUnit)
     const heightInput = document.querySelector('input[name="heightUnit"]');
     if(heightInput) heightInput.value = height;
 
-    // 카테고리 (SelectBox) 변경
     const cateSelect = document.querySelector('select[name="cateId"]');
-    if (cateSelect) {
-        cateSelect.value = cateId;
-    }
+    if (cateSelect) cateSelect.value = cateId;
 
-    // 히든 필드(reqId) 채우기 -> 저장 시 상태 변경(APPROVED)을 위해 필수
+    // [3] 계약 및 설명 매핑
+    const descInput = document.querySelector('textarea[name="description"]');
+    if(descInput && purpose) descInput.value = purpose;
+
+    const dateInput = document.querySelector('input[name="contractDate"]');
+    if(dateInput && cdate) dateInput.value = cdate;
+
+    const monthSelect = document.querySelector('select[name="contractMonth"]');
+    if(monthSelect && cmonth) monthSelect.value = cmonth;
+
+    // [4] 히든 필드 (reqId) 업데이트
     const reqField = document.getElementById('reqIdField');
     if(reqField) reqField.value = reqId;
 
-    // 사용자 알림
-    alert("신청서 정보가 적용되었습니다.\n나머지 정보(랙 위치, 시리얼, IP)를 확인 후 등록하세요.");
+    alert("신청서 내용이 불러와졌습니다.\n'랙 위치'와 '시리얼 번호', 'IP'를 입력 후 등록하세요.");
 }
