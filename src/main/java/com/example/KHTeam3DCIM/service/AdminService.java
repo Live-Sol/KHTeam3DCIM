@@ -57,7 +57,7 @@ public class AdminService {
         String oldEmail = member.getEmail();
         String oldContact = member.getContact();
 
-        // 2. 엔티티 업데이트 (Member.java의 updateAdminInfo 메서드 사용)
+        // 2. 엔티티 업데이트 (Member.java의 updateAdminInfo 메서드 사용.)
         member.updateAdminInfo(
                 updateRequest.getName(),
                 updateRequest.getEmail(),

@@ -36,7 +36,7 @@ public class KhTeam3DcimApplication {
         if (!memberRepository.existsByMemberId("admin")) {
             memberRepository.save(Member.builder()
                     .memberId("admin")
-                    // 비밀번호 암호화는 PasswordEncoder Bean이 준비된 후 실행됩니다.
+                    // 비밀번호 암호화는 PasswordEncoder Bean이 준비된 후 실행됩니다..
                     .password(passwordEncoder.encode("1234"))
                     .name("관리자")
                     .email("admin@kh.co.kr")
