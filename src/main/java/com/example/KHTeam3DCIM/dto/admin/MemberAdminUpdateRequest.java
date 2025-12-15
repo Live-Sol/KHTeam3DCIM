@@ -19,7 +19,7 @@ import lombok.Setter;
 public class MemberAdminUpdateRequest {
 
     // 기업명 (이름)
-    @NotBlank(message = "기업명은 필수 입력 값입니다.")
+    @NotBlank(message = "기업명은 필수 입력 값입니다")
     private String name;
 
     // 이메일
