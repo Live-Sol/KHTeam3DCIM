@@ -3,110 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <title>랙 실장도</title>
+    <!-- CSRF 토큰 (전원 제어용) -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script> <!-- QR 코드 생성 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="/css/rack_view.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="container mt-5 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            🏢 랙 실장도 : <span class="text-primary">[[${rack.rackName}]]</span>
-            <br>
-            <small class="text-muted fs-6">📍 [[${rack.locationDesc}]]</small>
-        </h2>
+<!-- 헤더 추가 (네비게이션을 위해 필수) -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container mt-4 mb-5">
+
+    <!-- 1. 상단 정보 및 버튼 -->
+    <div class="d-flex justify-content-between align-items-end mb-3">
         <div>
-            <a href="/devices" class="btn btn-outline-primary">📋 장비 목록</a>
-            <a href="/racks" class="btn btn-secondary">🔙 랙 목록</a>
+            <h2 class="mb-0">
+                <i class="bi bi-hdd-rack-fill text-secondary"></i>
+                Rack : <span class="text-primary fw-bold">[[${rack.rackName}]]</span>
+            </h2>
+            <p class="text-muted mb-0 ms-1">📍 [[${rack.locationDesc}]]</p>
+        </div>
+        <div class="btn-group">
+            <a href="/devices" class="btn btn-outline-primary"><i class="bi bi-list-ul"></i> 장비 목록</a>
+            <a href="/racks" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> 랙 목록</a>
         </div>
     </div>
 
-    <div class="alert alert-success border-success mb-3" th:if="${reqId != null}">
-        <strong>🚀 자리 배정 모드:</strong> 원하시는 <strong>[빈 슬롯]</strong>을 클릭하면,
-        해당 위치에 신청서(No.[[${reqId}]]) 내용으로 장비가 등록됩니다.
+    <!-- 2. 자리 배정 모드 알림 -->
+    <div class="alert alert-success border-success shadow-sm" th:if="${reqId != null}">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-magic fs-3 me-3"></i>
+            <div>
+                <strong>🚀 자리 배정 모드 (승인 처리 중)</strong><br>
+                신청서(No.[[${reqId}]]) 처리를 위해, 아래 실장도에서 <strong>[빈 슬롯]</strong>을 클릭하여 장비를 설치하세요.
+            </div>
+        </div>
     </div>
 
-    <div class="card shadow" style="max-width: 800px; margin: 0 auto;">
-        <div class="card-header bg-dark text-white text-center">
-            <strong>TOP (42U)</strong>
+    <!-- 3. 범례 (Legend) : 색상 가이드 -->
+    <div class="d-flex gap-2 mb-3 justify-content-center">
+        <span class="badge rounded-pill bg-light text-dark border"><span class="status-led led-running"></span> 가동중</span>
+        <span class="badge rounded-pill bg-light text-dark border"><span class="status-led led-off"></span> OFF</span>
+        <span class="vr"></span>
+        <span class="badge" style="background-color: #d1e7dd; color: #0f5132;">Server</span>
+        <span class="badge" style="background-color: #fff3cd; color: #664d03;">Network</span>
+        <span class="badge" style="background-color: #cff4fc; color: #055160;">Storage</span>
+        <span class="badge" style="background-color: #e2d9f3; color: #432874;">UPS</span>
+    </div>
+
+    <!-- 4. 랙 실장도 메인 (캐비닛 스타일) -->
+    <div class="card rack-container mx-auto" style="max-width: 900px;">
+        <div class="card-header rack-header text-center">
+            TOP (Fan Unit)
         </div>
-        <div class="card-body p-0">
+        <div class="card-body p-0 bg-white">
             <table class="table table-bordered rack-table mb-0">
                 <tbody>
                 <tr th:each="slot : ${rackView}">
 
-                    <td class="unit-col"
-                        th:classappend="${slot.status == 'FULL' or slot.status == 'SKIP'} ?
-                                        (${slot.runStatus == 'RUNNING'} ? 'unit-running' : 'unit-off')">
-                        [[${slot.unitNum}]]U
-                    </td>
+                    <!-- 왼쪽 U 번호 -->
+                    <td class="unit-col">[[${slot.unitNum}]]U</td>
 
+                    <!-- 장비가 있는 칸 -->
                     <td th:if="${slot.status == 'FULL'}"
                         th:rowspan="${slot.rowSpan}"
                         class="device-occupied"
-                        th:classappend="${slot.runStatus == 'RUNNING'} ? 'status-running' : 'status-off'"
-                        th:id="'device-cell-' + ${slot.deviceId}"
-                        th:onclick="|showDeviceModal(${slot.deviceId})|">
 
-                        <div class="fw-bold mb-1">
-                            <i class="bi" th:classappend="${slot.runStatus == 'RUNNING'} ? 'bi-hdd-network' : 'bi-dash-circle'"></i>
-                            [[${slot.deviceName}]]
+                    /* 장비 종류에 따라 CSS 클래스 동적 적용 */
+                    th:classappend="${slot.type == 'SVR' ? 'type-server' :
+                    (slot.type == 'NET' ? 'type-network' :
+                    (slot.type == 'STO' ? 'type-storage' :
+                    (slot.type == 'UPS' ? 'type-ups' : 'type-etc')))}"
+
+                    th:onclick="|showDeviceModal(${slot.deviceId})|">
+
+                    <div class="d-flex justify-content-between align-items-center px-3">
+                        <!-- 왼쪽: 장비 정보 -->
+                        <div class="text-start">
+                            <div class="fw-bold">
+                                <!-- 종류별 아이콘 -->
+                                <i class="bi" th:classappend="${slot.type == 'SVR' ? 'bi-server' :
+                                                                  (slot.type == 'NET' ? 'bi-router' :
+                                                                  (slot.type == 'STO' ? 'bi-hdd-network' : 'bi-battery-charging'))}"></i>
+                                [[${slot.deviceName}]]
+                            </div>
+                            <small class="opacity-75">[[${slot.type}]] / [[${slot.rowSpan}]]U</small>
                         </div>
 
-                        <span class="badge bg-dark opacity-75 me-1">[[${slot.rowSpan}]] U</span>
-
-                        <th:block th:switch="${slot.type}">
-                            <span th:case="'SVR'" class="badge badge-server">Server</span>
-                            <span th:case="'NET'" class="badge badge-network">Network</span>
-                            <span th:case="'STO'" class="badge badge-storage">Storage</span>
-                            <span th:case="'UPS'" class="badge badge-ups">UPS/Power</span>
-                            <span th:case="*" class="badge badge-etc">Etc</span>
-                        </th:block>
+                        <!-- 오른쪽: 상태 LED -->
+                        <div class="text-end" title="전원 상태">
+                                <span class="status-led"
+                                      th:classappend="${slot.runStatus == 'RUNNING'} ? 'led-running' : 'led-off'"></span>
+                            <span style="font-size: 0.8em;" th:text="${slot.runStatus == 'RUNNING' ? 'ON' : 'OFF'}"></span>
+                        </div>
+                    </div>
                     </td>
 
+                    <!-- 빈 칸 -->
                     <td th:if="${slot.status == 'EMPTY'}"
                         class="device-empty"
                         th:onclick="|location.href='@{/devices/new(rackId=${rack.id}, startUnit=${slot.unitNum}, reqId=${reqId})}'|">
-                        <i class="bi bi-plus-circle-dotted"></i> 빈 슬롯 (등록)
+                        <i class="bi bi-plus-lg"></i> Empty
                     </td>
 
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div class="card-footer bg-dark text-white text-center">
-            <strong>BOTTOM (1U)</strong>
+        <div class="card-footer rack-footer text-center">
+            BOTTOM
         </div>
     </div>
 </div>
 
+<!-- 모달 (Modal) 부분은 기존과 동일하지만 JS 연결을 위해 유지 -->
 <div class="modal fade" id="deviceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light">
-                <h5 class="modal-title">장비 상세 정보</h5>
+                <h5 class="modal-title">🖥️ 장비 상세 정보</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-8">
-                        <table class="table table-sm">
-                            <tr><th style="width: 30%">제조사</th><td id="modalVendor"></td></tr>
-                            <tr><th>모델명</th><td id="modalModel" class="fw-bold text-primary"></td></tr>
-                            <tr><th>시리얼</th><td id="modalSerial"></td></tr>
-                            <tr><th>IP 주소</th><td id="modalIp"></td></tr>
-                            <tr><th>상태</th><td id="modalStatus"></td></tr>
-                            <tr><th>입고일</th><td id="modalContractDate"></td></tr>
-                            <tr><th>계약만료</th><td id="modalExpiry" class="fw-bold text-danger"></td></tr>
+                        <table class="table table-sm table-borderless">
+                            <tr><th class="text-muted" style="width: 30%">제조사</th><td id="modalVendor"></td></tr>
+                            <tr><th class="text-muted">모델명</th><td id="modalModel" class="fw-bold text-primary"></td></tr>
+                            <tr><th class="text-muted">시리얼</th><td id="modalSerial" style="font-family: monospace;"></td></tr>
+                            <tr><th class="text-muted">IP 주소</th><td id="modalIp" style="font-family: monospace;"></td></tr>
+                            <tr><th class="text-muted">상태</th><td id="modalStatus"></td></tr>
+                            <tr><th class="text-muted">입고일</th><td id="modalContractDate"></td></tr>
+                            <tr><th class="text-muted">계약만료</th><td id="modalExpiry"></td></tr>
                         </table>
                     </div>
-
-                    <div class="col-4 d-flex flex-column align-items-center justify-content-center border-start">
-                        <div id="qrcode" class="mb-2"></div> <small class="text-muted" style="font-size: 0.7em;">Asset Tag</small>
+                    <div class="col-4 d-flex flex-column align-items-center justify-content-center border-start bg-light rounded">
+                        <div id="qrcode" class="mb-2 bg-white p-1 border"></div>
+                        <small class="text-muted fw-bold" style="font-size: 0.7em;">ASSET TAG</small>
                     </div>
                 </div>
             </div>
@@ -115,7 +153,7 @@
                     <i class="bi bi-power"></i> 전원 제어
                 </button>
                 <div>
-                    <a href="#" id="modalEditBtn" class="btn btn-warning">수정</a>
+                    <a href="#" id="modalEditBtn" class="btn btn-warning"><i class="bi bi-pencil-square"></i> 수정</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>

@@ -7,10 +7,9 @@ import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder; // ⭐️ 추가
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,10 @@ public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final RackRepository rackRepository;
     private final CategoryRepository categoryRepository;
-    private final AuditLogService auditLogService; // ⭐️ DcLogRepository 대신 이거 사용!
+    private final AuditLogService auditLogService;
+
+    // ... (기존 registerDevice, createSort 등 메서드는 유지) ...
+    // ... (전체 파일을 다시 덮어쓰셔도 됩니다. 아래는 기존 코드 포함 전체입니다.) ...
 
     // ==========================================
     // 1. 장비 등록하기
@@ -52,20 +54,16 @@ public class DeviceService {
             }
         }
 
-        // 통과했으면 관계 맺어주기
         newDevice.setRack(rack);
         newDevice.setCategory(category);
 
-        // 상태가 없으면 기본값 'OFF'로 설정
         if (newDevice.getStatus() == null || newDevice.getStatus().isEmpty()) {
             newDevice.setStatus("OFF");
         }
 
-        // 장비 저장 (DB에 INSERT)
         deviceRepository.save(newDevice);
 
-        // ⭐️ AuditLog 저장 (팀원 코드 활용)
-        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName(); // 로그인한 ID 가져오기
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 등록: " + newDevice.getSerialNum(), LogType.DEVICE_OPERATION);
 
         return newDevice.getId();
@@ -74,36 +72,26 @@ public class DeviceService {
     // ==========================================
     // 2. 조회 기능들
     // ==========================================
-    // [1] 수정: 정렬 옵션(무엇을)과 방향(어떻게)을 모두 받아서 처리
     private Sort createSort(String sortOption, String sortDir) {
-
-        // 1. 방향 결정 (기본값은 DESC)
-        // 화면에서 "asc"라고 보내면 오름차순(ASC), 아니면 내림차순(DESC)
         Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-        // 2. 정렬할 속성(필드명) 결정
         String property = switch (sortOption) {
-            case "id_asc" -> "id"; // ID 기준
-            case "rack" -> "rack.rackName"; // 랙 이름 기준
-            case "category" -> "category.name"; // 카테고리 이름 기준
-            case "serial" -> "serialNum"; // 시리얼 번호 기준
-            case "location" -> "startUnit"; // 위치(Unit) 기준
-            case "status" -> "status"; // 상태 기준
-            case "contract", "expiry" -> "contractDate"; // 계약일, 만료일 정렬
-            default -> "id"; // 기본값(latest 등)은 ID 기준
+            case "id_asc" -> "id";
+            case "rack" -> "rack.rackName";
+            case "category" -> "category.name";
+            case "serial" -> "serialNum";
+            case "location" -> "startUnit";
+            case "status" -> "status";
+            case "contract", "expiry" -> "contractDate";
+            default -> "id";
         };
-
-        // 3. Sort 객체 생성 (방향 + 속성)
         return Sort.by(direction, property);
     }
 
-    // [2] 전체 조회 (파라미터 추가)
     public List<Device> findAllDevices(String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
         return deviceRepository.findAll(sort);
     }
 
-    // [3] 검색 조회 (파라미터 추가)
     public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -113,6 +101,10 @@ public class DeviceService {
                 keyword, keyword, keyword, sort);
     }
 
+    // ⭐ [NEW] 총 장비 개수 조회 메서드 추가
+    public long countAllDevices() {
+        return deviceRepository.count();
+    }
 
     // ==========================================
     // 3. 랙 실장도 데이터 가공
@@ -139,8 +131,8 @@ public class DeviceService {
             slots[end].setRowSpan(d.getHeightUnit());
             slots[end].setDeviceId(d.getId());
             slots[end].setRunStatus(d.getStatus());
-            slots[end].setSerialNum(d.getSerialNum()); // 툴팁용
-            slots[end].setIpAddr(d.getIpAddr());       // 툴팁용
+            slots[end].setSerialNum(d.getSerialNum());
+            slots[end].setIpAddr(d.getIpAddr());
 
             for (int j = start; j < end; j++) {
                 slots[j].setStatus("SKIP");
@@ -157,28 +149,31 @@ public class DeviceService {
     // 4. 삭제/수정/전원
     // ==========================================
     @Transactional
-    public void deleteDevice(Long id) { // 장비 삭제
+    public void deleteDevice(Long id) {
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
         deviceRepository.delete(device);
-
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
     }
 
     @Transactional
-    public void updateDevice(Long id, Device formDevice) { // 장비 수정
+    public void updateDevice(Long id, Device formDevice) {
         Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 🚑 [수정] 충돌 검사 로직이 필요하다면 여기에 추가해야 함 (현재는 생략)
+
         target.setVendor(formDevice.getVendor());
         target.setModelName(formDevice.getModelName());
         target.setSerialNum(formDevice.getSerialNum());
         target.setIpAddr(formDevice.getIpAddr());
+        // 위치 변경은 현재 미지원 (복잡도 때문)
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 정보 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
     }
 
     @Transactional
-    public String toggleStatus(Long id) { // 전원 토글
+    public String toggleStatus(Long id) {
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
         if ("RUNNING".equals(device.getStatus())) device.setStatus("OFF");
         else device.setStatus("RUNNING");
@@ -188,9 +183,6 @@ public class DeviceService {
         return device.getStatus();
     }
 
-    // ==========================================
-    // [추가] 단건 조회 (Controller에서 호출함)
-    // ==========================================
     public Device findById(Long id) {
         return deviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 장비가 존재하지 않습니다."));
