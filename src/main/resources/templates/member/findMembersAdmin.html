@@ -10,8 +10,8 @@
     <style>
         /* 버튼 정렬 문제를 해결하기 위한 커스텀 스타일 */
         .action-cell {
-            min-width: 320px; /* 버튼 3개 + 간격을 충분히 확보 */
-            white-space: nowrap; /* 줄바꿈 방지 */
+            min-width: 320px;
+            white-space: nowrap;
             vertical-align: middle;
             text-align: center;
         }
@@ -20,7 +20,7 @@
         .action-cell form {
             margin: 0;
             padding: 0;
-            display: inline; /* 폼을 인라인으로 처리 */
+            display: inline;
         }
     </style>
 </head>
@@ -36,7 +36,7 @@
         </a>
     </div>
 
-    <div th:if="${deleteMessage}" class="alert"
+    <div th:if="${deleteMessage != null}" class="alert"
          th:classappend="${deleteSuccess} ? 'alert-success' : 'alert-danger'">
         <p th:text="${deleteMessage}" class="mb-0"></p>
     </div>
@@ -45,7 +45,9 @@
         <thead class="table-dark">
         <tr>
             <th>회원 ID</th>
-            <th>이름</th>
+            <th>기업명</th>
+            <th>이메일</th>
+            <th>연락처</th>
             <th>역할</th>
             <th class="text-center">관리</th> </tr>
         </thead>
@@ -53,19 +55,22 @@
         <tr th:each="member : ${members}">
             <td th:text="${member.memberId}" class="align-middle"></td>
             <td th:text="${member.name}" class="align-middle"></td>
+            <td th:text="${member.email}" class="align-middle"></td>
+            <td th:text="${member.contact}" class="align-middle"></td>
             <td th:text="${member.role}" class="align-middle"></td>
 
             <td class="action-cell">
                 <div sec:authorize="hasRole('ADMIN')" class="d-flex justify-content-center gap-2">
 
-                    <a th:href="@{/members/admin/edit/{memberId}(memberId=${member.memberId})}"
+                    <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"
                        th:if="${member.memberId != #authentication.name}"
                        class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil-square"></i> 관리 수정
                     </a>
 
                     <form th:id="'deleteForm_' + ${member.memberId}"
-                          th:action="@{/members/admin/delete/{memberId}(memberId=${member.memberId})}"
+                          th:action="@{/admin/members-delete/{memberId}(memberId=${member.memberId})}"
+                          th:if="${member.role.name() != 'ADMIN' and member.memberId != #authentication.name}"
                           method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <input type="hidden" name="_method" value="delete" />
@@ -80,7 +85,7 @@
                     </form>
                 </div>
 
-                <a th:href="@{/members/edit}"
+                <a th:href="@{/admin/edit}"
                    sec:authorize="isAuthenticated()"
                    th:if="${member.memberId == #authentication.name}"
                    class="btn btn-info btn-sm text-white">

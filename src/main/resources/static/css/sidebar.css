@@ -1,0 +1,28 @@
+/* ⭐️ 1. Sidebar 기본 스타일 ⭐️ */
+.sidebar {
+    width: 250px;
+    background-color: #343a40;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+}
+
+/* ⭐️ 2. Sidebar Link 스타일 ⭐️ */
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active { /* ⭐️ .active 클래스 스타일 ⭐️ */
+    color: #ffffff;
+    background-color: #007bff;
+}
+
+/* ⭐️ 3. Main Content 패딩 ⭐️ */
+.main-content {
+    padding: 20px;
+    background-color: #f8f9fa;
+}

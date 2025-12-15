@@ -9,50 +9,118 @@ body {
 
 /* 컨테이너 스타일 */
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* 헤더 스타일 */
 h2 {
     text-align: center;
     color: #333;
+    margin-bottom: 25px;
 }
 
-/* 입력 필드 스타일 */
-input {
+/* -------------------- 폼 요소 스타일 -------------------- */
+
+/* 입력 필드 그룹 (라벨+입력창) */
+div {
+    margin-bottom: 15px;
+}
+
+/* 라벨 스타일 (정렬을 위해) */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* 입력 필드, Select 박스 스타일 통일 */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+select {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 5px 0 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 1em;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
+/* Readonly 필드 스타일 */
+input[readonly] {
+    background-color: #eee;
+    color: #777;
+    cursor: not-allowed;
+}
+
+/* -------------------- 버튼 및 링크 스타일 -------------------- */
+
+/* 버튼 기본 스타일 */
+button, .btn {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1em;
+    transition: background-color 0.3s;
 }
 
-button:hover {
+button[type="submit"] {
+    width: 100%;
+    background-color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+button[type="submit"]:hover {
     background-color: #45a049;
 }
 
-/* 링크 스타일 */
-a {
-    color: #4CAF50;
-    text-decoration: none;
+/* 목록으로 버튼 (보조 버튼 스타일) */
+.btn-secondary {
+    width: 100%;
+    background-color: #6c757d;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
 }
 
-a:hover {
-    text-decoration: underline;
+/* -------------------- 메시지 및 오류 스타일 -------------------- */
+
+/* 서버 메시지 박스 기본 스타일 */
+.message-box {
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.error-message { /* HTML에서 class="message-box error-message" 사용 */
+    background-color: #fdd;
+    border: 1px solid #f00;
+}
+
+.success-message { /* HTML에서 class="message-box success-message" 사용 */
+    background-color: #dff;
+    border: 1px solid #0f0;
+}
+
+/* DTO 유효성 검사 오류 메시지 스타일 */
+.error-text, ul li {
+    color: darkred;
+    font-size: 0.85em;
+    margin-top: 5px;
+    list-style-type: disc;
+    margin-left: 20px;
 }

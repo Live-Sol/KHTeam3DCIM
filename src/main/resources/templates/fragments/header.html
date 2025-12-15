@@ -24,10 +24,15 @@
                 <li class="nav-item" sec:authorize="isAuthenticated()">
                     <span class="nav-link text-white">
                         <i class="bi bi-person-badge-fill"></i>
-                        환영합니다, <b sec:authentication="name">User</b> 님 </span>
+                        환영합니다,
+                        <b th:text="${#authentication.principal instanceof T(com.example.KHTeam3DCIM.security.CustomUserDetails)
+                        ? #authentication.principal.name
+                        : #authentication.principal.username}">User</b>
+                        님
+                    </span>
                 </li>
 
-                <li class="nav-item" sec:authorize="isAuthenticated()">
+                <li class="nav-item" sec:authorize="!hasRole('ADMIN')">
                     <a class="nav-link text-white d-flex align-items-center" href="/requests/new">
                         <i class="bi bi-pencil-square me-1"></i> 입주 신청
                     </a>

@@ -15,7 +15,6 @@
         <p th:text="${error}"></p>
     </div>
 
-
     <form id="signupForm" th:action="@{/members}" method="POST">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div>
@@ -27,13 +26,25 @@
         <div>
             <label for="password">비밀번호</label>
             <input type="password" id="password" name="password" required>
-            <div id="passwordError" style="color:red; display:none;">비밀번호는 4~20글자 사이여야 합니다.</div>
+            <div id="passwordError" style="color:red; display:none;">비밀번호는 4자 이상, 영문자와 숫자를 포함해야 합니다.</div>
         </div>
 
         <div>
             <label for="name">이름</label>
             <input type="text" id="name" name="name" required>
             <div id="nameError" style="color:red; display:none;">이름은 한글과 알파벳만 가능하며, 2~10글자여야 합니다.</div>
+        </div>
+
+        <div>
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" required>
+            <div id="emailError" style="color:red; display:none;">유효한 이메일 주소를 입력해 주세요.</div>
+        </div>
+
+        <div>
+            <label for="contact">연락처</label>
+            <input type="tel" id="contact" name="contact" required placeholder="010-xxxx-xxxx">
+            <div id="contactError" style="color:red; display:none;">연락처 형식이 올바르지 않습니다. (예: 010-xxxx-xxxx 또는 010xxxxxxxx)</div>
         </div>
 
         <!-- role 필드는 기본적으로 USER로 설정되며, 폼에서 선택할 수 없습니다 -->
@@ -63,7 +74,7 @@
 
         // 비밀번호 검사
         const password = document.getElementById('password').value;
-        const passwordPattern = /^.{4,20}$/; // 4~20글자
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,}$/; // 4자 이상, 영문자와 숫자를 포함해야 함
         const passwordError = document.getElementById('passwordError');
         if (!passwordPattern.test(password)) {
             passwordError.style.display = 'block';
@@ -83,6 +94,32 @@
             valid = false;
         } else {
             nameError.style.display = 'none';
+        }
+
+        // Email 유효성 검사 로직 추가
+        const email = document.getElementById('email').value;
+        // 클라이언트 측 간단한 이메일 형식 검사
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailError = document.getElementById('emailError');
+        if (!emailPattern.test(email)) {
+            emailError.style.display = 'block';
+            document.getElementById('email').focus();
+            valid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
+
+        // 연락처 유효성 검사 로직 추가
+        const contact = document.getElementById('contact').value;
+        // 서버 DTO와 동일한 패턴: 하이픈 포함/미포함 10~11자리 숫자
+        const contactPattern = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$|^[0-9]{10,11}$/;
+        const contactError = document.getElementById('contactError');
+        if (!contactPattern.test(contact)) {
+            contactError.style.display = 'block';
+            document.getElementById('contact').focus();
+            valid = false;
+        } else {
+            contactError.style.display = 'none';
         }
 
         // // 유효성 검사를 통과하지 못하면 form 제출을 막음

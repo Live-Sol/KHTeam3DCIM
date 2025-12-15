@@ -10,5 +10,7 @@ import lombok.Data;
 public class MemberAdminResponse {
     private String memberId;
     private String name;
+    private String email;
+    private String contact;
     private Role role;
 }

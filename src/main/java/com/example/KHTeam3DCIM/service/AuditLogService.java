@@ -3,6 +3,9 @@ package com.example.KHTeam3DCIM.service;
 import com.example.KHTeam3DCIM.domain.AuditLog; // AuditLog의 실제 패키지 경로로 수정 필요
 import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.repository.AuditLogRepository;
+import com.example.KHTeam3DCIM.repository.DeviceRepository;
+import com.example.KHTeam3DCIM.repository.MemberRepository;
+import com.example.KHTeam3DCIM.repository.RequestRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +17,17 @@ import java.util.List;
 public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
-    // 나중에 MemberRepository, DeviceRepository 등을 추가합니다.
+    private  final MemberRepository memberRepository;
+    private final RequestRepository  requestRepository;
+    private final DeviceRepository deviceRepository;
+        // 나중에 MemberRepository, DeviceRepository 등을 추가합니다.
 
-    public AuditLogService(AuditLogRepository auditLogRepository) {
+    public AuditLogService(AuditLogRepository auditLogRepository, MemberRepository  memberRepository,
+                           RequestRepository  requestRepository, DeviceRepository deviceRepository) {
         this.auditLogRepository = auditLogRepository;
+        this.memberRepository = memberRepository;
+        this.requestRepository = requestRepository;
+        this.deviceRepository = deviceRepository;
     }
 
     /**
@@ -33,17 +43,17 @@ public class AuditLogService {
     // --- 통계 데이터 (현재는 더미, 나중에 Repository 연동 필요) ---
     public int getPendingRequestCount() {
         // TODO: 실제 RequestRepository를 사용하여 countByStatus("PENDING") 로직 구현
-        return 5;
+        return (int) requestRepository.count();
     }
 
     public int getTotalDeviceCount() {
         // TODO: 실제 DeviceRepository를 사용하여 count() 로직 구현
-        return 120;
+        return (int) deviceRepository.count();
     }
 
     public int getTotalMemberCount() {
         // TODO: 실제 MemberRepository를 사용하여 count() 로직 구현
-        return 45;
+        return (int) memberRepository.count();
     }
 
     // AuditLogService.java - saveLog 메서드 수정

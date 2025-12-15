@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService; // ⭐�
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User; // Spring Security가 사용하는 UserDetails 구현체
+import com.example.KHTeam3DCIM.security.CustomUserDetails;
 
 import java.util.Collections;
 
@@ -44,11 +44,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         SimpleGrantedAuthority authority =
                 new SimpleGrantedAuthority("ROLE_" + member.getRole().name());
 
-        // 2. UserDetails 객체 반환
-        return new User(
-                member.getMemberId(), // 사용자 ID
-                member.getPassword(), // DB에 저장된 암호화된 비밀번호
-                Collections.singleton(authority) // 권한 목록
+        // Member 전체 정보를 담은 커스텀 UserDetails 생성
+        // (로그인 성공 후 SecurityContext에 저장됨)
+        return new CustomUserDetails(
+                member,
+                Collections.singleton(authority)
         );
     }
 }
