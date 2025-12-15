@@ -4,6 +4,7 @@ import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Role;
 import com.example.KHTeam3DCIM.dto.Member.*;
+import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -145,8 +146,14 @@ public class MemberService {
         String oldName = member.getName();
 
         // Entity 업데이트 메서드 호출
-        member.updateName(updateRequest.getName());
-        member.updateRole(updateRequest.getRole());
+        member.updateAdminInfo(
+                updateRequest.getName(),
+                updateRequest.getEmail(),
+                updateRequest.getContact(),
+                updateRequest.getCompanyName(),
+                updateRequest.getCompanyPhone(),
+                updateRequest.getRole()
+        );
 
         String logDescription = String.format(
                 "회원 [%s (%s)] 정보 수정 by [%s]: 이름 (%s -> %s), 역할 (%s -> %s)",

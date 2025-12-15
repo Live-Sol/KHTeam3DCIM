@@ -32,6 +32,15 @@ public class MemberAdminUpdateRequest {
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "연락처는 00-000-0000 형식으로 입력해 주세요.")
     private String contact;
 
+    // 회사명
+    @NotBlank(message = "회사명은 필수 입력 값입니다.")
+    private String companyName;
+
+    // 회사번호
+    @NotBlank(message = "연락처는 필수 입력 값입니다.")
+    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "연락처는 00-000-0000 형식으로 입력해 주세요.")
+    private String companyPhone;
+
     // 역할 (관리자 전용 수정 항목)
     @NotNull(message = "역할은 필수 선택 값입니다.")
     private Role role;

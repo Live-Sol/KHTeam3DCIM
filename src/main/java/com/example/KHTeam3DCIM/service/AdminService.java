@@ -62,6 +62,8 @@ public class AdminService {
                 updateRequest.getName(),
                 updateRequest.getEmail(),
                 updateRequest.getContact(),
+                updateRequest.getCompanyName(),
+                updateRequest.getCompanyPhone(),
                 updateRequest.getRole()
         );
 

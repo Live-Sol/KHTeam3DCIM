@@ -41,6 +41,8 @@ public class KhTeam3DcimApplication {
                     .name("관리자")
                     .email("admin@kh.co.kr")
                     .contact("010-0000-0000")
+                    .companyName("KH")
+                    .companyPhone("052-123-4567")
                     .role(Role.ADMIN).build());
             System.out.println("⭐ 초기 관리자 계정(admin) 생성 완료 및 암호화 적용");
         }
@@ -53,6 +55,8 @@ public class KhTeam3DcimApplication {
                     .name("김운영")
                     .email("user@kh.co.kr")
                     .contact("010-0000-0000")
+                    .companyName("KH")
+                    .companyPhone("052-123-4567")
                     .role(Role.USER).build());
             System.out.println("⭐ 초기 사용자 계정(user) 생성 완료 및 암호화 적용");
         }
