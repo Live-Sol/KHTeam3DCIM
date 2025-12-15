@@ -3,6 +3,7 @@ package com.example.KHTeam3DCIM.service;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
+import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

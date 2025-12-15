@@ -35,13 +35,12 @@ public class Member {
     @Column(name = "COMPANY_PHONE", length = 20)
     private String companyPhone; // 회사 대표 번호
 
-
-    // ⭐️ 관리자용 이름 업데이트 메서드 ⭐️
-    public void updateName(String name) {
+    // ⭐️ 3. 관리자용 정보 통합 업데이트 메서드 ⭐️
+    // 기존 updateName, updateRole 메서드를 대체하며, 추가된 필드까지 처리합니다.
+    public void updateAdminInfo(String name, String email, String contact, Role role) {
         this.name = name;
-    }
-    // ⭐️ 관리자용 역할 업데이트 메서드 추가 ⭐️
-    public void updateRole(Role role) {
+        this.email = email;
+        this.contact = contact;
         this.role = role;
     }
 
