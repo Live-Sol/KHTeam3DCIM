@@ -4,17 +4,24 @@
     <meta charset="UTF-8">
     <title>랙 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
+
+<!-- 🚑 [수술 완료] 헤더 이식 -->
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container mt-5">
     <h2 class="mb-4">🏢 서버 랙(Rack) 관리</h2>
 
+    <!-- (이하 내용은 기존 파일과 동일하므로 생략하지 않고, 사용자가 덮어쓰기 좋게 전체 제공할 수도 있음) -->
+    <!-- ... 기존 테이블 코드 ... -->
     <div class="d-flex justify-content-end mb-3">
         <a href="/racks/new" class="btn btn-primary">➕ 새 랙 추가</a>
         <a href="/" class="btn btn-secondary ms-2">🏠 홈으로</a>
     </div>
 
+    <!-- (중략) 기존 코드 유지 -->
     <div class="alert alert-success border-success" th:if="${reqId != null}">
         <strong>🚀 자리 배정 모드:</strong> 현재 입주 신청서(No.[[${reqId}]])를 처리 중입니다.
         장비를 설치할 랙의 <strong>[실장도]</strong> 버튼을 눌러주세요.
@@ -38,20 +45,13 @@
             </td>
             <td th:text="${rack.locationDesc}">[건물내 랙 장비 위치]</td>
 
-            <!-- 가동률 진행바 -->
             <td>
-                <!-- 퍼센트 계산 (소수점 없이 정수로) -->
-                <!-- th:with 변수 선언: 퍼센트 = (사용량 * 100) / 총량 -->
                 <div th:with="percent=${rack.totalUnit > 0 ? (rack.usedUnit * 100 / rack.totalUnit) : 0}">
-
                     <div class="d-flex justify-content-between mb-1">
                         <small>사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
                         <small class="fw-bold">[[${percent}]]%</small>
                     </div>
-
                     <div class="progress" style="height: 10px;">
-                        <!-- style width에 퍼센트 적용 -->
-                        <!-- 퍼센트에 따라 색상 변경 (80% 넘으면 빨간색, 50% 넘으면 노란색, 그 외 초록색) -->
                         <div class="progress-bar" role="progressbar"
                              th:style="'width: ' + ${percent} + '%'"
                              th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}">

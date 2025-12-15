@@ -1,5 +1,8 @@
 let currentDeviceId = null; // 현재 열려있는 장비 ID 저장용
 
+// ============================
+// 장비 모달 창 열기
+// ============================
 function showDeviceModal(deviceId) {
     currentDeviceId = deviceId; // ID 저장
 
@@ -12,6 +15,35 @@ function showDeviceModal(deviceId) {
             document.getElementById('modalIp').innerText = data.ipAddr;
             updateStatusUI(data.status);
             document.getElementById('modalEditBtn').href = '/devices/' + data.id + '/edit';
+
+            // ====================
+            // 날짜 및 만료일 계산 로직
+            // ====================
+            const dateElem = document.getElementById('modalContractDate');
+            const expiryElem = document.getElementById('modalExpiry');
+
+            if (data.contractDate) {
+                // 입고일 표시
+                dateElem.innerText = data.contractDate;
+
+                // 만료일 계산 (입고일 + 개월수)
+                if (data.contractMonth) {
+                    const startDate = new Date(data.contractDate);
+                    // 개월 수 더하기
+                    startDate.setMonth(startDate.getMonth() + data.contractMonth);
+
+                    // YYYY-MM-DD 형식으로 변환
+                    const expiryStr = startDate.toISOString().split('T')[0];
+
+                    expiryElem.innerText = `+${data.contractMonth}개월 (~${expiryStr})`;
+                } else {
+                    expiryElem.innerText = "-";
+                }
+            } else {
+                dateElem.innerText = "-";
+                expiryElem.innerText = "-";
+            }
+            // ===============================================
 
             // QR 코드 생성
             const qrContainer = document.getElementById("qrcode");
@@ -39,7 +71,9 @@ function showDeviceModal(deviceId) {
         });
 }
 
+// ============================
 // 전원 버튼 클릭 시 실행
+// ============================
 function togglePower() {
     if(!currentDeviceId) return;
     if(!confirm("장비의 전원 상태를 변경하시겠습니까?")) return;

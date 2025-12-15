@@ -31,13 +31,16 @@
                 </div>
 
                 <div class="card-body">
-                    <h5 class="card-title fw-bold">[[${req.userName}]] <small class="text-muted fs-6">([[${req.contact}]])</small></h5>
+                    <h5 class="card-title fw-bold">회사명: [[${req.companyName}]] <small class="text-muted fs-6">회사번호: ([[${req.companyPhone}]])</small></h5>
+                    <p class="card-text mb-1"><strong>담당자:</strong> [[${req.userName}]] (연락처: [[${req.contact}]])</p>
 
                     <hr>
 
-                    <p class="card-text mb-1"><strong>📦 장비:</strong> [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)</p>
-                    <p class="card-text mb-1"><strong>📅 희망일:</strong> [[${req.startDate}]] (계약: [[${req.termMonth}]]개월)</p>
-                    <p class="card-text bg-light p-2 rounded"><strong>📝 목적:</strong> [[${req.purpose}]]</p>
+                    <p class="card-text mb-1"><strong>장비명:</strong> [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)</p>
+                    <p class="card-text mb-1"><strong>계약기간:</strong> [[${req.startDate}]] (계약: [[${req.termMonth}]]개월)</p>
+                    <p class="card-text mb-1"><strong>입고 목적:</strong></p>
+                    <p class="card-text bg-light p-2 rounded">[[${req.purpose}]]</p>
+
 
                     <div class="d-flex gap-2 mt-3">
                         <a th:href="@{/racks(reqId=${req.id})}" class="btn btn-primary flex-grow-1">

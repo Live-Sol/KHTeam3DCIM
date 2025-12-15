@@ -19,12 +19,14 @@
         <form action="/devices" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 700px;">
 
             <select name="sort" class="form-select" style="width: 160px;" onchange="this.form.submit()">
-                <option value="latest" th:selected="${sort == 'latest'}">📅 등록일 기준</option>
-                <option value="rack" th:selected="${sort == 'rack'}">🏢 위치(Rack)</option>
-                <option value="category" th:selected="${sort == 'category'}">🏷️ 종류/제조사</option>
-                <option value="serial" th:selected="${sort == 'serial'}">🔡 시리얼 번호</option>
-                <option value="location" th:selected="${sort == 'location'}">📏 설치 위치</option>
-                <option value="status" th:selected="${sort == 'status'}">💡 상태</option>
+                <option value="latest" th:selected="${sort == 'latest'}">등록일 기준</option>
+                <option value="rack" th:selected="${sort == 'rack'}">위치(Rack)</option>
+                <option value="category" th:selected="${sort == 'category'}">🏷종류/제조사</option>
+                <option value="serial" th:selected="${sort == 'serial'}">시리얼 번호</option>
+                <option value="location" th:selected="${sort == 'location'}">설치 위치</option>
+                <option value="contract" th:selected="${sort == 'contract'}">입고일(계약일) 기준</option>
+                <option value="expiry" th:selected="${sort == 'expiry'}">만료일 임박 순</option>
+                <option value="status" th:selected="${sort == 'status'}">상태</option>
             </select>
 
             <select name="sortDir" class="form-select" style="width: 130px;" onchange="this.form.submit()">
@@ -40,7 +42,7 @@
 
         <div>
             <a href="/" class="btn btn-secondary me-2">🏠 홈</a>
-            <a href="/devices/new" class="btn btn-primary">➕ 등록</a>
+            <a href="/devices/new" class="btn btn-primary">➕ 신규 등록</a>
         </div>
     </div>
 
@@ -53,6 +55,7 @@
             <th>제조사/모델</th>
             <th>시리얼번호</th>
             <th>설치위치</th>
+            <th>계약 기간 (만료일)</th>
             <th>상태</th>
             <th>관리</th>
         </tr>
@@ -74,6 +77,28 @@
                 <span th:text="${device.startUnit}">10</span>U ~
                 <span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
             </td>
+
+            <td>
+                <span th:text="${device.member != null ? device.member.companyName : '미지정'}">삼성전자</span>
+                <br>
+                <small th:text="${device.member != null ? device.member.contact : ''}">010-1234-5678</small>
+            </td>
+
+            <td>
+                <div th:if="${device.contractDate != null}">
+                    <span th:text="${device.contractDate}">2025-01-01</span>
+                    <small class="text-muted"> (+[[${device.contractMonth}]]개월)</small>
+                    <br>
+                    <small class="fw-bold"
+                           th:with="expireDate=${device.contractDate.plusMonths(device.contractMonth)}"
+                           th:classappend="${expireDate.isBefore(#temporals.createToday())} ? 'text-white bg-danger px-1 rounded' : 'text-danger'">
+                        ~ [[${expireDate}]]
+                        <span th:if="${expireDate.isBefore(#temporals.createToday())}">(만료됨!)</span>
+                    </small>
+                </div>
+                <div th:unless="${device.contractDate != null}" class="text-muted">-</div>
+            </td>
+
             <td>
                 <span class="badge bg-success"
                       th:if="${device.status == 'RUNNING'}">ON</span>
@@ -85,17 +110,17 @@
             <!-- 관리 버튼 영역 (수정 + 삭제) -->
             <td>
                 <!-- 수정 버튼 -->
-                <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-warning">✏️</a>
+                <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-warning">수정</a>
 
                 <!-- 삭제 버튼 (다시 추가!) -->
                 <a th:href="@{/devices/{id}/delete(id=${device.id})}"
                    class="btn btn-sm btn-danger"
-                   onclick="return confirm('정말 이 장비를 폐기(삭제) 하시겠습니까?');">🗑️</a>
+                   onclick="return confirm('정말 이 장비를 폐기(삭제) 하시겠습니까?');">삭제</a>
             </td>
         </tr>
         <!-- 데이터 없을 때 안내 메시지 -->
         <tr th:if="${devices.isEmpty()}">
-            <td colspan="8" class="text-center py-4 text-muted">
+            <td colspan="9" class="text-center py-4 text-muted">
                 등록된 장비(서버)가 없습니다.
             </td>
         </tr>

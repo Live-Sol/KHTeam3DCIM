@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>장비 관리</title>
@@ -7,122 +7,225 @@
 </head>
 <body>
 
-<div class="container mt-5" style="max-width: 600px;">
-
-    <h2 class="mb-4" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h2>
-
-    <div class="alert alert-success" th:if="${reqId != null}">
-        🔔 <strong>장비 신청 승인</strong> 건입니다. 정보가 자동으로 입력되었습니다.<br>
-        랙 위치와 시리얼 번호만 입력하고 등록하세요.
+<div class="container mt-5" style="max-width: 800px;"> <div class="card shadow border-0 mb-5">
+    <div class="card-header bg-primary text-white p-3">
+        <h4 class="mb-0" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h4>
     </div>
 
-    <form th:action="${isEdit == true} ? @{/devices/{id}/edit(id=${device.id})} : @{/devices/new}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <div class="card-body p-4">
 
-        <div class="card bg-light mb-4 border-primary" th:if="${waitingRequests != null and !waitingRequests.isEmpty()}">
-            <div class="card-body p-3">
-                <label class="form-label fw-bold text-primary">📋 입주 대기 신청서 불러오기</label>
-                <select id="requestSelect" class="form-select" onchange="loadRequestData(this)">
-                    <option value="">--- 선택 안 함 (직접 입력) ---</option>
+        <div class="alert alert-success d-flex align-items-center" th:if="${reqId != null}">
+            <span class="fs-4 me-2">🔔</span>
+            <div>
+                <strong>장비 신청 승인(No.[[${reqId}]])</strong> 건입니다.<br>
+                신청서의 [회사명/연락처/장비정보]가 자동으로 입력되었습니다.
+            </div>
+        </div>
 
-                    <th:block th:each="req : ${waitingRequests}">
-                        <option th:value="${req.id}"
-                                th:data-vendor="${req.vendor}"
-                                th:data-model="${req.modelName}"
-                                th:data-cate="${req.cateId}"
-                                th:data-height="${req.heightUnit}"
-                                data-ip="">
-                            No.[[${req.id}]] [[${req.userName}]] - [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)
+        <form th:action="${isEdit == true} ? @{/devices/{id}/edit(id=${device.id})} : @{/devices/new}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" id="reqIdField" name="reqId" th:value="${reqId}">
+
+            <div class="card bg-light mb-4 border-secondary border-opacity-25"
+                 th:if="${isEdit != true and waitingRequests != null and !waitingRequests.isEmpty()}">
+                <div class="card-body p-3">
+                    <label class="form-label fw-bold text-primary">📥 입주 대기 신청서 불러오기</label>
+                    <select id="requestSelect" class="form-select border-primary" onchange="loadRequestData(this)">
+                        <option value="">--- 선택 안 함 (직접 입력) ---</option>
+
+                        <th:block th:each="req : ${waitingRequests}">
+                            <option th:value="${req.id}"
+                                    th:data-company="${req.companyName}"
+                                    th:data-company-phone="${req.companyPhone}"
+                                    th:data-username="${req.userName}"
+                                    th:data-contact="${req.contact}"
+                                    th:data-purpose="${req.purpose}"
+                                    th:data-vendor="${req.vendor}"
+                                    th:data-model="${req.modelName}"
+                                    th:data-cate="${req.cateId}"
+                                    th:data-height="${req.heightUnit}"
+                                    th:data-cdate="${req.startDate}"
+                                    th:data-cmonth="${req.termMonth}">
+                                No.[[${req.id}]] [[${req.companyName}]] ([[${req.userName}]]) - [[${req.modelName}]]
+                            </option>
+                        </th:block>
+                    </select>
+                    <div class="form-text">선택 시 아래 폼에 내용이 자동으로 채워집니다.</div>
+                </div>
+            </div>
+
+
+            <h5 class="mb-3 text-primary border-bottom pb-2">1. 소유자 정보</h5>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">회사명</label>
+                    <!-- 🚑 [수술 완료] device 값을 최우선으로 표시하고, 없으면 member 값 표시 -->
+                    <input type="text" name="companyName" class="form-control"
+                           th:value="${device.companyName != null ? device.companyName : (member != null ? member.companyName : '')}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           placeholder="예: (주)KH정보통신" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">회사 대표 번호</label>
+                    <input type="text" name="companyPhone" class="form-control"
+                           th:value="${device.companyPhone != null ? device.companyPhone : (member != null ? member.contact : '')}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           placeholder="예: 02-1234-5678">
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">담당자 성함</label>
+                    <input type="text" name="userName" class="form-control"
+                           th:value="${device.userName != null ? device.userName : (member != null ? member.name : '')}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">담당자 직통 번호</label>
+                    <input type="text" name="contact" class="form-control"
+                           th:value="${device.contact != null ? device.contact : (member != null ? member.contact : '')}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           placeholder="예: 010-0000-0000" required>
+                </div>
+            </div>
+
+
+            <h5 class="mb-3 text-primary border-bottom pb-2">2. 장비 상세 정보</h5>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">설치 위치 (Rack)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-hdd-rack"></i></span>
+                    <select name="rackId" class="form-select"
+                            th:disabled="${selectedRackId != null}"
+                            th:classappend="${selectedRackId != null} ? 'bg-light'">
+                        <option value="" disabled selected>--- 설치할 랙 선택 ---</option>
+                        <option th:each="rack : ${racks}"
+                                th:value="${rack.id}"
+                                th:text="|${rack.rackName} (${rack.locationDesc})|"
+                                th:selected="${rack.id == selectedRackId or (device.rack != null and device.rack.id == rack.id)}">
                         </option>
-                    </th:block>
-                </select>
-                <div class="form-text">선택 시 신청서 내용이 아래 폼에 자동으로 입력됩니다.</div>
+                    </select>
+                </div>
+                <input th:if="${selectedRackId != null}" type="hidden" name="rackId" th:value="${selectedRackId}">
             </div>
-        </div>
 
-        <input type="hidden" id="reqIdField" name="reqId" th:value="${reqId}">
-
-        <div class="mb-3">
-            <label class="form-label">설치된 랙</label>
-            <select name="rackId" class="form-select"
-                    th:disabled="${selectedRackId != null or isEdit == true}"
-                    th:classappend="${selectedRackId != null or isEdit == true} ? 'bg-light'">
-
-                <option value="" disabled selected>--- 설치할 랙을 선택하세요 ---</option>
-
-                <option th:each="rack : ${racks}"
-                        th:value="${rack.id}"
-                        th:text="|${rack.rackName} (${rack.locationDesc})|"
-                        th:selected="${rack.id == selectedRackId or (device.rack != null and device.rack.id == rack.id)}">
-                </option>
-            </select>
-            <input th:if="${selectedRackId != null}" type="hidden" name="rackId" th:value="${selectedRackId}">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">장비 종류</label>
-            <select name="cateId" class="form-select"
-                    th:disabled="${reqId != null or isEdit == true}"
-                    th:classappend="${reqId != null or isEdit == true} ? 'bg-light'">
-                <option th:each="cate : ${categories}"
-                        th:value="${cate.id}"
-                        th:text="${cate.name}"
-                        th:selected="${device.category != null and cate.id == device.category.id}">서버</option>
-            </select>
-            <input th:if="${reqId != null or isEdit == true}" type="hidden" name="cateId"
-                   th:value="${device.category != null ? device.category.id : selectedCateId}">
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">제조사</label>
-                <input type="text" name="vendor" class="form-control"
-                       th:value="${device.vendor}"
-                       th:readonly="${reqId != null}"
-                       th:classappend="${reqId != null} ? 'bg-light'">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">장비 종류</label>
+                    <select name="cateId" class="form-select"
+                            th:disabled="${reqId != null}"
+                            th:classappend="${reqId != null} ? 'bg-light'">
+                        <option th:each="cate : ${categories}"
+                                th:value="${cate.id}"
+                                th:text="${cate.name}"
+                                th:selected="${device.category != null and cate.id == device.category.id}">Server</option>
+                    </select>
+                    <input th:if="${reqId != null}" type="hidden" name="cateId"
+                           th:value="${device.category != null ? device.category.id : selectedCateId}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">시리얼 번호</label>
+                    <input type="text" name="serialNum" class="form-control"
+                           th:value="${device.serialNum}" placeholder="SN-XXXX-XXXX" required>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">모델명</label>
-                <input type="text" name="modelName" class="form-control"
-                       th:value="${device.modelName}"
-                       th:readonly="${reqId != null}"
-                       th:classappend="${reqId != null} ? 'bg-light'">
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">제조사</label>
+                    <input type="text" name="vendor" class="form-control"
+                           th:value="${device.vendor}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">모델명</label>
+                    <input type="text" name="modelName" class="form-control"
+                           th:value="${device.modelName}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'">
+                </div>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label">시리얼 번호</label>
-            <input type="text" name="serialNum" class="form-control"
-                   th:value="${device.serialNum}" required>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">시작 위치 (U)</label>
-                <input type="number" name="startUnit" class="form-control"
-                       th:value="${device.startUnit}"
-                       th:readonly="${isEdit == true}"
-                       th:classappend="${isEdit == true} ? 'bg-light'" required>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">시작 유닛 (U)</label>
+                    <input type="number" name="startUnit" class="form-control"
+                           th:value="${device.startUnit}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">장비 높이 (U)</label>
+                    <input type="number" name="heightUnit" class="form-control"
+                           th:value="${device.heightUnit != null ? device.heightUnit : 1}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">관리 IP</label>
+                    <input type="text" name="ipAddr" class="form-control"
+                           th:value="${device.ipAddr}" placeholder="192.168.x.x" required>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">장비 높이 (U)</label>
-                <input type="number" name="heightUnit" class="form-control"
-                       th:value="${device.heightUnit != null ? device.heightUnit : 1}"
-                       th:readonly="${reqId != null or isEdit == true}"
-                       th:classappend="${reqId != null or isEdit == true} ? 'bg-light'" required>
+
+
+            <h5 class="mb-3 text-primary border-bottom pb-2">3. 계약 및 기타 정보</h5>
+
+            <div class="mb-3">
+                <label class="form-label">용도 / 설명 (Description)</label>
+                <textarea name="description" class="form-control" rows="2"
+                          th:text="${device.description}"
+                          th:readonly="${reqId != null}"
+                          th:classappend="${reqId != null} ? 'bg-light'"
+                          placeholder="장비의 용도나 특이사항을 기록하세요."></textarea>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label">관리 IP 주소</label>
-            <input type="text" name="ipAddr" class="form-control"
-                   th:value="${device.ipAddr}" required>
-        </div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">입고일 (계약 시작일)</label>
+                    <input type="date" name="contractDate" class="form-control"
+                           th:value="${device.contractDate}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           required>
+                </div>
 
-        <hr>
-        <button type="submit" class="btn btn-primary w-100" th:text="${isEdit == true} ? '수정 저장' : '등록 완료'"></button>
-        <a href="/devices" class="btn btn-secondary w-100 mt-2">취소</a>
-    </form>
+                <!-- ✅ [개선 완료] 계약 기간 부분도 disabled + hidden 패턴으로 변경 -->
+                <div class="col-md-6">
+                    <label class="form-label">계약 기간</label>
+                    <select name="contractMonth" class="form-select"
+                            th:disabled="${reqId != null}"
+                            th:classappend="${reqId != null} ? 'bg-light'"
+                            required>
+                        <option value="12" th:selected="${device.contractMonth == 12}">1년 (12개월)</option>
+                        <option value="24" th:selected="${device.contractMonth == 24 or device.contractMonth == null}">2년 (24개월) - 표준</option>
+                        <option value="36" th:selected="${device.contractMonth == 36}">3년 (36개월)</option>
+                        <option value="0" th:selected="${device.contractMonth == 0}">기타</option>
+                    </select>
+                    <!-- 값이 고정(disabled)되었을 때 데이터를 보내기 위한 히든 필드 -->
+                    <input th:if="${reqId != null}" type="hidden" name="contractMonth" th:value="${device.contractMonth}">
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg fw-bold"
+                        th:text="${isEdit == true} ? '수정 내용 저장' : '장비 등록 완료'"></button>
+                <a href="/devices" class="btn btn-secondary">취소 및 목록으로</a>
+            </div>
+        </form>
+    </div>
+</div>
 </div>
 
 <script src="/js/device_form.js"></script>

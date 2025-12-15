@@ -74,7 +74,7 @@ public class DeviceService {
     // ==========================================
     // 2. 조회 기능들
     // ==========================================
-// [1] 수정: 정렬 옵션(무엇을)과 방향(어떻게)을 모두 받아서 처리
+    // [1] 수정: 정렬 옵션(무엇을)과 방향(어떻게)을 모두 받아서 처리
     private Sort createSort(String sortOption, String sortDir) {
 
         // 1. 방향 결정 (기본값은 DESC)
@@ -89,6 +89,7 @@ public class DeviceService {
             case "serial" -> "serialNum"; // 시리얼 번호 기준
             case "location" -> "startUnit"; // 위치(Unit) 기준
             case "status" -> "status"; // 상태 기준
+            case "contract", "expiry" -> "contractDate"; // 계약일, 만료일 정렬
             default -> "id"; // 기본값(latest 등)은 ID 기준
         };
 

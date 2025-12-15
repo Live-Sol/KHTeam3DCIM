@@ -1,5 +1,6 @@
 package com.example.KHTeam3DCIM.service;
 
+import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Role;
 import com.example.KHTeam3DCIM.dto.Member.*;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
 
     // 전체 회원 조회 (회원용 - 이름, role 표기)
@@ -25,6 +28,17 @@ public class MemberService {
         return memberRepository.findAll()
                 .stream()
                 .map(m -> MemberResponse.builder()
+                        .name(m.getName())
+                        .role(m.getRole())
+                        .build())
+                .collect(Collectors.toList());
+    }
+    // 전체 회원 조회 (관리자용 - id, 이름, role 표기)
+    public List<MemberAdminResponse> findAllMembersAdmin() {
+        return memberRepository.findAll()
+                .stream()
+                .map(m -> MemberAdminResponse.builder()
+                        .memberId(m.getMemberId())
                         .name(m.getName())
                         .role(m.getRole())
                         .build())
@@ -53,30 +67,40 @@ public class MemberService {
 
     // 회원 등록
     public MemberResponse addMember(MemberCreateRequest request) {
-
         // 아이디 유효성 검사
         String memberId = request.getMemberId();
-
+        if (!Pattern.matches("^[a-z0-9]{4,20}$", memberId)) {
+            throw new RuntimeException("아이디는 알파벳 소문자와 숫자만 가능하며, 4~20글자여야 합니다.");
+        }
         // 아이디 중복 검사
         if (memberRepository.existsByMemberId(memberId)) {
             throw new RuntimeException("이미 존재하는 아이디입니다.");
         }
         // 비밀번호 유효성 검사
         String rawPassword = request.getPassword();
+        if (rawPassword.length() < 4 || rawPassword.length() > 20) {
+            throw new RuntimeException("비밀번호는 4~20글자 사이여야 합니다.");
+        }
         // 비밀번호 암호화 적용
-        String encodedPassword = passwordEncoder.encode(rawPassword);
+        String encodedPassword =  passwordEncoder.encode(rawPassword);
 
         // 이름 유효성 검사
         String name = request.getName();
+        if (!Pattern.matches("^[a-zA-Z가-힣]{2,10}$", name)) {
+            throw new RuntimeException("이름은 한글과 알파벳만 가능하며, 2~10글자여야 합니다.");
+        }
 
         // 회원 객체 생성 및 저장
         Member member = Member.builder()
                 .memberId(memberId)
-                .password(encodedPassword)  // 암호화된 비밀번호
+                .password(encodedPassword)
                 .name(name)
-                .email(request.getEmail())
+                .role(Role.USER)
+                // DTO에서 꺼내서 저장
+                .companyName(request.getCompanyName())
+                // 🚑 [수술 완료] 누락되었던 회사 전화번호 저장 로직 추가!
+                .companyPhone(request.getCompanyPhone())
                 .contact(request.getContact())
-                .role(Role.USER)  // 기본값 USER로 설정
                 .build();
 
         Member saved = memberRepository.save(member);
@@ -92,28 +116,14 @@ public class MemberService {
     @Transactional
     public MemberResponse updateMember(String memberId, MemberUpdateRequest patch) {
         Member updated = memberRepository.findById(memberId)
-                // .map(existing -> {...}) 내부가 람다 스코프입니다.
-                .map(existing -> {
-                    // 1. 비밀번호 업데이트 (변경 요청이 있을 경우에만)
-                    if (patch.getPassword() != null && !patch.getPassword().isEmpty()) { // 비밀번호 필드 비어있지 않은지 추가 확인
+                .map(existing ->{
+                    if(patch.getPassword() != null) {
                         String encodedNewPassword = passwordEncoder.encode(patch.getPassword());
                         existing.setPassword(encodedNewPassword);
                     }
-
-                    // 2. 이름 업데이트
-                    if (patch.getName() != null)
+                    if(patch.getName() != null)
                         existing.setName(patch.getName());
-
-                    // ⭐️ 3. 이메일 업데이트 (추가) ⭐️
-                    if (patch.getEmail() != null)
-                        existing.setEmail(patch.getEmail());
-
-                    // ⭐️ 4. 연락처 업데이트 (추가) ⭐️
-                    if (patch.getContact() != null)
-                        existing.setContact(patch.getContact());
-
-                    // 별도의 save 호출 없이 @Transactional에 의해 변경 사항이 DB에 반영됩니다.
-                    return existing;
+                    return memberRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         return MemberResponse.builder()
@@ -122,15 +132,50 @@ public class MemberService {
                 .build();
     }
 
+    // 회원 정보 수정 (관리자)
+    @Transactional
+    public void updateMemberByAdmin(String memberId,
+                                    MemberAdminUpdateRequest updateRequest,
+                                    String adminActorId) {
+
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("수정하려는 회원이 존재하지 않습니다: " + memberId));
+
+        String oldRole = member.getRole().name();
+        String oldName = member.getName();
+
+        // Entity 업데이트 메서드 호출
+        member.updateName(updateRequest.getName());
+        member.updateRole(updateRequest.getRole());
+
+        String logDescription = String.format(
+                "회원 [%s (%s)] 정보 수정 by [%s]: 이름 (%s -> %s), 역할 (%s -> %s)",
+                memberId, member.getName(), adminActorId, oldName, updateRequest.getName(), oldRole, updateRequest.getRole().name()
+        );
+        auditLogService.saveLog(adminActorId, logDescription, LogType.MEMBER_MANAGEMENT);
+    }
+
     // 회원 삭제 (회원 본인)
     public void deleteMemberWithPassword(String memberId, String password) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
-        if (!passwordEncoder.matches(password, member.getPassword())) {
+        if(!passwordEncoder.matches(password, member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
         memberRepository.delete(member);
+    }
+
+    // 회원 삭제 (관리자가 회원)
+    @Transactional
+    public void deleteMember(String memberId, String adminActorId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 회원이 존재하지 않습니다."));
+
+        memberRepository.delete(member);
+
+        String actionDescription = "회원 [" + member.getName() + " (" + memberId + ")] 삭제 처리.";
+        auditLogService.saveLog(adminActorId, actionDescription, LogType.MEMBER_MANAGEMENT);
     }
 }

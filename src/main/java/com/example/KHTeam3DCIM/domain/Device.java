@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 // [1] @Entity: "이 클래스는 자바 객체가 아니라, DB 테이블 그 자체야!"라고 선언하는 것입니다.
@@ -72,12 +74,34 @@ public class Device {
     @Column(name = "REG_DATE", updatable = false)
     private LocalDateTime regDate;
 
-    // [7] 연관관계 편의 메소드: "장비를 랙에 꽂으면, 랙 입장에서도 장비 목록에 이게 추가되어야 해"
-    // 양쪽의 데이터를 맞춰주는 꼼꼼한 코드입니다. (나중에 이해해도 됩니다)
-//    public void setRack(Rack rack) {
-//        this.rack = rack;
-//        if (!rack.getDevices().contains(this)) {
-//            rack.getDevices().add(this);
-//        }
-//    }
+    // ==========================================
+    // 계약 및 입고 정보
+    // ==========================================
+    @Column(name = "CONTRACT_DATE")
+    private LocalDate contractDate; // 입고(계약) 시작일
+
+    @Column(name = "CONTRACT_MONTH")
+    private Integer contractMonth;  // 계약 기간 (개월 수)
+
+    // ==========================================
+    // ⭐ [핵심] 장비 소유자 (회원과 연결), Member 객체 자체를 연결합니다.
+    // ==========================================
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MEMBER_ID") // DC_DEVICE 테이블에 MEMBER_ID 컬럼이 생김
+    private Member member;
+
+    // ==========================================
+    // ⭐ [추가] 소유자 및 용도 정보 (신청서 연동용)
+    // ==========================================
+    @Column(name = "COMPANY_NAME", length = 50)
+    private String companyName;   // 회사명
+    @Column(name = "COMPANY_PHONE", length = 20)
+    private String companyPhone; // 회사 대표 번호
+    @Column(name = "USER_NAME", length = 50)
+    private String userName; // 담당자명
+    @Column(name = "CONTACT", length = 50)
+    private String contact; // 연락처 (담당자 직통 번호)
+    @Column(name = "DESCRIPTION", length = 500)
+    private String description; // 용도 및 설명
+
 }

@@ -26,11 +26,18 @@ public class Request {
     @Column(name = "REQ_ID")
     private Long id;            // 요청 ID    
 
+    // 1. 신청자 정보 (상세화)
+    @Column(name = "COMPANY_NAME", length = 50)
+    private String companyName;    // 회사명 (⭐추가됨)
+
+    @Column(name = "COMPANY_PHONE", length = 20)
+    private String companyPhone;   // 회사 대표 번호 (⭐추가됨)
+
     @Column(name = "USER_NAME", nullable = false)
-    private String userName;    // 요청자 이름
+    private String userName;       // 담당자 성함 (기존 필드 활용)
 
     @Column(name = "CONTACT")
-    private String contact;     // 연락처
+    private String contact;       // 담당자 직통 번호 (기존 필드 활용)
 
     @Column(name = "CATE_ID")
     private String cateId;      // 장비 종류 (Category ID)
