@@ -2,7 +2,7 @@
 
     import com.example.KHTeam3DCIM.domain.AuditLog;
     import com.example.KHTeam3DCIM.domain.Member;
-    import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
+    import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
     import com.example.KHTeam3DCIM.service.AdminService;
     import com.example.KHTeam3DCIM.service.AuditLogService;
@@ -55,17 +55,50 @@
             return "admin"; // templates/admin.html
         }
 
-        // (1) 전체 회원 조회 (관리자용)
-        // URL: /admin/members
+        /**
+         * (1-1) 관리자: 전체 회원 조회 목록 페이지 제공
+         *
+         *  - 관리자 권한을 가진 사용자가
+         *    시스템에 등록된 모든 회원 목록을 조회하기 위한 페이지를 반환한다.
+         *
+         *  - 회원 정보는 Service 계층에서 DTO 형태로 조회하여
+         *    View(Thymeleaf)로 전달한다.
+         *
+         *  - 또한 관리자 대시보드에 표시할
+         *    최근 감사 로그(Audit Log) 정보도 함께 조회한다.
+         *
+         *  URL: /admin/members
+         *  Method: GET
+         */
         @GetMapping("/members")
-        public String getAllMembersAdmin(Model model) {
-            List<MemberAdminResponse> members = adminService.findAllMembersAdmin();
+        public String findAllMembersAdmin(Model model) {
+
+            // 1️⃣ Service 계층을 통해 전체 회원 정보를 조회
+            //    - Member 엔티티가 아닌
+            //    - 관리자 화면에 필요한 정보만 담은 DTO(MemberAdminResponse) 목록
+            List<MemberAdminResponse> members =
+                    adminService.findAllMembersAdmin();
+
+            // 2️⃣ 조회한 회원 목록을 "members"라는 이름으로 Model에 저장
+            //    → Thymeleaf 템플릿에서 ${members}로 접근 가능
             model.addAttribute("members", members);
-            // 최근 로그 조회
-            List<AuditLog> recentLogs = auditLogService.findRecentLogs(5);
+
+            // 3️⃣ 최근 감사 로그(Audit Log) 조회
+            //    - 관리자 화면에서 최근 시스템 활동을 확인하기 위함
+            //    - 최근 5건만 조회
+            List<AuditLog> recentLogs =
+                    auditLogService.findRecentLogs(5);
+
+            // 4️⃣ 감사 로그 목록을 Model에 저장
+            //    → 템플릿에서 ${recentLogs}로 접근 가능
             model.addAttribute("recentLogs", recentLogs);
-            return "member/findMembersAdmin";
+
+            // 5️⃣ 관리자 회원 목록 화면 반환
+            //    - templates/admin/findMembersAdmin.html
+            return "admin/findMembersAdmin";
         }
+
+
 
         // ⭐️ 관리자 회원 정보 수정 기능 (/admin/members-edit/**) ⭐️
         // (2-1) 관리자 정보 수정 폼 제공 (GET)

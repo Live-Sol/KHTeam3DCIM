@@ -31,7 +31,7 @@
     </h2>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a th:href="@{/admin}" class="btn btn-outline-secondary btn-sm">
+        <a th:href="@{/templates/admin}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left-square me-1"></i> 관리자 대시보드
         </a>
     </div>
@@ -45,16 +45,22 @@
         <thead class="table-dark">
         <tr>
             <th>회원 ID</th>
-            <th>기업명</th>
+            <th>담당자 성함</th> <th>기업명</th>
+            <th>기업 대표 번호</th>
+
             <th>이메일</th>
-            <th>연락처</th>
-            <th>역할</th>
-            <th class="text-center">관리</th> </tr>
+            <th>연락처 (담당자)</th> <th>역할</th>
+            <th class="text-center">관리</th>
+        </tr>
         </thead>
         <tbody>
         <tr th:each="member : ${members}">
             <td th:text="${member.memberId}" class="align-middle"></td>
             <td th:text="${member.name}" class="align-middle"></td>
+
+            <td th:text="${member.companyName}" class="align-middle"></td>
+            <td th:text="${member.companyPhone}" class="align-middle"></td>
+
             <td th:text="${member.email}" class="align-middle"></td>
             <td th:text="${member.contact}" class="align-middle"></td>
             <td th:text="${member.role}" class="align-middle"></td>

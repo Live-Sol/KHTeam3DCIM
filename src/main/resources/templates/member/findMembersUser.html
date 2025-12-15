@@ -10,17 +10,22 @@
 <body>
 <div class="container">
     <h2>전체 회원 조회</h2>
-    <table>
+    <table class="table">
         <thead>
         <tr>
-            <th>이름</th>
-            <th>역할</th>
+            <th scope="col">No</th>
+            <th scope="col">담당자 성함</th>
+            <th scope="col">기업명</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="member : ${members}">
-            <td th:text="${member.name}"></td>
-            <td th:text="${member.role}"></td>
+        <tr th:each="member, stat : ${members}">
+            <td th:text="${stat.count}">1</td>
+
+            <td th:text="${member.name}">홍**</td>
+
+            <td th:text="${member.companyName}">삼**</td>
+
         </tr>
         </tbody>
     </table>

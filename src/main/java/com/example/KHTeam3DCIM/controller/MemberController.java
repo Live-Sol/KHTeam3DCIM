@@ -27,10 +27,8 @@ public class MemberController {
     public String getAllMembersUser(Model model) {
         List<MemberResponse> members = memberService.findAllMembersUser();
         model.addAttribute("members", members);
-        return "member/findMembersUser"; // findMembersUser.html
+        return "member/findMembersUser";
     }
-    
-    /* 기존 getAllMembersAdmin() 메서드 (= 관리자가 회원조회) 를 AdminController로 이동 */
     
     // 특정 회원 조회 (부분 일치 검색)
     @GetMapping("/search/{memberId}")

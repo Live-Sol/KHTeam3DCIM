@@ -2,7 +2,7 @@ package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.LogType;
-import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
+import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
 import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class AdminService {
     private final AuditLogService auditLogService;
     // PasswordEncoder는 관리자 수정/삭제 시에는 사용하지 않으므로 제거합니다.
 
-    // 전체 회원 조회 (관리자용 - 모든 정보 표기)
+    // (1-1) 전체 회원 조회 (관리자용 - 모든 정보 표기)
     @Transactional(readOnly = true)
     public List<MemberAdminResponse> findAllMembersAdmin() {
         return memberRepository.findAll()
@@ -32,6 +32,9 @@ public class AdminService {
                         .email(m.getEmail())
                         .contact(m.getContact())
                         .role(m.getRole())
+                        // ⭐️ 추가된 필드 매핑 ⭐️
+                        .companyName(m.getCompanyName())
+                        .companyPhone(m.getCompanyPhone())
                         .build())
                 .collect(Collectors.toList());
     }
