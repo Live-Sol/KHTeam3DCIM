@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 @Data
 @Builder // Lombok의 Builder 패턴 사용
 public class MemberUpdateRequest {
-
+//
     // 비밀번호는 변경 시에만 사용되므로 필수는 아니지만, 입력되면 유효성 검사 적용
     @Size(min = 4, max = 20, message = "비밀번호는 4자 이상 20자 이하이어야 합니다.")
     private String password;

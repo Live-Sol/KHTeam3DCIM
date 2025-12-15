@@ -105,7 +105,7 @@
                 return "redirect:/admin/members"; // 목록 페이지로 리다이렉트
             }
         }
-
+//
         // (2-2) 회원 정보 수정 처리 (PATCH)
         // 최종 URL: /admin/members-edit/{memberId}
         @PatchMapping("/members-edit/{memberId}") // ⭐️ URL 경로 변경 ⭐️
@@ -128,7 +128,6 @@
                 // Service 호출 시 변경된 매개변수 이름 사용
                 adminService.updateMemberByAdmin(memberId, memberAdminUpdateRequest, getLoggedInUserId());
                 redirectAttributes.addFlashAttribute("successMessage", memberId + " 회원의 정보가 성공적으로 수정되었습니다.");
-
                 return "redirect:/admin/members-edit/" + memberId; // 리다이렉트 URL 유지
             } catch (RuntimeException e) {
                 redirectAttributes.addFlashAttribute("errorMessage", "수정 실패: " + e.getMessage());

@@ -3,7 +3,6 @@ package com.example.KHTeam3DCIM.service;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.LogType;
 import com.example.KHTeam3DCIM.dto.Member.MemberAdminResponse;
-import com.example.KHTeam3DCIM.dto.Member.MemberAdminUpdateRequest;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -87,7 +86,7 @@ public class AdminService {
         if (member.getRole() == com.example.KHTeam3DCIM.domain.Role.ADMIN) {
             throw new RuntimeException("관리자 계정은 삭제할 수 없습니다.");
         }
-
+//
         memberRepository.delete(member);
 
         // 로그 기록

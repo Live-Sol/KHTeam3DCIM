@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-
+//
 public class MemberAdminUpdateRequest {
 
     // 기업명 (이름)

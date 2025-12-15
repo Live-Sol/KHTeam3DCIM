@@ -20,6 +20,8 @@ public class Member {
     private String password;    // 암호
     @Column(name = "NAME", nullable = false, length = 50)
     private String name;        // 담당자 성함
+    @Column(name = "EMAIL",  nullable = false, length = 50)
+    private String email;   // 이메일
     @Column(name = "CONTACT", length = 20)
     private String contact;     // 담당자 직통 번호
     @Enumerated(EnumType.STRING)

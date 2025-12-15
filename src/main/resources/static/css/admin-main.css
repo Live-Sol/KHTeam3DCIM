@@ -29,7 +29,7 @@
 .container table tbody td:last-child button,
 .container table tbody td:last-child form {
     margin: 0 3px; /* 좌우 마진을 주어 간격을 만듭니다. */
-    flex-shrink: 0; /* 버튼/폼이 줄어들지 않도록 설정 */
+    flex-shrink: 0.0; /* 버튼/폼이 줄어들지 않도록 설정 */
 }
 
 /* 5. 삭제 폼 내부의 버튼을 폼에 붙입니다. */
