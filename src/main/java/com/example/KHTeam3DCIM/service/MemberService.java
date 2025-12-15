@@ -140,7 +140,7 @@ public class MemberService {
                                     String adminActorId) {
 
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("수정하려는 회원이 존재하지 않습니다: " + memberId));
+                .orElseThrow(() -> new RuntimeException("수정하려는 회원이 존재하지 않습니다.: " + memberId));
 
         String oldRole = member.getRole().name();
         String oldName = member.getName();
