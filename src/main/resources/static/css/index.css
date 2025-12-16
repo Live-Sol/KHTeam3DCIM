@@ -1,0 +1,91 @@
+/* index.css - 메인 대시보드 스타일 */
+
+/* 폰트 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* 1. 히어로 슬라이드 섹션 */
+.hero-carousel {
+    height: 600px; /* 슬라이드 높이 고정 */
+    position: relative;
+}
+
+.carousel-item {
+    height: 600px;
+}
+
+.carousel-item img {
+    object-fit: cover; /* 이미지가 찌그러지지 않고 꽉 차게 */
+    height: 100%;
+    width: 100%;
+    filter: brightness(0.6); /* 글씨 잘 보이게 이미지 살짝 어둡게 */
+}
+
+.hero-caption {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 10;
+}
+
+.hero-caption h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+.hero-caption p {
+    font-size: 1.3rem;
+    font-weight: 300;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* 2. 통계 카드 스타일 */
+.stat-card {
+    border: none;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.chart-box {
+    height: 250px;
+    width: 100%;
+    position: relative;
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+/* 깜빡임 효과 (경고용) */
+.blink {
+    animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0.5;
+    }
+}
