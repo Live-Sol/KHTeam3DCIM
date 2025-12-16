@@ -14,32 +14,57 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <!-- 1. 메인 히어로 슬라이드 -->
-<div th:replace="~{main/slide :: slide}"></div>
+<div class="position-relative main-slider-wrapper">
+    <!-- 슬라이드 파일 불러오기 -->
+    <div th:replace="~{main/slide :: slide}"></div>
+
+    <!-- (이전 날씨 위젯 제거됨) -->
+</div>
 
 <!-- 2. 핵심 요약 띠 (Summary Strip) -->
 <div class="bg-dark text-white py-4 shadow">
     <div class="container">
         <div class="row text-center g-4">
-            <!-- (1) 총 랙 -->
+
+            <!-- (1) 총 랙 (증가 추세) -->
             <div class="col-md-3 border-end border-secondary">
                 <h6 class="text-secondary text-uppercase mb-2">Total Racks</h6>
-                <h2 class="fw-bold"><i class="bi bi-hdd-rack text-primary"></i> [[${totalRacks}]]</h2>
+                <h2 class="fw-bold">
+                    <i class="bi bi-hdd-rack text-primary"></i> [[${totalRacks}]]
+                    <!-- ⭐ 추세 표시 -->
+                    <span class="trend-badge trend-neutral" title="변동 없음"><i class="bi bi-dash"></i></span>
+                </h2>
             </div>
-            <!-- (2) 총 장비 -->
+
+            <!-- (2) 총 장비 (증가 추세) -->
             <div class="col-md-3 border-end border-secondary">
                 <h6 class="text-secondary text-uppercase mb-2">Total Devices</h6>
-                <h2 class="fw-bold"><i class="bi bi-server text-success"></i> [[${stats.totalDevices}]]</h2>
+                <h2 class="fw-bold">
+                    <i class="bi bi-server text-success"></i> [[${stats.totalDevices}]]
+                    <!-- ⭐ 추세 표시 (하드코딩 예시: +5) -->
+                    <span class="trend-badge trend-up" title="전월 대비 증가"><i class="bi bi-arrow-up-short"></i> 5</span>
+                </h2>
             </div>
-            <!-- (3) PUE 지수 -->
+
+            <!-- (3) PUE 지수 (감소=좋음 추세) -->
             <div class="col-md-3 border-end border-secondary">
                 <h6 class="text-secondary text-uppercase mb-2">Power Usage (PUE)</h6>
-                <h2 class="fw-bold text-info"><i class="bi bi-lightning-charge"></i> [[${stats.pue}]]</h2>
+                <h2 class="fw-bold text-info">
+                    <i class="bi bi-lightning-charge"></i> [[${stats.pue}]]
+                    <!-- ⭐ 추세 표시 (하드코딩 예시: -0.02 개선됨) -->
+                    <span class="trend-badge trend-down" title="효율 개선됨"><i class="bi bi-arrow-down-short"></i> 0.02</span>
+                </h2>
             </div>
-            <!-- (4) 대기 요청 (클릭 가능) -->
-            <div class="col-md-3" style="cursor: pointer;" onclick="location.href='/requests'">
-                <h6 class="text-secondary text-uppercase mb-2">Pending Requests</h6>
-                <h2 class="fw-bold" th:classappend="${waitingRequests > 0} ? 'text-warning blink' : 'text-white'">
-                    <i class="bi bi-bell-fill"></i> [[${waitingRequests}]]
+
+            <!-- (4) 데이터센터 환경 정보 (날씨) - 위치 변경됨 -->
+            <div class="col-md-3">
+                <h6 class="text-secondary text-uppercase mb-2">Environment (Seoul)</h6>
+                <h2 class="fw-bold text-warning">
+                    <i class="bi bi-cloud-sun"></i> 24℃
+                    <!-- 습도 및 냉방 부하 표시 -->
+                    <span class="fs-6 text-white-50 ms-2" title="Humidity">
+                        <i class="bi bi-droplet-fill text-primary"></i> 45%
+                    </span>
                 </h2>
             </div>
         </div>
@@ -57,7 +82,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- [왼쪽] 자산 분류 (도넛 차트) -->
+        <!-- [왼쪽] 자산 분류 -->
         <div class="col-lg-4">
             <div class="stat-card p-4">
                 <h5 class="fw-bold mb-4 border-start border-4 border-primary ps-3">자산 분류 (Type)</h5>
@@ -73,12 +98,11 @@
             </div>
         </div>
 
-        <!-- [가운데] 공간 및 에너지 (막대형/텍스트) -->
+        <!-- [가운데] 공간 및 에너지 -->
         <div class="col-lg-4">
             <div class="stat-card p-4 d-flex flex-column justify-content-center">
                 <h5 class="fw-bold mb-4 border-start border-4 border-warning ps-3">공간 및 에너지 효율</h5>
 
-                <!-- 공간 사용률 -->
                 <div class="mb-4">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="fw-bold text-muted">Rack Space Usage</span>
@@ -94,7 +118,6 @@
                 </div>
 
                 <div class="row text-center mt-2 g-3">
-                    <!-- 총 전력 -->
                     <div class="col-6">
                         <div class="p-3 bg-light rounded-3 border">
                             <i class="bi bi-plug-fill text-danger fs-3"></i>
@@ -102,7 +125,6 @@
                             <small class="text-muted">IT Load</small>
                         </div>
                     </div>
-                    <!-- EMS 장비 -->
                     <div class="col-6">
                         <div class="p-3 bg-light rounded-3 border">
                             <i class="bi bi-activity text-success fs-3"></i>
@@ -114,10 +136,14 @@
             </div>
         </div>
 
-        <!-- [오른쪽] 가동 현황 (파이 차트) -->
+        <!-- [오른쪽] 가동 현황 -->
         <div class="col-lg-4">
             <div class="stat-card p-4">
-                <h5 class="fw-bold mb-4 border-start border-4 border-success ps-3">가동 현황 (Status)</h5>
+                <!-- ⭐ [NEW] 실시간 점멸 표시 (Live Indicator) -->
+                <h5 class="fw-bold mb-4 border-start border-4 border-success ps-3">
+                    가동 현황 <span class="live-indicator ms-2" title="실시간 모니터링 중"></span>
+                </h5>
+
                 <div class="chart-box">
                     <canvas id="statusChart"></canvas>
                 </div>
@@ -133,7 +159,7 @@
         </div>
     </div>
 
-    <!-- 최근 로그 (하단 배치) -->
+    <!-- 최근 로그 -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="card shadow-sm border-0">
@@ -157,29 +183,17 @@
             </div>
         </div>
     </div>
-
 </div>
 
-<!-- 푸터 -->
-<footer class="bg-dark text-white py-4 mt-5">
-    <div class="container text-center">
-        <p class="mb-1 fw-bold">KHTeam3 DCIM Project</p>
-        <small class="text-secondary">© 2025 KH Information Educational Institute. All Rights Reserved.</small>
-    </div>
-</footer>
+<!-- 5. 푸터 (분리됨) -->
+<div th:replace="~{fragments/footer :: footer}"></div>
 
-<!-- Chart.js 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- 부트스트랩 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- 커스텀 JS 로드 -->
 <script src="/js/index.js"></script>
 
-<!-- 데이터 주입 및 초기화 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-
-    // 서버 데이터를 객체로 묶음
     const chartData = {
         svr: [[${stats.svrCount}]],
         net: [[${stats.netCount}]],
@@ -188,12 +202,9 @@
         on:  [[${stats.onCount}]],
         off: [[${stats.offCount}]]
     };
-
-    // JS 파일에 있는 초기화 함수 호출
     document.addEventListener("DOMContentLoaded", function() {
         initDashboardCharts(chartData);
     });
-
     /*]]>*/
 </script>
 
