@@ -10,6 +10,7 @@
     import jakarta.validation.Valid;
     import lombok.RequiredArgsConstructor; // ⭐️ Lombok의 RequiredArgsConstructor 사용 ⭐️
     import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
     import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.security.core.userdetails.UserDetails;
     import org.springframework.stereotype.Controller;
@@ -57,16 +58,12 @@
 
         /**
          * (1-1) 관리자: 전체 회원 조회 목록 페이지 제공
-         *
          *  - 관리자 권한을 가진 사용자가
          *    시스템에 등록된 모든 회원 목록을 조회하기 위한 페이지를 반환한다.
-         *
          *  - 회원 정보는 Service 계층에서 DTO 형태로 조회하여
          *    View(Thymeleaf)로 전달한다.
-         *
          *  - 또한 관리자 대시보드에 표시할
          *    최근 감사 로그(Audit Log) 정보도 함께 조회한다.
-         *
          *  URL: /admin/members
          *  Method: GET
          */
@@ -113,58 +110,82 @@
             Member member = adminService.findMember(loginId);
             model.addAttribute("member", member);
 
-            return "admin/editAdmin"; // 관리자 정보 수정 폼
+            return "admin/editMemberAdmin"; // 관리자 정보 수정 폼
         }
-        // (2-2) 회원 정보 수정 폼 제공 (GET)
-        @GetMapping("/members-edit/{memberId}") // ️ URL 경로 변경
+        // (2-2) 회원 정보 수정 폼 제공 (GET) - 변경 없음
+        @GetMapping("/members-edit/{memberId}")
         public String editMemberAdminForm(@PathVariable String memberId, Model model) {
             try {
-                Member member = adminService.findMember(memberId);
-                model.addAttribute("member", member);
+                Member member = memberService.findMember(memberId);
 
-                // ⭐️ 오류 해결 지점 ⭐️
-                // 유효성 검사 실패 시 Flash Attribute에 DTO가 없을 때만 초기화
-                if (!model.containsAttribute("memberAdminUpdateRequest")) {
-                    model.addAttribute("memberAdminUpdateRequest", MemberAdminUpdateRequest.builder()
-                            .name(member.getName())
-                            .email(member.getEmail())
-                            .contact(member.getContact())
-                            .role(member.getRole())
-                            .build());
+                // 1. DB에서 가져온 데이터를 기반으로 기본 DTO 객체 생성
+                MemberAdminUpdateRequest currentInfo = MemberAdminUpdateRequest.builder()
+                        .name(member.getName())
+                        .email(member.getEmail())
+
+                        // ⭐️ 수정 1: String 필드가 null일 경우 빈 문자열로 초기화 ⭐️
+                        .contact(member.getContact() != null ? member.getContact() : "")
+
+                        // ⭐️ 수정 2: Role이 null일 경우 기본값 (예: USER)으로 초기화 ⭐️
+                        // (Role은 필수이므로 null이 되면 안 되지만, 방어적 코드 추가)
+                        .role(member.getRole() != null ? member.getRole() : com.example.KHTeam3DCIM.domain.Role.USER)
+
+                        .companyName(member.getCompanyName())
+
+                        // ⭐️ 수정 3: String 필드가 null일 경우 빈 문자열로 초기화 ⭐️
+                        .companyPhone(member.getCompanyPhone() != null ? member.getCompanyPhone() : "")
+
+                        .build();
+
+                // 2. Model에 DTO를 추가합니다.
+                //    Flash Attribute가 있다면 Spring이 이전에 추가했으므로 덮어쓰지 않습니다.
+                //    (Spring의 addAttribute 동작 방식에 의존)
+                // ⭐️ 가장 안전한 방법은 아래와 같이 Model Attribute를 추가하는 것입니다. ⭐️
+
+                // 만약 Flash Attribute (유효성 검사 실패 DTO)가 Model에 없다면, currentInfo를 사용합니다.
+                if (model.getAttribute("memberAdminUpdateRequest") == null) {
+                    model.addAttribute("memberAdminUpdateRequest", currentInfo);
                 }
-                return "member/editMemberAdmin"; // templates/member/editMemberAdmin.html
+
+                model.addAttribute("targetMemberId", memberId);
+                return "admin/editMemberAdmin";
             } catch (RuntimeException e) {
-                model.addAttribute("errorMessage", "오류: " + e.getMessage());
-                return "redirect:/admin/members"; // 목록 페이지로 리다이렉트
+                return "redirect:/admin/members";
             }
         }
-//
-        // (2-2) 회원 정보 수정 처리 (PATCH)
-        // 최종 URL: /admin/members-edit/{memberId}
-        @PatchMapping("/members-edit/{memberId}") // ⭐️ URL 경로 변경 ⭐️
+
+        // ⭐️ 2. 회원 정보 수정 처리 (POST로 변경) ⭐️
+        @PostMapping("/members-edit/{memberId}")
         public String updateMemberAdmin(@PathVariable String memberId,
                                         @ModelAttribute @Valid MemberAdminUpdateRequest memberAdminUpdateRequest,
                                         BindingResult bindingResult,
-                                        RedirectAttributes redirectAttributes) {
-            // BindingResult는 @ModelAttribute 바로 다음에 와야 하므로, 매개변수 이름을 변경하면 BindingResult도 변경되어야 합니다.
-            String bindingResultKey = "org.springframework.validation.BindingResult.memberAdminUpdateRequest"; // ⭐️ 키 변경 ⭐️
+                                        RedirectAttributes redirectAttributes,
+                                        @AuthenticationPrincipal UserDetails userDetails) {
 
             if (bindingResult.hasErrors()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "수정 실패: 입력 값을 확인해 주세요.");
-                redirectAttributes.addFlashAttribute("memberAdminUpdateRequest", memberAdminUpdateRequest); // ⭐️ 모델 속성 이름 변경 ⭐️
-                redirectAttributes.addFlashAttribute(bindingResultKey, bindingResult); // ⭐️ 키 변경 ⭐️
+                redirectAttributes.addFlashAttribute("memberAdminUpdateRequest", memberAdminUpdateRequest);
+                redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + "memberAdminUpdateRequest", bindingResult);
 
-                return "redirect:/admin/members-edit/" + memberId; // 리다이렉트 URL 유지
+                // POST 요청 후 GET 요청으로 리다이렉트하여 오류 내용을 Flash Attribute로 전달
+                return "redirect:/admin/members-edit/" + memberId;
             }
-
+            // 2. 관리자 ID 추출
+            // UserDetails의 getUsername()은 일반적으로 인증 주체(여기서는 관리자 ID)를 반환합니다.
+            String adminActorId = userDetails.getUsername();
             try {
-                // Service 호출 시 변경된 매개변수 이름 사용
-                adminService.updateMemberByAdmin(memberId, memberAdminUpdateRequest, getLoggedInUserId());
-                redirectAttributes.addFlashAttribute("successMessage", memberId + " 회원의 정보가 성공적으로 수정되었습니다.");
-                return "redirect:/admin/members-edit/" + memberId; // 리다이렉트 URL 유지
+                // ⭐️ 3. 서비스 호출: 수정 대상 ID, DTO, 관리자 ID(Actor ID) 전달 ⭐️
+                adminService.updateMemberByAdmin(memberId, memberAdminUpdateRequest, adminActorId);
+
+                // 4. 성공 리다이렉트
+                redirectAttributes.addFlashAttribute("updateSuccess", true);
+                redirectAttributes.addFlashAttribute("successMessage", "[" + memberId + "] 회원의 정보가 성공적으로 수정되었습니다.");
+
+                return "redirect:/admin/members";
             } catch (RuntimeException e) {
+                // 5. 실패 리다이렉트
                 redirectAttributes.addFlashAttribute("errorMessage", "수정 실패: " + e.getMessage());
-                return "redirect:/admin/members-edit/" + memberId; // 리다이렉트 URL 유지
+                return "redirect:/admin/members-edit/" + memberId;
             }
         }
 

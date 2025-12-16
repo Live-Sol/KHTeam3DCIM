@@ -60,37 +60,54 @@
 
         </div>
 
-        <!-- 최근 활동 로그 (가상) -->
+        <!-- 최근 활동 로그 (DB) -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> 최근 활동 내역 (Recent Logs)</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>시간</th>
+                        <th>사용자</th>
+                        <th>활동 내용</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="log : ${recentLogs}">
+                        <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">수정시간(NULL)</td>
+
+                        <td><span class="badge bg-secondary" th:text="${log.actor}">변경자(NULL)</span></td>
+
+                        <td th:text="${log.actionDescription}">변견사항(NULL)</td>
+                    </tr>
+                    <tr th:if="${recentLogs.isEmpty()}">
+                        <td colspan="3" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 <!--        <div class="card mt-4 shadow-sm">-->
 <!--            <div class="card-header bg-white"><i class="bi bi-activity me-1"></i> 최근 활동 로그</div>-->
 <!--            <div class="card-body p-0">-->
 <!--                <ul class="list-group list-group-flush">-->
-<!--                    <li class="list-group-item">User123 님이 랙 5번의 전원 상태를 변경했습니다. (5분 전)</li>-->
-<!--                    <li class="list-group-item">새로운 입주 신청이 접수되었습니다. (1시간 전)</li>-->
-<!--                    <li class="list-group-item">Admin 님이 User456을 'USER'로 승인했습니다. (2시간 전)</li>-->
+
+<!--                    <li class="list-group-item" th:each="log : ${recentLogs}">-->
+<!--                        <span th:text="${log.actor} + ' ' + ${log.actionDescription}"></span>-->
+
+<!--                        <span class="text-muted float-end"-->
+<!--                              th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">-->
+<!--                        </span>-->
+<!--                    </li>-->
+
+<!--                    <li class="list-group-item text-center text-muted" th:if="${#lists.isEmpty(recentLogs)}">-->
+<!--                        최근 활동 로그가 없습니다.-->
+<!--                    </li>-->
 <!--                </ul>-->
 <!--            </div>-->
 <!--        </div>-->
-        <!-- 최근 활동 로그 (DB) -->
-        <div class="card mt-4 shadow-sm">
-            <div class="card-header bg-white"><i class="bi bi-activity me-1"></i> 최근 활동 로그</div>
-            <div class="card-body p-0">
-                <ul class="list-group list-group-flush">
-
-                    <li class="list-group-item" th:each="log : ${recentLogs}">
-                        <span th:text="${log.actor} + ' ' + ${log.actionDescription}"></span>
-
-                        <span class="text-muted float-end"
-                              th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">
-                        </span>
-                    </li>
-
-                    <li class="list-group-item text-center text-muted" th:if="${#lists.isEmpty(recentLogs)}">
-                        최근 활동 로그가 없습니다.
-                    </li>
-                </ul>
-            </div>
-        </div>
 
 
     </main>

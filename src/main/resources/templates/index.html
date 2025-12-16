@@ -28,7 +28,10 @@
 <!--</nav>-->
 
 <div class="container">
-
+    <div th:if="${updateSuccess}" id="auto-dismiss-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}">회원 정보가 성공적으로 수정되었습니다.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <!-- 1. 통계 카드 영역 -->
     <div class="row mb-4">
         <!-- 랙 통계 -->
@@ -124,5 +127,24 @@
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 1. 알림창 요소 가져오기 (HTML에서 추가한 ID 사용)
+    const alertElement = document.getElementById('auto-dismiss-alert');
+
+    // 2. 알림창 요소가 존재할 경우에만 타이머 설정
+    if (alertElement) {
+        // 부트스트랩 Alert 객체 생성
+        const bsAlert = new bootstrap.Alert(alertElement);
+
+        // 3. 3000 밀리초 (3초) 후에 실행될 함수 설정
+        setTimeout(() => {
+            // Alert 객체의 close() 메서드를 호출하여 알림창을 닫음
+            bsAlert.close();
+        }, 3000); // 3000ms = 3초
+    }
+</script>
 </body>
 </html>

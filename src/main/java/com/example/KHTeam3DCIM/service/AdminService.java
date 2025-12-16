@@ -31,10 +31,30 @@ public class AdminService {
                         .name(m.getName())
                         .email(m.getEmail())
                         .contact(m.getContact())
-                        .role(m.getRole())
-                        // ⭐️ 추가된 필드 매핑 ⭐️
                         .companyName(m.getCompanyName())
                         .companyPhone(m.getCompanyPhone())
+                        .role(m.getRole())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 관리자용 특정 아이디로 회원 조회 (마스킹 없이 모든 정보 노출)
+    @Transactional(readOnly = true)
+    public List<MemberAdminResponse> findMembersByMemberIdAdmin(String memberId) {
+
+        // Repository의 findByMemberIdLike 호출
+        List<Member> foundMembers = memberRepository.findByMemberIdLike(memberId);
+
+        // 마스킹 없이 MemberAdminResponse DTO로 변환하여 반환
+        return foundMembers.stream()
+                .map(m -> MemberAdminResponse.builder()
+                        .memberId(m.getMemberId())
+                        .name(m.getName())
+                        .email(m.getEmail())
+                        .contact(m.getContact())
+                        .companyName(m.getCompanyName())
+                        .companyPhone(m.getCompanyPhone())
+                        .role(m.getRole())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -47,12 +67,13 @@ public class AdminService {
     }
 
     // 회원 정보 수정 (관리자)
+    @Transactional
     public void updateMemberByAdmin(String memberId,
                                     MemberAdminUpdateRequest updateRequest,
                                     String adminActorId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("수정하려는 회원이 존재하지 않습니다: " + memberId));
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
 
         // 1. 변경 전 상태 저장 (로그 기록)
         String oldRole = member.getRole().name();
@@ -92,7 +113,6 @@ public class AdminService {
         if (member.getRole() == com.example.KHTeam3DCIM.domain.Role.ADMIN) {
             throw new RuntimeException("관리자 계정은 삭제할 수 없습니다.");
         }
-//
         memberRepository.delete(member);
 
         // 로그 기록
