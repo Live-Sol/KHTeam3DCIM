@@ -82,7 +82,7 @@ public class MemberService {
         if (rawPassword.length() < 4 || rawPassword.length() > 20) {
             throw new RuntimeException("비밀번호는 4~20글자 사이여야 합니다.");
         }
-        // 비밀번호 암호화 적용
+        // 비밀번호 암호화 적용.
         String encodedPassword =  passwordEncoder.encode(rawPassword);
 
         // 이름 유효성 검사
