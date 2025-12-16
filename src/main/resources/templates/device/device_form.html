@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>장비 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 아이콘 추가 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -26,6 +28,7 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" id="reqIdField" name="reqId" th:value="${reqId}">
 
+            <!-- 신청서 불러오기 드롭다운 -->
             <div class="card bg-light mb-4 border-secondary border-opacity-25"
                  th:if="${isEdit != true and waitingRequests != null and !waitingRequests.isEmpty()}">
                 <div class="card-body p-3">
@@ -33,6 +36,7 @@
                     <select id="requestSelect" class="form-select border-primary" onchange="loadRequestData(this)">
                         <option value="">--- 선택 안 함 (직접 입력) ---</option>
 
+                        <!-- ⭐ [핵심] 여기에 data-power, data-ems 추가! -->
                         <th:block th:each="req : ${waitingRequests}">
                             <option th:value="${req.id}"
                                     th:data-company="${req.companyName}"
@@ -45,7 +49,9 @@
                                     th:data-cate="${req.cateId}"
                                     th:data-height="${req.heightUnit}"
                                     th:data-cdate="${req.startDate}"
-                                    th:data-cmonth="${req.termMonth}">
+                                    th:data-cmonth="${req.termMonth}"
+                                    th:data-power="${req.powerWatt}"
+                                    th:data-ems="${req.emsStatus}">
                                 No.[[${req.id}]] [[${req.companyName}]] ([[${req.userName}]]) - [[${req.modelName}]]
                             </option>
                         </th:block>
@@ -60,7 +66,6 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label fw-bold">회사명</label>
-                    <!-- 🚑 [수술 완료] device 값을 최우선으로 표시하고, 없으면 member 값 표시 -->
                     <input type="text" name="companyName" class="form-control"
                            th:value="${device.companyName != null ? device.companyName : (member != null ? member.companyName : '')}"
                            th:readonly="${reqId != null}"
@@ -132,7 +137,7 @@
                            th:value="${device.category != null ? device.category.id : selectedCateId}">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">시리얼 번호</label>
+                    <label class="form-label">시리얼 번호<small class="text-danger"> (관리자)</small></label>
                     <input type="text" name="serialNum" class="form-control"
                            th:value="${device.serialNum}" placeholder="SN-XXXX-XXXX" required>
                 </div>
@@ -155,13 +160,36 @@
                 </div>
             </div>
 
+            <!-- ⭐ [추가] 소비 전력 및 EMS 설정 -->
+            <div class="row mb-3 bg-light p-2 rounded mx-1 border">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 소비 전력 (W)</label>
+                    <input type="number" name="powerWatt" class="form-control"
+                           th:value="${device.powerWatt != null ? device.powerWatt : 0}"
+                           th:readonly="${reqId != null}"
+                           th:classappend="${reqId != null} ? 'bg-light'"
+                           placeholder="예: 500" min="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 연동</label>
+                    <select name="emsStatus" class="form-select"
+                            th:disabled="${reqId != null}"
+                            th:classappend="${reqId != null} ? 'bg-light'">
+                        <option value="OFF" th:selected="${device.emsStatus == 'OFF'}">연동 안 함 (OFF)</option>
+                        <option value="ON" th:selected="${device.emsStatus == 'ON'}">연동 함 (ON)</option>
+                    </select>
+                    <!-- EMS 값 히든 전송 -->
+                    <input th:if="${reqId != null}" type="hidden" name="emsStatus" th:value="${device.emsStatus}">
+                </div>
+            </div>
+
             <div class="row mb-4">
                 <div class="col-md-4">
                     <label class="form-label">시작 유닛 (U)</label>
                     <input type="number" name="startUnit" class="form-control"
                            th:value="${device.startUnit}"
                            th:readonly="${reqId != null}"
-                           th:classappend="${reqId != null} ? 'bg-light'" required>
+                           th:classappend="${reqId != null} ? 'bg-light'" min="1" value="1" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">장비 높이 (U)</label>
@@ -171,7 +199,7 @@
                            th:classappend="${reqId != null} ? 'bg-light'" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">관리 IP</label>
+                    <label class="form-label">관리 IP<small class="text-danger"> (관리자)</small></label>
                     <input type="text" name="ipAddr" class="form-control"
                            th:value="${device.ipAddr}" placeholder="192.168.x.x" required>
                 </div>
@@ -199,7 +227,6 @@
                            required>
                 </div>
 
-                <!-- ✅ [개선 완료] 계약 기간 부분도 disabled + hidden 패턴으로 변경 -->
                 <div class="col-md-6">
                     <label class="form-label">계약 기간</label>
                     <select name="contractMonth" class="form-select"
@@ -211,7 +238,6 @@
                         <option value="36" th:selected="${device.contractMonth == 36}">3년 (36개월)</option>
                         <option value="0" th:selected="${device.contractMonth == 0}">기타</option>
                     </select>
-                    <!-- 값이 고정(disabled)되었을 때 데이터를 보내기 위한 히든 필드 -->
                     <input th:if="${reqId != null}" type="hidden" name="contractMonth" th:value="${device.contractMonth}">
                 </div>
             </div>

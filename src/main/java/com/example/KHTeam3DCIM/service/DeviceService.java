@@ -7,13 +7,14 @@ import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder; // ⭐️ 추가
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final RackRepository rackRepository;
     private final CategoryRepository categoryRepository;
-    private final AuditLogService auditLogService; // ⭐️ DcLogRepository 대신 이거 사용!
+    private final AuditLogService auditLogService;
 
     // ==========================================
     // 1. 장비 등록하기
@@ -52,20 +53,16 @@ public class DeviceService {
             }
         }
 
-        // 통과했으면 관계 맺어주기
         newDevice.setRack(rack);
         newDevice.setCategory(category);
 
-        // 상태가 없으면 기본값 'OFF'로 설정
         if (newDevice.getStatus() == null || newDevice.getStatus().isEmpty()) {
             newDevice.setStatus("OFF");
         }
 
-        // 장비 저장 (DB에 INSERT)
         deviceRepository.save(newDevice);
 
-        // ⭐️ AuditLog 저장 (팀원 코드 활용)
-        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName(); // 로그인한 ID 가져오기
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 등록: " + newDevice.getSerialNum(), LogType.DEVICE_OPERATION);
 
         return newDevice.getId();
@@ -74,36 +71,95 @@ public class DeviceService {
     // ==========================================
     // 2. 조회 기능들
     // ==========================================
-    // [1] 수정: 정렬 옵션(무엇을)과 방향(어떻게)을 모두 받아서 처리
     private Sort createSort(String sortOption, String sortDir) {
-
-        // 1. 방향 결정 (기본값은 DESC)
-        // 화면에서 "asc"라고 보내면 오름차순(ASC), 아니면 내림차순(DESC)
         Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-        // 2. 정렬할 속성(필드명) 결정
         String property = switch (sortOption) {
-            case "id_asc" -> "id"; // ID 기준
-            case "rack" -> "rack.rackName"; // 랙 이름 기준
-            case "category" -> "category.name"; // 카테고리 이름 기준
-            case "serial" -> "serialNum"; // 시리얼 번호 기준
-            case "location" -> "startUnit"; // 위치(Unit) 기준
-            case "status" -> "status"; // 상태 기준
-            case "contract", "expiry" -> "contractDate"; // 계약일, 만료일 정렬
-            default -> "id"; // 기본값(latest 등)은 ID 기준
+            case "id_asc" -> "id";
+            case "rack" -> "rack.rackName";
+            case "category" -> "category.name";
+            case "serial" -> "serialNum";
+            case "location" -> "startUnit";
+            case "status" -> "status";
+            case "contract", "expiry" -> "contractDate";
+            default -> "id";
         };
-
-        // 3. Sort 객체 생성 (방향 + 속성)
         return Sort.by(direction, property);
     }
 
-    // [2] 전체 조회 (파라미터 추가)
+    // ==========================================
+    // 3. 에너지 대시보드용 통계 데이터 생성
+    // ==========================================
+    public Map<String, Object> getEnergyStatistics() {
+        // 1. IT 장비 총 전력 (DB에서 조회)
+        long itPower = deviceRepository.sumTotalPower();
+
+        // 2. 기반 설비 전력 (가정: IT 전력의 0.5배만큼 냉방비로 더 쓴다고 가정 -> 총 1.5배)
+        // 실제로는 센서가 필요하지만, 시뮬레이션이므로 공식으로 계산합니다.
+        long facilityPower = (long) (itPower * 1.5);
+
+        // 3. PUE 계산 공식: (총 전력 / IT 전력)
+        // IT 전력이 0이면 나눗셈 에러나므로 1.0(이상적 수치)으로 처리
+        double pue = (itPower == 0) ? 1.0 : (double) facilityPower / itPower;
+
+        // 4. 데이터를 맵(Map)이라는 보따리에 담아서 리턴
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("itPower", itPower);         // IT 장비 전력 (W)
+        stats.put("totalPower", facilityPower); // 전체 전력 (W)
+        stats.put("pue", String.format("%.2f", pue)); // 소수점 2자리까지만 (예: 1.50)
+
+        return stats;
+    }
+
+    // ==========================================
+    // 4. 메인 대시보드용 통계 데이터 생성 (All-in-One)
+    // ==========================================
+    public Map<String, Object> getDashboardStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 1. [기본] 총 장비 개수
+        long totalDevices = deviceRepository.count();
+        stats.put("totalDevices", totalDevices);
+
+        // 2. [종류별] 개수 (SVR, NET, STO, UPS)
+        stats.put("svrCount", deviceRepository.countByCategory_Id("SVR"));
+        stats.put("netCount", deviceRepository.countByCategory_Id("NET"));
+        stats.put("stoCount", deviceRepository.countByCategory_Id("STO"));
+        stats.put("upsCount", deviceRepository.countByCategory_Id("UPS"));
+
+        // 3. [상태별] ON/OFF 비율
+        long onCount = deviceRepository.countByStatus("RUNNING");
+        long offCount = deviceRepository.countByStatus("OFF"); // 또는 total - onCount
+        stats.put("onCount", onCount);
+        stats.put("offCount", offCount);
+
+        // 4. [공간 효율] (사용중인 Unit / 전체 Rack Unit)
+        long totalSpace = rackRepository.sumTotalRackUnit(); // 분모 (전체 42U * 랙개수)
+        long usedSpace = deviceRepository.sumTotalUsedHeight(); // 분자 (장비 높이 합계)
+        double spaceUsage = (totalSpace == 0) ? 0.0 : ((double) usedSpace / totalSpace) * 100;
+
+        stats.put("totalSpace", totalSpace);
+        stats.put("usedSpace", usedSpace);
+        stats.put("emptySpace", totalSpace - usedSpace); // 빈 공간
+        stats.put("spaceUsage", String.format("%.1f", spaceUsage)); // 소수점 1자리 (예: 45.2)
+
+        // 5. [에너지] 전력량 & PUE & EMS
+        long itPower = deviceRepository.sumTotalPower();
+        long facilityPower = (long) (itPower * 1.5); // 시뮬레이션 (1.5배)
+        double pue = (itPower == 0) ? 1.0 : (double) facilityPower / itPower;
+        long emsCount = deviceRepository.countByEmsStatus("ON");
+
+        stats.put("itPower", itPower);
+        stats.put("pue", String.format("%.2f", pue));
+        stats.put("emsCount", emsCount);
+
+        return stats;
+    }
+
     public List<Device> findAllDevices(String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
         return deviceRepository.findAll(sort);
     }
 
-    // [3] 검색 조회 (파라미터 추가)
     public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -113,9 +169,13 @@ public class DeviceService {
                 keyword, keyword, keyword, sort);
     }
 
+    // ⭐ [NEW] 총 장비 개수 조회 메서드 추가
+    public long countAllDevices() {
+        return deviceRepository.count();
+    }
 
     // ==========================================
-    // 3. 랙 실장도 데이터 가공
+    // 5. 랙 실장도 데이터 가공
     // ==========================================
     public List<RackDetailDto> getRackViewData(Long rackId) {
         Rack rack = rackRepository.findById(rackId)
@@ -139,8 +199,12 @@ public class DeviceService {
             slots[end].setRowSpan(d.getHeightUnit());
             slots[end].setDeviceId(d.getId());
             slots[end].setRunStatus(d.getStatus());
-            slots[end].setSerialNum(d.getSerialNum()); // 툴팁용
-            slots[end].setIpAddr(d.getIpAddr());       // 툴팁용
+            slots[end].setSerialNum(d.getSerialNum());
+            slots[end].setIpAddr(d.getIpAddr());
+
+            // ⭐ [추가] 실장도 팝업용 데이터 매핑
+            slots[end].setPowerWatt(d.getPowerWatt());
+            slots[end].setEmsStatus(d.getEmsStatus());
 
             for (int j = start; j < end; j++) {
                 slots[j].setStatus("SKIP");
@@ -154,31 +218,46 @@ public class DeviceService {
     }
 
     // ==========================================
-    // 4. 삭제/수정/전원
+    // 6. 삭제/수정/전원
     // ==========================================
     @Transactional
-    public void deleteDevice(Long id) { // 장비 삭제
+    public void deleteDevice(Long id) {
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
         deviceRepository.delete(device);
-
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
     }
 
     @Transactional
-    public void updateDevice(Long id, Device formDevice) { // 장비 수정
+    public void updateDevice(Long id, Device formDevice) {
         Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+
+        // 🚑 [수정] 충돌 검사 로직이 필요하다면 여기에 추가해야 함 (현재는 생략)
+
         target.setVendor(formDevice.getVendor());
         target.setModelName(formDevice.getModelName());
         target.setSerialNum(formDevice.getSerialNum());
         target.setIpAddr(formDevice.getIpAddr());
+
+        // ⭐ [수정] 여기가 빠져있어서 수정이 안 됐습니다!
+        target.setPowerWatt(formDevice.getPowerWatt());
+        target.setEmsStatus(formDevice.getEmsStatus());
+        target.setContractMonth(formDevice.getContractMonth());
+        target.setContractDate(formDevice.getContractDate());
+        target.setCompanyName(formDevice.getCompanyName());
+        target.setCompanyPhone(formDevice.getCompanyPhone());
+        target.setUserName(formDevice.getUserName());
+        target.setContact(formDevice.getContact());
+        target.setDescription(formDevice.getDescription());
+
+        // 위치 변경은 현재 미지원 (복잡도 때문)
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 정보 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
     }
 
     @Transactional
-    public String toggleStatus(Long id) { // 전원 토글
+    public String toggleStatus(Long id) {
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
         if ("RUNNING".equals(device.getStatus())) device.setStatus("OFF");
         else device.setStatus("RUNNING");
@@ -188,9 +267,6 @@ public class DeviceService {
         return device.getStatus();
     }
 
-    // ==========================================
-    // [추가] 단건 조회 (Controller에서 호출함)
-    // ==========================================
     public Device findById(Long id) {
         return deviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 장비가 존재하지 않습니다."));

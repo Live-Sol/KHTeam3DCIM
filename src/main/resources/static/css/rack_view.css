@@ -1,86 +1,109 @@
-/* rack_view.css */
+/* rack_view.css - 전문적인 DCIM 스타일 적용 */
 
-.rack-table { text-align: center; vertical-align: middle; }
-
-/* 1. 유닛 컬럼 기본 스타일 (복구됨) */
-.unit-col {
-    width: 60px;
-    background-color: #f8f9fa;
-    font-weight: bold;
-    border-right: 2px solid #333;
-    border-bottom: 1px solid #dee2e6;
+/* 1. 랙 전체 프레임 (캐비닛 느낌) */
+.rack-container {
+    background-color: #2c3e50; /* 랙 외관 (어두운 남색) */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
 }
 
-/* 2. 장비가 있는 칸 (테두리와 기본 커서) */
+.rack-header, .rack-footer {
+    color: #ecf0f1;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: #34495e !important;
+    border: none !important;
+}
+
+.rack-table {
+    background-color: #f8f9fa;
+    text-align: center;
+    vertical-align: middle;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* 2. 유닛 컬럼 (왼쪽 숫자 42U, 41U...) */
+.unit-col {
+    width: 60px;
+    background-color: #e9ecef;
+    color: #495057;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-right: 3px solid #ced4da; /* 랙 마운트 레일 느낌 */
+    border-bottom: 1px solid #dee2e6;
+    font-family: 'Courier New', monospace; /* 기계적인 폰트 */
+}
+
+/* 3. 장비가 있는 칸 (공통) */
 .device-occupied {
-    color: #383d41;
     cursor: pointer;
     transition: all 0.2s;
-    border-bottom: 2px solid #fff !important; /* 구분선 */
+    border: 1px solid rgba(0,0,0,0.1);
+    position: relative; /* LED 위치 잡기 위해 */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* 약간의 입체감 */
 }
 
 .device-occupied:hover {
     filter: brightness(0.95);
-    border-bottom: 2px solid #f8f9fa !important;
+    transform: scale(1.01); /* 살짝 튀어나오는 효과 */
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 /* ================================================= */
-/* [상태별 색상] 배경색 + 좌우 띠 */
+/* [장비 종류별 배경색] 파스텔 톤으로 눈이 편하게 */
 /* ================================================= */
+.type-server  { background-color: #d1e7dd !important; color: #0f5132; border-left: 5px solid #198754 !important; } /* 초록 계열 */
+.type-network { background-color: #fff3cd !important; color: #664d03; border-left: 5px solid #ffc107 !important; } /* 노랑 계열 */
+.type-storage { background-color: #cff4fc !important; color: #055160; border-left: 5px solid #0dcaf0 !important; } /* 하늘 계열 */
+.type-ups     { background-color: #e2d9f3 !important; color: #432874; border-left: 5px solid #6f42c1 !important; } /* 보라 계열 */
+.type-etc     { background-color: #e9ecef !important; color: #495057; border-left: 5px solid #6c757d !important; } /* 회색 계열 */
 
-/* 가동 중 (RUNNING) - 연한 초록 */
-.status-running {
-    background-color: #d1e7dd !important;
-    color: #0f5132 !important;
-    border-left: 5px solid #198754 !important;
-    border-right: 5px solid #198754 !important;
+/* ================================================= */
+/* [상태 LED] 장비 우측에 작은 점으로 표시 */
+/* ================================================= */
+.status-led {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
 }
 
-/* 꺼짐 (OFF) - 연한 빨강 */
-.status-off {
-    background-color: #f8d7da !important;
-    color: #842029 !important;
-    border-left: 5px solid #dc3545 !important;
-    border-right: 5px solid #dc3545 !important;
+/* 가동 중 (깜빡이는 초록불) */
+.led-running {
+    background-color: #00ff00;
+    box-shadow: 0 0 5px #00ff00;
+    animation: blink 2s infinite;
+}
+
+/* 꺼짐 (회색불) */
+.led-off {
+    background-color: #95a5a6;
+    border: 1px solid #7f8c8d;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
 }
 
 /* ================================================= */
-/* [유닛 번호 색상] 장비 상태와 깔맞춤 (복구됨) */
+/* [빈 슬롯] */
 /* ================================================= */
-
-.unit-running {
-    background-color: #d1e7dd !important;
-    color: #0f5132;
-    border-right: 2px solid #198754;
-}
-
-.unit-off {
-    background-color: #f8d7da !important;
-    color: #842029;
-    border-right: 2px solid #dc3545;
-}
-
-/* ================================================= */
-/* [장비 종류별 배지 색상] */
-/* ================================================= */
-
-/* Server: 노랑 */
-.badge-server { background-color: #ffc107 !important; color: #000 !important; }
-/* Network: 주황 */
-.badge-network { background-color: #fd7e14 !important; color: #fff !important; }
-/* Storage: 파랑 */
-.badge-storage { background-color: #0d6efd !important; color: #fff !important; }
-/* UPS: 보라 */
-.badge-ups { background-color: #6f42c1 !important; color: #fff !important; }
-/* Etc: 회색 */
-.badge-etc { background-color: #6c757d !important; color: #fff !important; }
-
-
-/* 빈 칸 스타일 */
 .device-empty {
-    color: #ccc; font-size: 0.8em; background-color: #fff !important;
-    border-bottom: 1px solid #eee; cursor: pointer;
+    color: #adb5bd;
+    font-size: 0.8rem;
+    background-color: #fff !important;
+    border-bottom: 1px dashed #dee2e6; /* 점선으로 빈 공간 표현 */
+    cursor: pointer;
 }
 .device-empty:hover {
-    background-color: #e9ecef !important; color: #0d6efd; font-weight: bold;
+    background-color: #f1f3f5 !important;
+    color: #0d6efd;
+    font-weight: bold;
 }

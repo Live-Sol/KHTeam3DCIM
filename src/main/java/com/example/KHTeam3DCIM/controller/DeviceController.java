@@ -12,7 +12,6 @@ import com.example.KHTeam3DCIM.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-// import org.springframework.transaction.annotation.Transactional; // Service단에서 처리하므로 제거
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +38,7 @@ public class DeviceController {
     public String list(Model model,
                        @RequestParam(required = false) String keyword,
                        @RequestParam(required = false, defaultValue = "latest") String sort,
-                       @RequestParam(required = false, defaultValue = "desc") String sortDir) {
+                       @RequestParam(required = false, defaultValue = "asc") String sortDir) {
 
         List<Device> devices = deviceService.searchDevices(keyword, sort, sortDir);
 
@@ -88,6 +87,8 @@ public class DeviceController {
                 device.setUserName(req.getUserName());         // 담당자 이름
                 device.setContact(req.getContact());           // 담당자 연락처
                 device.setDescription(req.getPurpose());       // 입고 목적 -> 설명
+                device.setPowerWatt(req.getPowerWatt());       // 예상 소비 전력
+                device.setEmsStatus(req.getEmsStatus());       // EMS 사용 신청
 
                 model.addAttribute("selectedCateId", req.getCateId());
             }

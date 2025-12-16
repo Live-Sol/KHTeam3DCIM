@@ -19,32 +19,30 @@ import java.util.stream.Collectors;
 public class RackService {
 
     private final RackRepository rackRepository;
-    private final DeviceRepository deviceRepository; // [추가] 사용량 계산 위해 필요
+    private final DeviceRepository deviceRepository;
 
     // ==========================================
-    // 1. 전체 조회 (사용량 계산 로직 추가)
+    // 1. 전체 조회
     // ==========================================
     @Transactional(readOnly = true)
     public List<RackResponse> findAllRacks() {
         return rackRepository.findAll()
                 .stream()
                 .map(r -> {
-                    // DB에서 이 랙의 사용량(높이 합계) 계산해오기
                     Integer used = deviceRepository.getUsedUnitByRackId(r.getId());
-
                     return RackResponse.builder()
                             .id(r.getId())
                             .rackName(r.getRackName())
                             .totalUnit(r.getTotalUnit())
                             .locationDesc(r.getLocationDesc())
-                            .usedUnit(used) // DTO에 담기
+                            .usedUnit(used)
                             .build();
                 })
                 .collect(Collectors.toList());
     }
 
     // ==========================================
-    // 2. 단일 조회 (사용량 계산 로직 추가)
+    // 2. 단일 조회
     // ==========================================
     @Transactional(readOnly = true)
     public RackResponse findRackById(Long id) {
@@ -58,8 +56,14 @@ public class RackService {
                 .rackName(rack.getRackName())
                 .totalUnit(rack.getTotalUnit())
                 .locationDesc(rack.getLocationDesc())
-                .usedUnit(used) // DTO에 담기
+                .usedUnit(used)
                 .build();
+    }
+
+    // ⭐ [NEW] 총 랙 개수 조회 메서드 추가
+    @Transactional(readOnly = true)
+    public long countAllRacks() {
+        return rackRepository.count();
     }
 
     // ==========================================

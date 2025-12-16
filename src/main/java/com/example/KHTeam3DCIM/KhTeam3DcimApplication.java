@@ -15,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableJpaAuditing
 public class KhTeam3DcimApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
         SpringApplication.run(KhTeam3DcimApplication.class, args);
-	}
+    }
     // ⭐️ 초기 데이터 설정을 위한 필드 주입 ⭐️
     @Autowired
     private MemberRepository memberRepository;

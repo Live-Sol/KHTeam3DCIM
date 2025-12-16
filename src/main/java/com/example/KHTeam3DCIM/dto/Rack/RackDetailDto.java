@@ -19,8 +19,10 @@ public class RackDetailDto {
     private int rowSpan;       // 몇 칸 차지하는지 (HTML rowspan용)
     private Long deviceId;     // 클릭하면 상세페이지로 이동하려고
 
-    // ⭐ [신규 추가] 상세 정보를 위한 필드들
     private String serialNum;  // 시리얼 번호 (툴팁용)
     private String ipAddr;     // IP 주소 (툴팁용)
     private String runStatus;  // 가동 상태 (RUNNING, OFF) -> LED 표시용
+
+    private Integer powerWatt; // 툴팁 표시용
+    private String emsStatus;  // 아이콘 표시용
 }

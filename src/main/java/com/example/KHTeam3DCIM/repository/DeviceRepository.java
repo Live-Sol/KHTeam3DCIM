@@ -34,11 +34,29 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // ==========================================
     // 4. 랙별 사용량(높이 합계) 계산 쿼리
     // ==========================================
-    /*COALESCE(..., 0): 장비가 하나도 없으면 NULL 대신 0을 반환해라*/
+    // COALESCE(..., 0)은 NULL일 경우 0으로 바꿔주는 안전장치입니다.
     @Query("SELECT COALESCE(SUM(d.heightUnit), 0) FROM Device d WHERE d.rack.id = :rackId")
     Integer getUsedUnitByRackId(@Param("rackId") Long rackId);
 
+    // ==========================================
+    // 5. [대시보드용 통계 쿼리 모음]
+    // ==========================================
 
+    // 5-1. 총 소비 전력 합계
+    @Query("SELECT COALESCE(SUM(d.powerWatt), 0) FROM Device d")
+    Integer sumTotalPower();
 
+    // 5-2. 총 사용 중인 유닛(높이) 합계 (공간 효율 계산용)
+    @Query("SELECT COALESCE(SUM(d.heightUnit), 0) FROM Device d")
+    Integer sumTotalUsedHeight();
+
+    // 5-3. 종류별 장비 개수 세기 (SVR, NET, STO, UPS)
+    long countByCategory_Id(String cateId);
+
+    // 5-4. 상태별 장비 개수 세기 (RUNNING, OFF)
+    long countByStatus(String status);
+
+    // 5-5. EMS 연동 장비 개수 세기 (EMS_STATUS가 'ON'인 것)
+    long countByEmsStatus(String emsStatus);
 
 }
