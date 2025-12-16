@@ -24,7 +24,7 @@ public class MemberService {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
 
-// MemberService.java 전체 (필요한 부분만 발췌)
+// MemberService.java 전체 (필요한 부분만 발췌).
 
     // ⭐️ [정리] maskString 헬퍼 메서드는 클래스 내부에 한 번만 정의합니다. ⭐️
     private String maskString(String input) {
