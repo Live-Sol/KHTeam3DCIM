@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +25,6 @@ public class DeviceService {
     private final RackRepository rackRepository;
     private final CategoryRepository categoryRepository;
     private final AuditLogService auditLogService;
-
-    // ... (기존 registerDevice, createSort 등 메서드는 유지) ...
-    // ... (전체 파일을 다시 덮어쓰셔도 됩니다. 아래는 기존 코드 포함 전체입니다.) ...
 
     // ==========================================
     // 1. 장비 등록하기
@@ -87,6 +86,75 @@ public class DeviceService {
         return Sort.by(direction, property);
     }
 
+    // ==========================================
+    // 3. 에너지 대시보드용 통계 데이터 생성
+    // ==========================================
+    public Map<String, Object> getEnergyStatistics() {
+        // 1. IT 장비 총 전력 (DB에서 조회)
+        long itPower = deviceRepository.sumTotalPower();
+
+        // 2. 기반 설비 전력 (가정: IT 전력의 0.5배만큼 냉방비로 더 쓴다고 가정 -> 총 1.5배)
+        // 실제로는 센서가 필요하지만, 시뮬레이션이므로 공식으로 계산합니다.
+        long facilityPower = (long) (itPower * 1.5);
+
+        // 3. PUE 계산 공식: (총 전력 / IT 전력)
+        // IT 전력이 0이면 나눗셈 에러나므로 1.0(이상적 수치)으로 처리
+        double pue = (itPower == 0) ? 1.0 : (double) facilityPower / itPower;
+
+        // 4. 데이터를 맵(Map)이라는 보따리에 담아서 리턴
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("itPower", itPower);         // IT 장비 전력 (W)
+        stats.put("totalPower", facilityPower); // 전체 전력 (W)
+        stats.put("pue", String.format("%.2f", pue)); // 소수점 2자리까지만 (예: 1.50)
+
+        return stats;
+    }
+
+    // ==========================================
+    // 4. 메인 대시보드용 통계 데이터 생성 (All-in-One)
+    // ==========================================
+    public Map<String, Object> getDashboardStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 1. [기본] 총 장비 개수
+        long totalDevices = deviceRepository.count();
+        stats.put("totalDevices", totalDevices);
+
+        // 2. [종류별] 개수 (SVR, NET, STO, UPS)
+        stats.put("svrCount", deviceRepository.countByCategory_Id("SVR"));
+        stats.put("netCount", deviceRepository.countByCategory_Id("NET"));
+        stats.put("stoCount", deviceRepository.countByCategory_Id("STO"));
+        stats.put("upsCount", deviceRepository.countByCategory_Id("UPS"));
+
+        // 3. [상태별] ON/OFF 비율
+        long onCount = deviceRepository.countByStatus("RUNNING");
+        long offCount = deviceRepository.countByStatus("OFF"); // 또는 total - onCount
+        stats.put("onCount", onCount);
+        stats.put("offCount", offCount);
+
+        // 4. [공간 효율] (사용중인 Unit / 전체 Rack Unit)
+        long totalSpace = rackRepository.sumTotalRackUnit(); // 분모 (전체 42U * 랙개수)
+        long usedSpace = deviceRepository.sumTotalUsedHeight(); // 분자 (장비 높이 합계)
+        double spaceUsage = (totalSpace == 0) ? 0.0 : ((double) usedSpace / totalSpace) * 100;
+
+        stats.put("totalSpace", totalSpace);
+        stats.put("usedSpace", usedSpace);
+        stats.put("emptySpace", totalSpace - usedSpace); // 빈 공간
+        stats.put("spaceUsage", String.format("%.1f", spaceUsage)); // 소수점 1자리 (예: 45.2)
+
+        // 5. [에너지] 전력량 & PUE & EMS
+        long itPower = deviceRepository.sumTotalPower();
+        long facilityPower = (long) (itPower * 1.5); // 시뮬레이션 (1.5배)
+        double pue = (itPower == 0) ? 1.0 : (double) facilityPower / itPower;
+        long emsCount = deviceRepository.countByEmsStatus("ON");
+
+        stats.put("itPower", itPower);
+        stats.put("pue", String.format("%.2f", pue));
+        stats.put("emsCount", emsCount);
+
+        return stats;
+    }
+
     public List<Device> findAllDevices(String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
         return deviceRepository.findAll(sort);
@@ -107,7 +175,7 @@ public class DeviceService {
     }
 
     // ==========================================
-    // 3. 랙 실장도 데이터 가공
+    // 5. 랙 실장도 데이터 가공
     // ==========================================
     public List<RackDetailDto> getRackViewData(Long rackId) {
         Rack rack = rackRepository.findById(rackId)
@@ -134,6 +202,10 @@ public class DeviceService {
             slots[end].setSerialNum(d.getSerialNum());
             slots[end].setIpAddr(d.getIpAddr());
 
+            // ⭐ [추가] 실장도 팝업용 데이터 매핑
+            slots[end].setPowerWatt(d.getPowerWatt());
+            slots[end].setEmsStatus(d.getEmsStatus());
+
             for (int j = start; j < end; j++) {
                 slots[j].setStatus("SKIP");
                 slots[j].setRunStatus(d.getStatus());
@@ -146,7 +218,7 @@ public class DeviceService {
     }
 
     // ==========================================
-    // 4. 삭제/수정/전원
+    // 6. 삭제/수정/전원
     // ==========================================
     @Transactional
     public void deleteDevice(Long id) {
@@ -166,6 +238,18 @@ public class DeviceService {
         target.setModelName(formDevice.getModelName());
         target.setSerialNum(formDevice.getSerialNum());
         target.setIpAddr(formDevice.getIpAddr());
+
+        // ⭐ [수정] 여기가 빠져있어서 수정이 안 됐습니다!
+        target.setPowerWatt(formDevice.getPowerWatt());
+        target.setEmsStatus(formDevice.getEmsStatus());
+        target.setContractMonth(formDevice.getContractMonth());
+        target.setContractDate(formDevice.getContractDate());
+        target.setCompanyName(formDevice.getCompanyName());
+        target.setCompanyPhone(formDevice.getCompanyPhone());
+        target.setUserName(formDevice.getUserName());
+        target.setContact(formDevice.getContact());
+        target.setDescription(formDevice.getDescription());
+
         // 위치 변경은 현재 미지원 (복잡도 때문)
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();

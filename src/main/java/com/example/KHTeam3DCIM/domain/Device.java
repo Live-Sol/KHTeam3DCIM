@@ -84,24 +84,28 @@ public class Device {
     private Integer contractMonth;  // 계약 기간 (개월 수)
 
     // ==========================================
-    // ⭐ [핵심] 장비 소유자 (회원과 연결), Member 객체 자체를 연결합니다.
+    // [핵심] 장비 소유자 (회원과 연결), Member 객체 자체를 연결합니다.
     // ==========================================
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID") // DC_DEVICE 테이블에 MEMBER_ID 컬럼이 생김
     private Member member;
 
     // ==========================================
-    // ⭐ [추가] 소유자 및 용도 정보 (신청서 연동용)
+    // 소유자 및 용도 정보 (신청서 연동용)
     // ==========================================
     @Column(name = "COMPANY_NAME", length = 50)
-    private String companyName;   // 회사명
+    private String companyName;     // 회사명
     @Column(name = "COMPANY_PHONE", length = 20)
-    private String companyPhone; // 회사 대표 번호
+    private String companyPhone;    // 회사 대표 번호
     @Column(name = "USER_NAME", length = 50)
-    private String userName; // 담당자명
+    private String userName;        // 담당자명
     @Column(name = "CONTACT", length = 50)
-    private String contact; // 연락처 (담당자 직통 번호)
+    private String contact;         // 연락처 (담당자 직통 번호)
     @Column(name = "DESCRIPTION", length = 500)
-    private String description; // 용도 및 설명
+    private String description;     // 용도 및 설명
+    @Column(name = "POWER_WATT")
+    private Integer powerWatt;      // 소비 전력 (W)
+    @Column(name = "EMS_STATUS", length = 10)
+    private String emsStatus;       // EMS 감시 상태 (ON/OFF)
 
 }

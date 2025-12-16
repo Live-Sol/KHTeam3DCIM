@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>입고 신청</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -66,6 +67,23 @@
                 <div class="col-md-6">
                     <label class="form-label">모델명</label>
                     <input type="text" name="modelName" class="form-control" placeholder="예: R740" required>
+                </div>
+            </div>
+
+            <!-- ⭐ [추가] 전력 및 EMS 입력 -->
+            <div class="row mb-3 bg-light p-2 mx-1 border rounded">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 예상 소비 전력 (W)</label>
+                    <input type="number" name="powerWatt" class="form-control" placeholder="예: 500" min="0" required>
+                    <div class="form-text">장비 스펙상의 정격 전력을 입력하세요.</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 서비스</label>
+                    <select name="emsStatus" class="form-select">
+                        <option value="OFF">신청 안 함</option>
+                        <option value="ON">신청 함 (전력 모니터링)</option>
+                    </select>
+                    <div class="form-text">실시간 전력 모니터링 서비스 신청 여부</div>
                 </div>
             </div>
 

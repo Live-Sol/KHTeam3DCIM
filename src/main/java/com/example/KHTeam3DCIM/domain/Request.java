@@ -1,5 +1,3 @@
-// 장비 요청
-
 package com.example.KHTeam3DCIM.domain;
 
 import jakarta.persistence.*;
@@ -24,23 +22,24 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REQ_SEQ_GEN")
     @Column(name = "REQ_ID")
-    private Long id;            // 요청 ID    
+    private Long id;            // 요청 ID
 
-    // 1. 신청자 정보 (상세화)
+    // 1. 신청자 정보
     @Column(name = "COMPANY_NAME", length = 50)
-    private String companyName;    // 회사명 (⭐추가됨)
+    private String companyName;    // 회사명
 
     @Column(name = "COMPANY_PHONE", length = 20)
-    private String companyPhone;   // 회사 대표 번호 (⭐추가됨)
+    private String companyPhone;   // 회사 대표 번호
 
     @Column(name = "USER_NAME", nullable = false)
-    private String userName;       // 담당자 성함 (기존 필드 활용)
+    private String userName;       // 담당자 성함
 
     @Column(name = "CONTACT")
-    private String contact;       // 담당자 직통 번호 (기존 필드 활용)
+    private String contact;       // 담당자 직통 번호
 
+    // 2. 장비 정보
     @Column(name = "CATE_ID")
-    private String cateId;      // 장비 종류 (Category ID)
+    private String cateId;      // 장비 종류
 
     @Column(name = "VENDOR")
     private String vendor;      // 제조사
@@ -51,20 +50,27 @@ public class Request {
     @Column(name = "HEIGHT_UNIT", nullable = false)
     private Integer heightUnit; // 2U, 4U, 6U 등
 
+    // ⭐ [추가] 신청 단계에서도 전력량과 EMS 여부를 받습니다.
+    @Column(name = "POWER_WATT")
+    private Integer powerWatt;      // 예상 소비 전력
+
+    @Column(name = "EMS_STATUS", length = 10)
+    private String emsStatus;       // EMS 사용 신청 (ON/OFF)
+
+    // 3. 상태 및 계약 정보
     @Column(name = "STATUS")
-    private String status;      // WAITING, APPROVED
+    private String status;      // WAITING, APPROVED, REJECTED
 
     @CreatedDate
     @Column(name = "REQ_DATE", updatable = false)
     private LocalDateTime reqDate;  // 요청일자
 
     @Column(name = "PURPOSE", length = 200)
-    private String purpose; // 입주 목적 (예: 웹 서비스 운영, DB 백업용, 사내 테스트 서버 등)
+    private String purpose; // 입주 목적
 
     @Column(name = "START_DATE")
-    private LocalDate startDate; // 입주 희망 시작일 (언제부터 쓸 건지)
+    private LocalDate startDate; // 입주 희망 시작일
 
     @Column(name = "TERM_MONTH")
-    private Integer termMonth; // 계약 기간 (개월 수 단위: 12, 24, 36...)
-
+    private Integer termMonth; // 계약 기간
 }

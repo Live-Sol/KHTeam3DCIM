@@ -13,6 +13,19 @@ function showDeviceModal(deviceId) {
             document.getElementById('modalModel').innerText = data.modelName;
             document.getElementById('modalSerial').innerText = data.serialNum;
             document.getElementById('modalIp').innerText = data.ipAddr;
+
+            // ⭐ [추가] 소비 전력 표시 (값이 없으면 0W)
+            const power = data.powerWatt ? data.powerWatt : 0;
+            document.getElementById('modalPower').innerText = power + ' W';
+
+            // ⭐ [추가] EMS 연동 여부 표시
+            const emsCell = document.getElementById('modalEms');
+            if (data.emsStatus === 'ON') {
+                emsCell.innerHTML = '<span class="badge bg-info text-dark">연동 중 (ON)</span>';
+            } else {
+                emsCell.innerHTML = '<span class="text-muted">미연동 (OFF)</span>';
+            }
+
             updateStatusUI(data.status);
             document.getElementById('modalEditBtn').href = '/devices/' + data.id + '/edit';
 

@@ -1,128 +1,247 @@
-<!-- http://localhost:8080/   메인화면   -->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>DCIM Dashboard</title>
-    <!-- 부트스트랩 & 아이콘(Bootstrap Icons) CDN -->
+    <title>DCIM Integrated Dashboard</title>
+    <!-- 부트스트랩 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js 라이브러리 (차트 그리기용) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        .card-hover:hover { transform: translateY(-5px); transition: 0.3s; cursor: pointer;}
-        .stat-card { border-left: 5px solid gray; }
-        .border-primary-left { border-left-color: #0d6efd !important; }
-        .border-success-left { border-left-color: #198754 !important; }
-        .border-warning-left { border-left-color: #ffc107 !important; }
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-5px); cursor: pointer; }
+        .icon-box {
+            width: 50px; height: 50px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
     </style>
 </head>
 <body class="bg-light">
+
 <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- 헤더 (나중에 header.html로 분리 가능) -->
-<!--<nav class="navbar navbar-dark bg-dark mb-4">-->
-<!--    <div class="container">-->
-<!--        <span class="navbar-brand mb-0 h1">🏭 KHTeam3 DCIM System</span>-->
-<!--        <span class="text-white">Admin 접속중</span>-->
-<!--    </div>-->
-<!--</nav>-->
+<div class="container-fluid px-4 mt-4">
 
-<div class="container">
-
-    <!-- 1. 통계 카드 영역 -->
-    <div class="row mb-4">
-        <!-- 랙 통계 -->
-        <div class="col-md-4">
-            <div class="card shadow-sm stat-card border-primary-left card-hover">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Racks</h6>
-                    <h2 class="fw-bold text-primary">
+    <!-- 1. 상단 핵심 지표 (KPI) -->
+    <div class="row g-3 mb-4">
+        <!-- (1) 총 랙 개수 -->
+        <div class="col-md-3">
+            <div class="card stat-card bg-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 fw-bold">Total Racks</p>
+                        <h3 class="mb-0 fw-bold" th:text="${totalRacks}">0</h3>
+                    </div>
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
                         <i class="bi bi-hdd-rack"></i>
-                        <span th:text="${totalRacks}">0</span>
-                    </h2>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- 장비 통계 -->
-        <div class="col-md-4">
-            <div class="card shadow-sm stat-card border-success-left card-hover">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Devices</h6>
-                    <h2 class="fw-bold text-success">
+        <!-- (2) 총 장비 개수 -->
+        <div class="col-md-3">
+            <div class="card stat-card bg-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 fw-bold">Total Devices</p>
+                        <h3 class="mb-0 fw-bold" th:text="${stats.totalDevices}">0</h3>
+                    </div>
+                    <div class="icon-box bg-success bg-opacity-10 text-success">
                         <i class="bi bi-server"></i>
-                        <span th:text="${totalDevices}">0</span>
-                    </h2>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- 대기중인 신청 -->
-        <div class="col-md-4">
-            <div class="card shadow-sm stat-card border-warning-left card-hover"
-                 onclick="location.href='/requests'">
-                <div class="card-body">
-                    <h6 class="text-muted">Waiting Requests</h6>
-                    <h2 class="fw-bold text-warning">
+        <!-- (3) PUE 지표 -->
+        <div class="col-md-3">
+            <div class="card stat-card bg-white p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 fw-bold">PUE Efficiency</p>
+                        <h3 class="mb-0 fw-bold text-info" th:text="${stats.pue}">1.0</h3>
+                    </div>
+                    <div class="icon-box bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                </div>
+                <small class="text-muted" style="font-size: 0.8rem;">Target: < 1.5</small>
+            </div>
+        </div>
+        <!-- (4) 대기중인 신청 -->
+        <div class="col-md-3">
+            <div class="card stat-card bg-white p-3 h-100" onclick="location.href='/requests'">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 fw-bold">Waiting Requests</p>
+                        <h3 class="mb-0 fw-bold text-warning" th:text="${waitingRequests}">0</h3>
+                    </div>
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning">
                         <i class="bi bi-bell"></i>
-                        <span th:text="${waitingRequests}">0</span> 건
-                    </h2>
-                    <small th:if="${waitingRequests > 0}" class="text-danger fw-bold">승인 처리가 필요합니다!</small>
+                    </div>
+                </div>
+                <small th:if="${waitingRequests > 0}" class="text-danger fw-bold blink">Action Required!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 차트 및 상세 현황 영역 -->
+    <div class="row g-3 mb-4">
+
+        <!-- 왼쪽: 장비 유형 비율 (Doughnut Chart) -->
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h6 class="fw-bold"><i class="bi bi-pie-chart-fill"></i> Asset Distribution (자산 분포)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 가운데: 공간 사용률 (Bar Chart or Progress) -->
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h6 class="fw-bold"><i class="bi bi-building"></i> Capacity Planning (공간 효율)</h6>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <div class="text-center mb-3">
+                        <h2 class="display-6 fw-bold text-primary">[[${stats.spaceUsage}]]%</h2>
+                        <span class="text-muted">Used Capacity</span>
+                    </div>
+
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar bg-primary" role="progressbar"
+                             th:style="'width: ' + ${stats.spaceUsage} + '%'"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between text-muted small px-2">
+                        <span>Used: [[${stats.usedSpace}]] U</span>
+                        <span>Empty: [[${stats.emptySpace}]] U</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="fw-bold text-dark"><i class="bi bi-lightning-charge"></i> Total Power</span>
+                        <span class="fs-5 fw-bold">[[${stats.itPower}]] W</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span class="fw-bold text-success"><i class="bi bi-plugin"></i> EMS Devices</span>
+                        <span class="fs-5 fw-bold text-success">[[${stats.emsCount}]] EA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 가동 현황 (Pie Chart) -->
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-header bg-white border-0 pt-3">
+                    <h6 class="fw-bold"><i class="bi bi-activity"></i> Operation Status (가동률)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. 바로가기 메뉴 -->
+    <!-- 3. 바로가기 메뉴 -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex gap-2">
-                    <a href="/devices" class="btn btn-outline-primary btn-lg flex-grow-1">
-                        <i class="bi bi-pc-display"></i> 장비 관리 (Device)
+            <div class="card stat-card p-3">
+                <div class="d-flex gap-2">
+                    <a href="/devices" class="btn btn-outline-primary flex-grow-1 py-2">
+                        <i class="bi bi-pc-display fs-5"></i><br>Device List
                     </a>
-                    <a href="/requests/new" class="btn btn-outline-success btn-lg flex-grow-1">
-                        <i class="bi bi-pencil-square"></i> 입주 신청 (User Mode)
+                    <a href="/requests/new" class="btn btn-outline-success flex-grow-1 py-2">
+                        <i class="bi bi-pencil-square fs-5"></i><br>Request Form
                     </a>
-                    <a href="/requests" class="btn btn-outline-warning btn-lg flex-grow-1">
-                        <i class="bi bi-check-circle"></i> 승인 관리 (Admin Mode)
+                    <a href="/requests" class="btn btn-outline-warning flex-grow-1 py-2">
+                        <i class="bi bi-check-circle fs-5"></i><br>Approval
                     </a>
-                    <a href="/racks" class="btn btn-lg flex-grow-1">
-                        <i class="bi bi-check-circle"></i> 랙 관리 (Admin Mode)
+                    <a href="/racks" class="btn btn-outline-secondary flex-grow-1 py-2">
+                        <i class="bi bi-grid-3x3 fs-5"></i><br>Rack Map
                     </a>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- 3. 최근 활동 로그 (DcLog) -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <h5 class="mb-0"><i class="bi bi-clock-history"></i> 최근 활동 내역 (Recent Logs)</h5>
-        </div>
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                <tr>
-                    <th>시간</th>
-                    <th>사용자</th>
-                    <th>활동 내용</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="log : ${recentLogs}">
-                    <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">수정시간(NULL)</td>
-
-                    <td><span class="badge bg-secondary" th:text="${log.actor}">변경자(NULL)</span></td>
-
-                    <td th:text="${log.actionDescription}">변견사항(NULL)</td>
-                </tr>
-                <tr th:if="${recentLogs.isEmpty()}">
-                    <td colspan="3" class="text-center py-3 text-muted">최근 활동 내역이 없습니다.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 </div>
+
+<!-- 4. 차트 데이터 주입 및 렌더링 스크립트 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // 1. 서버에서 넘어온 데이터 받기
+    const svrCount = [[${stats.svrCount}]];
+    const netCount = [[${stats.netCount}]];
+    const stoCount = [[${stats.stoCount}]];
+    const upsCount = [[${stats.upsCount}]];
+
+    const onCount = [[${stats.onCount}]];
+    const offCount = [[${stats.offCount}]];
+
+    // 2. 자산 분포 차트 (Type Chart)
+    new Chart(document.getElementById('typeChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Server', 'Network', 'Storage', 'UPS'],
+            datasets: [{
+                data: [svrCount, netCount, stoCount, upsCount],
+                backgroundColor: ['#198754', '#ffc107', '#0dcaf0', '#6f42c1'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // 3. 가동 현황 차트 (Status Chart)
+    new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Running (ON)', 'Stopped (OFF)'],
+            datasets: [{
+                data: [onCount, offCount],
+                backgroundColor: ['#198754', '#dc3545'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    /*]]>*/
+</script>
+
 </body>
 </html>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>요청 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 
@@ -37,10 +38,18 @@
                     <hr>
 
                     <p class="card-text mb-1"><strong>장비명:</strong> [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)</p>
+
+                    <!-- ⭐ [추가] 전력 및 EMS 정보 표시 -->
+                    <p class="card-text mb-1">
+                        <strong>전력/EMS:</strong>
+                        <span class="text-danger fw-bold">[[${req.powerWatt}]] W</span> /
+                        <span th:if="${req.emsStatus == 'ON'}" class="badge bg-success">EMS 신청</span>
+                        <span th:unless="${req.emsStatus == 'ON'}" class="badge bg-secondary">EMS 미신청</span>
+                    </p>
+
                     <p class="card-text mb-1"><strong>계약기간:</strong> [[${req.startDate}]] (계약: [[${req.termMonth}]]개월)</p>
                     <p class="card-text mb-1"><strong>입고 목적:</strong></p>
                     <p class="card-text bg-light p-2 rounded">[[${req.purpose}]]</p>
-
 
                     <div class="d-flex gap-2 mt-3">
                         <a th:href="@{/racks(reqId=${req.id})}" class="btn btn-primary flex-grow-1">

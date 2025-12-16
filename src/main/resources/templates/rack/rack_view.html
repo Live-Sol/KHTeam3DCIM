@@ -74,7 +74,6 @@
                         th:rowspan="${slot.rowSpan}"
                         class="device-occupied"
 
-                    /* 장비 종류에 따라 CSS 클래스 동적 적용 */
                     th:classappend="${slot.type == 'SVR' ? 'type-server' :
                     (slot.type == 'NET' ? 'type-network' :
                     (slot.type == 'STO' ? 'type-storage' :
@@ -121,7 +120,7 @@
     </div>
 </div>
 
-<!-- 모달 (Modal) 부분은 기존과 동일하지만 JS 연결을 위해 유지 -->
+<!-- 모달 (Modal) 부분 -->
 <div class="modal fade" id="deviceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -137,6 +136,10 @@
                             <tr><th class="text-muted">모델명</th><td id="modalModel" class="fw-bold text-primary"></td></tr>
                             <tr><th class="text-muted">시리얼</th><td id="modalSerial" style="font-family: monospace;"></td></tr>
                             <tr><th class="text-muted">IP 주소</th><td id="modalIp" style="font-family: monospace;"></td></tr>
+                            <!-- ⭐ [추가] 소비전력, EMS 표시 영역 -->
+                            <tr><th class="text-muted">소비전력</th><td id="modalPower"></td></tr>
+                            <tr><th class="text-muted">EMS</th><td id="modalEms"></td></tr>
+                            <!-- ============================ -->
                             <tr><th class="text-muted">상태</th><td id="modalStatus"></td></tr>
                             <tr><th class="text-muted">입고일</th><td id="modalContractDate"></td></tr>
                             <tr><th class="text-muted">계약만료</th><td id="modalExpiry"></td></tr>

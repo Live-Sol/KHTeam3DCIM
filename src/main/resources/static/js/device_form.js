@@ -34,6 +34,7 @@ function loadRequestData(selectObj) {
             if (isLocked) {
                 select.classList.add('bg-light');
                 // disabled 되면 값이 전송 안 되므로, hidden input을 동적으로 생성
+                // (이미 있으면 값만 업데이트, 없으면 생성)
                 let hidden = document.querySelector(`input[type="hidden"][name="${name}"]`);
                 if (!hidden) {
                     hidden = document.createElement('input');
@@ -76,30 +77,36 @@ function loadRequestData(selectObj) {
     const cdate = selectedOption.getAttribute('data-cdate');
     const cmonth = selectedOption.getAttribute('data-cmonth');
 
+    // ⭐ [추가] 전력 및 EMS 데이터 읽기
+    const power = selectedOption.getAttribute('data-power');
+    const ems = selectedOption.getAttribute('data-ems');
+
 
     // 3. 값 적용 및 잠금 실행
 
-    // [소유자 정보] - 잠금 대상
+    // [소유자 정보]
     setInput('companyName', company);
     setInput('companyPhone', companyPhone);
     setInput('userName', userName);
     setInput('contact', contact);
 
-    // [장비 정보] - 일부 잠금 대상
-    setSelect('cateId', cateId);      // 종류 (잠금)
-    setInput('vendor', vendor);       // 제조사 (잠금)
-    setInput('modelName', model);     // 모델명 (잠금)
-    setInput('heightUnit', height);   // 높이 (잠금)
+    // [장비 정보]
+    setSelect('cateId', cateId);      // 종류
+    setInput('vendor', vendor);       // 제조사
+    setInput('modelName', model);     // 모델명
+    setInput('heightUnit', height);   // 높이
 
-    // ※ 시리얼번호, IP주소, 랙 위치(RackId), 시작위치(StartUnit)는
-    //    신청서에 없는 정보이므로 잠그지 않음 (직접 입력해야 함)
+    // ⭐ [추가] 전력 및 EMS 적용
+    setInput('powerWatt', power);
+    setSelect('emsStatus', ems);
 
-    // [계약 정보] - 잠금 대상
+
+    // [계약 정보]
     setTextarea('description', purpose);
     setInput('contractDate', cdate);
     setSelect('contractMonth', cmonth);
 
-    // [히든 필드 업데이트]
+    // [히든 필드 업데이트] (Controller로 넘겨줄 reqId)
     const reqField = document.getElementById('reqIdField');
     if(reqField) reqField.value = reqId;
 
