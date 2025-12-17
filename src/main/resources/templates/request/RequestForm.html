@@ -21,77 +21,71 @@
             </div>
 
             <div class="card-body p-4 p-md-5">
-                <form th:action="@{/requests/new}" method="post">
+                <form th:action="@{/requests/new}" th:object="${requestDTO}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">
-<!--                        <i class="bi bi-person-badge me-2"></i>-->
-                        1. 신청자 정보
-                    </h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">1. 신청자 정보</h5>
 
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">회사명</label>
-                            <input type="text" name="companyName" class="form-control custom-input"
-                                   th:value="${member != null ? member.companyName : ''}"
-                                   placeholder="예: (주)KH정보통신" required>
+                            <input type="text" th:field="*{companyName}" class="form-control custom-input"
+                                   placeholder="예: (주)KH정보통신">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">회사 대표 번호</label>
-                            <input type="text" name="companyPhone" class="form-control custom-input"
-                                   th:value="${member != null ? member.companyPhone : ''}"
-                                   placeholder="예: 02-1234-5678">
+                            <input type="text" th:field="*{companyPhone}" class="form-control custom-input" placeholder="예: 02-1234-5678">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
                         </div>
                     </div>
 
                     <div class="row mb-5">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">담당자 성함</label>
-                            <input type="text" name="userName" class="form-control custom-input"
-                                   th:value="${member != null ? member.name : ''}" required>
+                            <input type="text" th:field="*{userName}" class="form-control custom-input">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">담당자 직통 번호</label>
-                            <input type="text" name="contact" class="form-control custom-input"
-                                   th:value="${member != null ? member.contact : ''}"
-                                   placeholder="예: 010-0000-0000" required>
+                            <input type="text" th:field="*{contact}" class="form-control custom-input" placeholder="예: 010-0000-0000">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
                         </div>
                     </div>
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">
-<!--                        <i class="bi bi-cpu me-2"></i>-->
-                        2. 장비 정보
-                    </h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">2. 장비 정보</h5>
 
                     <div class="mb-3">
                         <label class="form-label text-sub">장비 종류</label>
-                        <select name="cateId" class="form-select custom-input" required>
-                            <option value="" disabled selected>--- 선택해 주세요 ---</option>
-                            <option th:each="category : ${categories}"
-                                    th:value="${category.id}"
-                                    th:text="${category.name}"></option>
+                        <select th:field="*{cateId}" class="form-select custom-input">
+                            <option value="" selected>--- 선택해 주세요 ---</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
                         </select>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('cateId')}" th:errors="*{cateId}"></div>
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">제조사</label>
-                            <input type="text" name="vendor" class="form-control custom-input" placeholder="예: Dell" required>
+                            <input type="text" th:field="*{vendor}" class="form-control custom-input" placeholder="예: Dell">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('vendor')}" th:errors="*{vendor}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">모델명</label>
-                            <input type="text" name="modelName" class="form-control custom-input" placeholder="예: R740" required>
+                            <input type="text" th:field="*{modelName}" class="form-control custom-input" placeholder="예: R740">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('modelName')}" th:errors="*{modelName}"></div>
                         </div>
                     </div>
 
                     <div class="row mb-4 ems-box p-3 mx-0 rounded">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 예상 소비 전력 (W)</label>
-                            <input type="number" name="powerWatt" class="form-control custom-input-dark" placeholder="예: 500" min="0" required>
+                            <input type="number" th:field="*{powerWatt}" class="form-control custom-input-dark" placeholder="예: 500">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('powerWatt')}" th:errors="*{powerWatt}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 서비스</label>
-                            <select name="emsStatus" class="form-select custom-input-dark">
+                            <select th:field="*{emsStatus}" class="form-select custom-input-dark">
                                 <option value="OFF">신청 안 함</option>
                                 <option value="ON">신청 함 (전력 모니터링)</option>
                             </select>
@@ -100,7 +94,7 @@
 
                     <div class="mb-5">
                         <label class="form-label text-sub d-block">장비 높이 (Unit)</label>
-                        <input type="hidden" id="realHeightUnit" name="heightUnit" value="2">
+                        <input type="hidden" id="realHeightUnit" th:field="*{heightUnit}">
                         <div class="btn-group w-100 mb-3" role="group">
                             <input type="radio" class="btn-check" name="u_option" id="u1" value="1" onclick="selectUnit(1)">
                             <label class="btn btn-outline-unit" for="u1">1 U</label>
@@ -116,33 +110,32 @@
                             <input type="number" id="etcInput" class="form-control custom-input" min="1" disabled oninput="updateEtcValue()">
                             <span class="input-group-text custom-addon">U</span>
                         </div>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('heightUnit')}" th:errors="*{heightUnit}"></div>
                     </div>
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">
-<!--                        <i class="bi bi-file-earmark-text me-2"></i>-->
-                        3. 입고 계약 정보
-                    </h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">3. 입고 계약 정보</h5>
 
                     <div class="mb-4">
                         <label class="form-label text-sub">입고 목적</label>
-                        <textarea name="purpose" class="form-control custom-input" rows="3" placeholder="예: 사내 그룹웨어 운영용" required></textarea>
+                        <textarea th:field="*{purpose}" class="form-control custom-input" rows="3" placeholder="예: 사내 그룹웨어 운영용"></textarea>
+                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('purpose')}" th:errors="*{purpose}"></div>
                     </div>
 
                     <div class="row mb-5">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">입고 희망일</label>
-                            <input type="date" id="startDate" name="startDate" class="form-control custom-input" required>
+                            <input type="date" th:field="*{startDate}" class="form-control custom-input">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">계약 기간</label>
-                            <select name="termMonth" class="form-select custom-input" required>
+                            <select th:field="*{termMonth}" class="form-select custom-input">
                                 <option value="12">1년 (12개월)</option>
-                                <option value="24" selected>2년 (24개월)</option>
+                                <option value="24">2년 (24개월)</option>
                                 <option value="36">3년 (36개월)</option>
                             </select>
                         </div>
                     </div>
-
                     <div class="row g-3">
                         <div class="col-6">
                             <button type="submit" class="btn btn-primary-admin w-100 py-3 fw-bold">신청서 제출</button>
@@ -152,6 +145,138 @@
                         </div>
                     </div>
                 </form>
+
+<!--                <form th:action="@{/requests/new}" method="post">-->
+<!--                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+
+<!--                    <h5 class="section-title border-bottom pb-2 mb-4">-->
+<!--&lt;!&ndash;                        <i class="bi bi-person-badge me-2"></i>&ndash;&gt;-->
+<!--                        1. 신청자 정보-->
+<!--                    </h5>-->
+
+<!--                    <div class="row mb-3">-->
+<!--                        <div class="col-md-6 mb-3 mb-md-0">-->
+<!--                            <label class="form-label text-sub">회사명</label>-->
+<!--                            <input type="text" name="companyName" class="form-control custom-input"-->
+<!--                                   th:value="${member != null ? member.companyName : ''}"-->
+<!--                                   placeholder="예: (주)KH정보통신" required>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label class="form-label text-sub">회사 대표 번호</label>-->
+<!--                            <input type="text" name="companyPhone" class="form-control custom-input"-->
+<!--                                   th:value="${member != null ? member.companyPhone : ''}"-->
+<!--                                   placeholder="예: 02-1234-5678">-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="row mb-5">-->
+<!--                        <div class="col-md-6 mb-3 mb-md-0">-->
+<!--                            <label class="form-label text-sub">담당자 성함</label>-->
+<!--                            <input type="text" name="userName" class="form-control custom-input"-->
+<!--                                   th:value="${member != null ? member.name : ''}" required>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label class="form-label text-sub">담당자 직통 번호</label>-->
+<!--                            <input type="text" name="contact" class="form-control custom-input"-->
+<!--                                   th:value="${member != null ? member.contact : ''}"-->
+<!--                                   placeholder="예: 010-0000-0000" required>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <h5 class="section-title border-bottom pb-2 mb-4">-->
+<!--&lt;!&ndash;                        <i class="bi bi-cpu me-2"></i>&ndash;&gt;-->
+<!--                        2. 장비 정보-->
+<!--                    </h5>-->
+
+<!--                    <div class="mb-3">-->
+<!--                        <label class="form-label text-sub">장비 종류</label>-->
+<!--                        <select name="cateId" class="form-select custom-input" required>-->
+<!--                            <option value="" disabled selected>-&#45;&#45; 선택해 주세요 -&#45;&#45;</option>-->
+<!--                            <option th:each="category : ${categories}"-->
+<!--                                    th:value="${category.id}"-->
+<!--                                    th:text="${category.name}"></option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+
+<!--                    <div class="row mb-4">-->
+<!--                        <div class="col-md-6 mb-3 mb-md-0">-->
+<!--                            <label class="form-label text-sub">제조사</label>-->
+<!--                            <input type="text" name="vendor" class="form-control custom-input" placeholder="예: Dell" required>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label class="form-label text-sub">모델명</label>-->
+<!--                            <input type="text" name="modelName" class="form-control custom-input" placeholder="예: R740" required>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="row mb-4 ems-box p-3 mx-0 rounded">-->
+<!--                        <div class="col-md-6 mb-3 mb-md-0">-->
+<!--                            <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 예상 소비 전력 (W)</label>-->
+<!--                            <input type="number" name="powerWatt" class="form-control custom-input-dark" placeholder="예: 500" min="0" required>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 서비스</label>-->
+<!--                            <select name="emsStatus" class="form-select custom-input-dark">-->
+<!--                                <option value="OFF">신청 안 함</option>-->
+<!--                                <option value="ON">신청 함 (전력 모니터링)</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="mb-5">-->
+<!--                        <label class="form-label text-sub d-block">장비 높이 (Unit)</label>-->
+<!--                        <input type="hidden" id="realHeightUnit" name="heightUnit" value="2">-->
+<!--                        <div class="btn-group w-100 mb-3" role="group">-->
+<!--                            <input type="radio" class="btn-check" name="u_option" id="u1" value="1" onclick="selectUnit(1)">-->
+<!--                            <label class="btn btn-outline-unit" for="u1">1 U</label>-->
+<!--                            <input type="radio" class="btn-check" name="u_option" id="u2" value="2" onclick="selectUnit(2)" checked>-->
+<!--                            <label class="btn btn-outline-unit" for="u2">2 U</label>-->
+<!--                            <input type="radio" class="btn-check" name="u_option" id="u4" value="4" onclick="selectUnit(4)">-->
+<!--                            <label class="btn btn-outline-unit" for="u4">4 U</label>-->
+<!--                            <input type="radio" class="btn-check" name="u_option" id="u_etc" value="etc" onclick="enableEtc()">-->
+<!--                            <label class="btn btn-outline-unit" for="u_etc">기타</label>-->
+<!--                        </div>-->
+<!--                        <div class="input-group">-->
+<!--                            <span class="input-group-text custom-addon">직접 입력</span>-->
+<!--                            <input type="number" id="etcInput" class="form-control custom-input" min="1" disabled oninput="updateEtcValue()">-->
+<!--                            <span class="input-group-text custom-addon">U</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <h5 class="section-title border-bottom pb-2 mb-4">-->
+<!--&lt;!&ndash;                        <i class="bi bi-file-earmark-text me-2"></i>&ndash;&gt;-->
+<!--                        3. 입고 계약 정보-->
+<!--                    </h5>-->
+
+<!--                    <div class="mb-4">-->
+<!--                        <label class="form-label text-sub">입고 목적</label>-->
+<!--                        <textarea name="purpose" class="form-control custom-input" rows="3" placeholder="예: 사내 그룹웨어 운영용" required></textarea>-->
+<!--                    </div>-->
+
+<!--                    <div class="row mb-5">-->
+<!--                        <div class="col-md-6 mb-3 mb-md-0">-->
+<!--                            <label class="form-label text-sub">입고 희망일</label>-->
+<!--                            <input type="date" id="startDate" name="startDate" class="form-control custom-input" required>-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label class="form-label text-sub">계약 기간</label>-->
+<!--                            <select name="termMonth" class="form-select custom-input" required>-->
+<!--                                <option value="12">1년 (12개월)</option>-->
+<!--                                <option value="24" selected>2년 (24개월)</option>-->
+<!--                                <option value="36">3년 (36개월)</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="row g-3">-->
+<!--                        <div class="col-6">-->
+<!--                            <button type="submit" class="btn btn-primary-admin w-100 py-3 fw-bold">신청서 제출</button>-->
+<!--                        </div>-->
+<!--                        <div class="col-6">-->
+<!--                            <a th:href="@{/}" class="btn btn-outline-secondary-admin w-100 py-3">취소</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </form>-->
             </div>
         </div>
     </div>
