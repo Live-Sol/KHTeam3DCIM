@@ -30,7 +30,7 @@
                         <!-- Title -->
                         <div class="text-center mb-5">
                             <h2 class="login-title">STAR-ROOT LOGIN</h2>
-                            <p class="text-white-50 small">Enter your ID/PW to access the DCIM core.<br></p>
+                            <p class="text-white-50 small">ID/PW을 입력하여 로그인 하세요.<br></p>
                         </div>
 
                         <!-- Error Message -->
@@ -60,7 +60,7 @@
                                 <div class="form-check custom-checkbox">
                                     <input class="form-check-input" type="checkbox" id="saveId">
                                     <label class="form-check-label" for="saveId">
-                                        Save ID
+                                        아이디 저장하기
                                     </label>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
                             <!-- Action Buttons -->
                             <div class="d-grid gap-2 mt-5">
                                 <button type="submit" class="btn btn-login btn-lg">
-                                    LOG-IN <i class="bi bi-arrow-right-short"></i>
+                                    로그인 <i class="bi bi-arrow-right-short"></i>
                                 </button>
                             </div>
                         </form>
@@ -77,19 +77,19 @@
                         <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
                             <!-- 비밀번호 찾기 -->
                             <p class="text-white-50 small mb-2">
-                                Forgotten your identity?
-                                <a th:href="@{/members/forgot-password}" class="link-cyan fw-bold ms-1">Recover Credentials</a>
+                                비밀번호를 잊으셨나요?
+                                <a th:href="@{/members/forgot-password}" class="link-cyan fw-bold ms-1">비밀번호 찾으러가기</a>
                             </p>
 
                             <!-- 회원가입 링크 -->
                             <p class="text-white-50 small mb-2">
-                                New agent?
-                                <a th:href="@{/members/signup}" class="link-cyan fw-bold ms-1">Register Identity</a>
+                                회원가입이 필요하신가요?
+                                <a th:href="@{/members/signup}" class="link-cyan fw-bold ms-1">회원가입</a>
                             </p>
 
                             <!-- 홈으로 돌아가기 -->
                             <a th:href="@{/}" class="link-cyan fw-bold">
-                                <i class="bi bi-house-door me-2"></i>Return Home
+                                <i class="bi bi-house-door me-2"></i>메인으로 돌아가기
                             </a>
                         </div>
 

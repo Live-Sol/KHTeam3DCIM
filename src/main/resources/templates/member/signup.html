@@ -31,11 +31,11 @@
 
                         <!-- Title -->
                         <div class="text-center mb-5">
-                            <h2 class="login-title">NEW AGENT REGISTRATION</h2>
-                            <p class="text-white-50 small">Create your identity to access StarRoot DCIM.</p>
+                            <h2 class="login-title">STAR-ROOT<br>SIGNUP</h2>
+                            <p class="text-white-50 small">StarRoot에 접속하여 다양한 서비스를 누려보세요.</p>
                         </div>
 
-                        <!-- Global Error Message -->
+                        <!-- 에러 메시지 -->
                         <div th:if="${error}" class="alert alert-custom mb-4" role="alert">
                             <i class="bi bi-exclamation-octagon-fill me-2"></i>
                             <span th:text="${error}">회원가입 중 문제가 발생했습니다.</span>
@@ -46,7 +46,7 @@
 
                             <!-- 섹션 1: 계정 정보 -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4">
-                                <i class="bi bi-shield-lock me-2"></i>Account Credentials
+                                <i class="bi bi-shield-lock me-2"></i>계정 정보
                             </h6>
 
                             <!-- 아이디 + 중복확인 -->
@@ -55,7 +55,7 @@
                                     <div class="input-group">
                                         <div class="form-floating flex-grow-1">
                                             <input type="text" class="form-control form-control-custom rounded-end-0" id="memberId" name="memberId" placeholder="User ID" required>
-                                            <label for="memberId">User ID</label>
+                                            <label for="memberId">아이디</label>
                                         </div>
                                         <button type="button" class="btn btn-check-custom px-4" id="checkIdBtn">
                                             <i class="bi bi-check2-circle me-1"></i> Check
@@ -79,7 +79,7 @@
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
                                         <input type="password" class="form-control form-control-custom" id="password" name="password" placeholder="Password" required>
-                                        <label for="password">Password</label>
+                                        <label for="password">비밀번호</label>
                                     </div>
                                     <div id="passwordError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-info-circle"></i> 영문+숫자 포함 5~20자
@@ -87,8 +87,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="password" class="form-control form-control-custom" id="passwordConfirm" placeholder="Confirm Password" required>
-                                        <label for="passwordConfirm">Confirm Password</label>
+                                        <input type="password" class="form-control form-control-custom" id="passwordConfirm" placeholder="passwordConfirm" required>
+                                        <label for="passwordConfirm">비밀번호 재확인</label>
                                     </div>
                                     <div id="passwordConfirmError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-exclamation-triangle"></i> 비밀번호가 일치하지 않습니다.
@@ -96,9 +96,9 @@
                                 </div>
                             </div>
 
-                            <!-- 섹션 2: 개인 정보 -->
+                            <!-- 섹션 2: 담당자 정보 -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4 mt-2">
-                                <i class="bi bi-person-vcard me-2"></i>Personal Info
+                                <i class="bi bi-person-vcard me-2"></i>담당자 정보
                             </h6>
 
                             <!-- 이름 & 연락처 -->
@@ -106,7 +106,7 @@
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="name" name="name" placeholder="Name" required>
-                                        <label for="name">Name</label>
+                                        <label for="name">담당자 성함</label>
                                     </div>
                                     <div id="nameError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-x-circle"></i> 한글/영문 2~10자
@@ -115,7 +115,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="contact" name="contact" placeholder="010-0000-0000" required>
-                                        <label for="contact">Phone (010-0000-0000)</label>
+                                        <label for="contact">예: 010-0000-0000</label>
                                     </div>
                                     <div id="contactError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-x-circle"></i> 형식이 올바르지 않습니다.
@@ -127,7 +127,7 @@
                             <div class="mb-4">
                                 <div class="form-floating">
                                     <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="Email" required>
-                                    <label for="email">Email Address</label>
+                                    <label for="email">예: KHcompany@example.com</label>
                                 </div>
                                 <div id="emailError" class="validation-msg text-error" style="display:none;">
                                     <i class="bi bi-x-circle"></i> 올바른 이메일 형식이 아닙니다.
@@ -136,14 +136,14 @@
 
                             <!-- 섹션 3: 회사 정보 -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4 mt-2">
-                                <i class="bi bi-building me-2"></i>Company Info
+                                <i class="bi bi-building me-2"></i>기업 정보
                             </h6>
 
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyName" name="companyName" placeholder="Company Name" required>
-                                        <label for="companyName">Company Name</label>
+                                        <label for="companyName">예: KH컴퍼니</label>
                                     </div>
                                     <div id="companyNameError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-x-circle"></i> 2~30자 (특수문자 제외)
@@ -152,7 +152,7 @@
                                 <div class="col-md-6">
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyPhone" name="companyPhone" placeholder="052-000-0000" required>
-                                        <label for="companyPhone">Company Phone</label>
+                                        <label for="companyPhone">예: 052-000-0000</label>
                                     </div>
                                     <div id="companyPhoneError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-x-circle"></i> 번호 형식이 올바르지 않습니다.
@@ -165,13 +165,13 @@
                             <!-- Submit Button -->
                             <div class="d-grid gap-2 mt-5">
                                 <button type="submit" class="btn btn-login btn-lg">
-                                    REGISTER IDENTITY <i class="bi bi-arrow-right-short"></i>
+                                    회원가입 <i class="bi bi-arrow-right-short"></i>
                                 </button>
                             </div>
 
                             <div class="text-center mt-3">
                                 <p class="text-white-50 small">
-                                    Already have an account? <a th:href="@{/members/login}" class="link-cyan fw-bold">Log In</a>
+                                    이미 계정이 있으신가요? <a th:href="@{/members/login}" class="link-cyan fw-bold">로그인</a>
                                 </p>
                             </div>
                         </form>
