@@ -1,0 +1,162 @@
+/* ===============================
+   Color System (관리자 테마) - 공통 변수
+================================ */
+:root {
+    --dark-bg: #0f172a;        /* 전체 배경 */
+    --panel-bg: #111827;      /* 사이드바 */
+    --card-bg: #1f2937;       /* 카드 */
+    --border-color: #374151;
+
+    --primary: #6366f1;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --info: #38bdf8;
+
+    --text-main: #e5e7eb;
+    --text-sub: #9ca3af;
+    --text-muted: #6b7280;
+}
+/* ===============================
+   HR (전역)
+================================ */
+hr {
+    border-color: var(--border-color);
+}
+
+
+/* ===============================
+   Global
+================================ */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+/* ===============================
+   Main Content
+================================ */
+.main-content {
+    padding: 32px;
+}
+
+.main-content h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+}
+
+/* ===============================
+   KPI Cards
+================================ */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    color: var(--text-main);
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.card-header {
+    background: none;
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--text-sub);
+    padding-bottom: 0;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.card-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.card-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ===============================
+   Card Accent Variants
+================================ */
+.card-primary {
+    border-left: 4px solid var(--primary);
+}
+
+.card-success {
+    border-left: 4px solid var(--success);
+}
+
+.card-warning {
+    border-left: 4px solid var(--warning);
+}
+
+.card-info {
+    border-left: 4px solid var(--info);
+}
+
+/* ===============================
+   Buttons
+================================ */
+.btn-light {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+}
+
+.btn-light:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* ===============================
+   Logs Table
+================================ */
+.table {
+    color: var(--text-main);
+}
+
+.table thead th {
+    background-color: #020617;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.table tbody td {
+    font-size: 0.85rem;
+    padding: 14px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-main);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #020617;
+}
+
+/* ================================
+   Badge
+================================ */
+.badge {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}

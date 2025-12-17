@@ -1,28 +1,60 @@
-/* ⭐️ 1. Sidebar 기본 스타일 ⭐️ */
+/* ===============================
+   Sidebar
+================================ */
 .sidebar {
-    width: 250px;
-    background-color: #343a40;
-    height: 100vh;
-    position: sticky;
-    top: 0.0;
-    flex-shrink: 0;
+    width: 260px;
+    min-height: 100vh;
+    background-color: var(--panel-bg);
+    border-right: 1px solid var(--border-color);
 }
 
-/* ⭐️ 2. Sidebar Link 스타일 ⭐️ */
+.sidebar h5 {
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    letter-spacing: 0.05em;
+}
+
 .sidebar .nav-link {
-    color: #adb5bd;
-    padding: 10px 15px;
-    transition: background-color 0.3s, color 0.3s;
+    color: var(--text-sub);
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin: 4px 12px;
+    display: flex;
+    align-items: center;
 }
 
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active { /* ⭐️ .active 클래스 스타일 ⭐️ */
+.sidebar .nav-link i {
+    font-size: 1.05rem;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #1e293b;
     color: #ffffff;
-    background-color: #007bff;
 }
 
-/* ⭐️ 3. Main Content 패딩 ⭐️ */
-.main-content {
-    padding: 20px;
-    background-color: #f8f9fa;
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, var(--primary), #4338ca);
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(99,102,241,0.4);
+}
+
+/* ================================
+   HR (전역)
+================================ */
+hr {
+    border-color: var(--border-color);
+}
+
+/* ===============================
+   Global
+================================ */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+
+a {
+    text-decoration: none;
 }
