@@ -228,4 +228,23 @@ public class MemberService {
         String actionDescription = "회원 [" + member.getName() + " (" + memberId + ")] 삭제 처리.";
         auditLogService.saveLog(adminActorId, actionDescription, LogType.MEMBER_MANAGEMENT);
     }
+
+    @Transactional
+    public void resetPassword(MemberPasswordResetRequest request) {
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 아이디입니다."));
+
+        // 본인 확인 (이름과 이메일이 일치하는지 검사)
+        if (!member.getName().equals(request.getName()) ||
+                !member.getEmail().equals(request.getEmail())) {
+            throw new IllegalArgumentException("회원 정보가 일치하지 않습니다. (이름 또는 이메일 확인 필요)");
+        }
+
+        // 새 비밀번호 암호화 및 저장
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        member.setPassword(encodedPassword);
+
+        // 감사 로그 기록
+        auditLogService.saveLog(member.getMemberId(), "비밀번호 재설정(Account Recovery) 완료", LogType.MEMBER_MANAGEMENT);
+    }
 }

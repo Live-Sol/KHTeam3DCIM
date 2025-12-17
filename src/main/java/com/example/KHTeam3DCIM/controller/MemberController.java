@@ -216,4 +216,29 @@ public class MemberController {
         return authentication.getName();
     }
 
+    // 비밀번호 찾기(재설정) 페이지 이동
+    @GetMapping("/forgot-password")
+    public String forgotPasswordForm() {
+        return "member/forgot_password";
+    }
+
+    // 비밀번호 재설정 처리
+    @PostMapping("/forgot-password")
+    public String resetPassword(@ModelAttribute MemberPasswordResetRequest request, Model model) {
+        try {
+            // 유효성 검사 (간단히 패턴만 체크하거나 Service에서 처리)
+            if (request.getNewPassword() == null || !request.getNewPassword().matches("^(?=.*[a-zA-Z])(?=.*\\d).{5,20}$")) {
+                throw new IllegalArgumentException("비밀번호는 영문자와 숫자를 포함하여 5~20자여야 합니다.");
+            }
+
+            memberService.resetPassword(request);
+            model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다. 로그인해주세요.");
+            return "member/login"; // 성공 시 로그인 페이지로 이동하며 메시지 전달
+
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "member/forgot_password"; // 실패 시 다시 폼으로
+        }
+    }
+
 }

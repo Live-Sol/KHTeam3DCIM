@@ -30,7 +30,14 @@ public class SecurityConfig {
                 // 1. URL 접근 권한 설정
                 .authorizeHttpRequests(authorize -> authorize
                         // 회원가입, 로그인 페이지 및 정적 리소스(CSS/JS)는 모두 허용
-                        .requestMatchers("/", "/members/login", "/members/signup","/members/check-id", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(
+                                "/css/**", "/js/**", "/images/**", // 정적 리소스
+                                "/",
+                                "/members/signup",      // 회원가입
+                                "/members/check-id",    // 아이디 중복 확인
+                                "/members/login",       // 로그인
+                                "/members/forgot-password" // 비밀번호 찾기
+                        ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/members").permitAll()
                         // 관리자 페이지(/members/admin/**)는 'ADMIN' 역할을 가진 사용자만 접근 허용
                         // Spring Security가 인증된 사용자의 권한을 확인합니다.
