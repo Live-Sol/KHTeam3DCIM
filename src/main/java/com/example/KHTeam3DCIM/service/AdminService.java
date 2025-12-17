@@ -24,7 +24,8 @@ public class AdminService {
     // (1-1) 전체 회원 조회 (관리자용 - 모든 정보 표기)
     @Transactional(readOnly = true)
     public List<MemberAdminResponse> findAllMembersAdmin() {
-        return memberRepository.findAll()
+        // 전체 회원을 Role을 기준으로 오름차순(Asc) 정렬하여 조회
+        return memberRepository.findAllByOrderByRoleAsc()
                 .stream()
                 .map(m -> MemberAdminResponse.builder()
                         .memberId(m.getMemberId())
@@ -37,6 +38,7 @@ public class AdminService {
                         .build())
                 .collect(Collectors.toList());
     }
+
 
     // 관리자용 특정 아이디로 회원 조회 (마스킹 없이 모든 정보 노출)
     @Transactional(readOnly = true)

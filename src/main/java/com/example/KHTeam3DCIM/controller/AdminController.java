@@ -105,6 +105,7 @@
             //    → 템플릿에서 ${recentLogs}로 접근 가능
             model.addAttribute("recentLogs", recentLogs);
 
+
             // 5️⃣ 관리자 회원 목록 화면 반환
             //    - templates/admin/findMembersAdmin.html
             return "admin/findMembersAdmin";
