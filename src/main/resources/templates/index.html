@@ -17,8 +17,6 @@
 <div class="position-relative main-slider-wrapper">
     <!-- 슬라이드 파일 불러오기 -->
     <div th:replace="~{main/slide :: slide}"></div>
-
-    <!-- (이전 날씨 위젯 제거됨) -->
 </div>
 
 <!-- 2. 핵심 요약 띠 (Summary Strip) -->
@@ -58,12 +56,12 @@
 
             <!-- (4) 데이터센터 환경 정보 (날씨) - 위치 변경됨 -->
             <div class="col-md-3">
-                <h6 class="text-secondary text-uppercase mb-2">Environment (Seoul)</h6>
+                <h6 class="text-secondary text-uppercase mb-2">Environment (Ulsan)</h6>
                 <h2 class="fw-bold text-warning">
-                    <i class="bi bi-cloud-sun"></i> 24℃
+                    <i class="bi bi-cloud-sun"></i> 8℃
                     <!-- 습도 및 냉방 부하 표시 -->
                     <span class="fs-6 text-white-50 ms-2" title="Humidity">
-                        <i class="bi bi-droplet-fill text-primary"></i> 45%
+                        <i class="bi bi-droplet-fill text-primary"></i> 25%
                     </span>
                 </h2>
             </div>
@@ -71,8 +69,9 @@
     </div>
 </div>
 
-<!-- 3. 상세 대시보드 (Charts & Metrics) -->
+<!-- 4. 상세 대시보드 (Charts & Cards) -->
 <div class="container py-5">
+
     <div class="row mb-4">
         <div class="col-12 text-center">
             <h3 class="fw-bold text-dark">Data Center Overview</h3>
@@ -82,76 +81,95 @@
     </div>
 
     <div class="row g-4">
-        <!-- [왼쪽] 자산 분류 -->
+        <!-- [왼쪽] 자산 분류 (Assets) - 색상 변경 완료 -->
         <div class="col-lg-4">
-            <div class="stat-card p-4">
-                <h5 class="fw-bold mb-4 border-start border-4 border-primary ps-3">자산 분류 (Type)</h5>
-                <div class="chart-box">
+            <div class="stat-card p-4 position-relative">
+                <div class="card-header-line line-primary"></div>
+                <h5 class="fw-bold mb-4 mt-2">자산 분류 (Assets)</h5>
+                <!-- 차트 영역 -->
+                <div style="height: 250px;">
                     <canvas id="typeChart"></canvas>
                 </div>
+                <!--
+                   ⭐ [범례 색상 통일]
+                   SVR(초록), NET(노랑), STO(하늘), UPS(보라)
+                -->
                 <div class="mt-4 text-center d-flex justify-content-around small fw-bold">
-                    <span class="text-success"><i class="bi bi-circle-fill"></i> SVR: [[${stats.svrCount}]]</span>
-                    <span class="text-warning"><i class="bi bi-circle-fill"></i> NET: [[${stats.netCount}]]</span>
-                    <span class="text-info"><i class="bi bi-circle-fill"></i> STO: [[${stats.stoCount}]]</span>
-                    <span style="color: #6f42c1"><i class="bi bi-circle-fill"></i> UPS: [[${stats.upsCount}]]</span>
+                    <span style="color: #4ade80"><i class="bi bi-circle-fill"></i> SVR: [[${stats.svrCount}]]</span>
+                    <span style="color: #facc15"><i class="bi bi-circle-fill"></i> NET: [[${stats.netCount}]]</span>
+                    <span style="color: #22d3ee"><i class="bi bi-circle-fill"></i> STO: [[${stats.stoCount}]]</span>
+                    <span style="color: #c084fc"><i class="bi bi-circle-fill"></i> UPS: [[${stats.upsCount}]]</span>
                 </div>
             </div>
         </div>
 
-        <!-- [가운데] 공간 및 에너지 -->
+        <!-- [가운데] 공간 및 전력 (Capacity) -->
         <div class="col-lg-4">
-            <div class="stat-card p-4 d-flex flex-column justify-content-center">
-                <h5 class="fw-bold mb-4 border-start border-4 border-warning ps-3">공간 및 에너지 효율</h5>
+            <div class="stat-card p-4 position-relative d-flex flex-column justify-content-center">
+                <div class="card-header-line line-warning"></div>
+                <h5 class="fw-bold mb-4 mt-2">공간 및 전력 (Capacity)</h5>
 
                 <div class="mb-4">
                     <div class="d-flex justify-content-between mb-1">
-                        <span class="fw-bold text-muted">Rack Space Usage</span>
-                        <span class="fw-bold text-primary">[[${stats.spaceUsage}]]%</span>
+                        <span class="fw-bold text-muted small">Rack Space Usage</span>
+                        <span class="fw-bold text-primary small">[[${stats.spaceUsage}]]%</span>
                     </div>
-                    <div class="progress" style="height: 20px; border-radius: 10px;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
-                             role="progressbar" th:style="'width: ' + ${stats.spaceUsage} + '%'"></div>
+                    <!-- 프로그레스 바 -->
+                    <div class="progress" style="height: 12px; border-radius: 10px; background-color: #e9ecef;">
+                        <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             th:style="'width: ' + ${stats.spaceUsage} + '%'"></div>
                     </div>
-                    <small class="text-muted mt-1 d-block text-end">
-                        사용: [[${stats.usedSpace}]]U / 잔여: [[${stats.emptySpace}]]U
-                    </small>
+                    <div class="text-end mt-1">
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            Used: [[${stats.usedSpace}]]U / Free: [[${stats.emptySpace}]]U
+                        </small>
+                    </div>
                 </div>
 
-                <div class="row text-center mt-2 g-3">
+                <div class="row g-2">
                     <div class="col-6">
-                        <div class="p-3 bg-light rounded-3 border">
-                            <i class="bi bi-plug-fill text-danger fs-3"></i>
-                            <h5 class="fw-bold mt-2 mb-0">[[${stats.itPower}]] W</h5>
+                        <div class="p-3 bg-light rounded-3 text-center border h-100">
+                            <i class="bi bi-lightning-charge-fill text-danger fs-3"></i>
+                            <h4 class="fw-bold mt-2 mb-0">[[${stats.itPower}]] W</h4>
                             <small class="text-muted">IT Load</small>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="p-3 bg-light rounded-3 border">
-                            <i class="bi bi-activity text-success fs-3"></i>
-                            <h5 class="fw-bold mt-2 mb-0">[[${stats.emsCount}]] EA</h5>
-                            <small class="text-muted">EMS Linked</small>
+                        <div class="p-3 bg-light rounded-3 text-center border h-100">
+                            <i class="bi bi-hdd-network-fill text-success fs-3"></i>
+                            <h4 class="fw-bold mt-2 mb-0">[[${stats.emsCount}]]</h4>
+                            <small class="text-muted">EMS Nodes</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- [오른쪽] 가동 현황 -->
+        <!-- [오른쪽] 가동 현황 (Status) - 입체 색상 적용 -->
         <div class="col-lg-4">
-            <div class="stat-card p-4">
-                <!-- ⭐ [NEW] 실시간 점멸 표시 (Live Indicator) -->
-                <h5 class="fw-bold mb-4 border-start border-4 border-success ps-3">
-                    가동 현황 <span class="live-indicator ms-2" title="실시간 모니터링 중"></span>
-                </h5>
+            <div class="stat-card p-4 position-relative">
+                <div class="card-header-line line-success"></div>
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                    <h5 class="fw-bold mb-0">가동 현황</h5>
+                    <div class="d-flex align-items-center small text-success fw-bold bg-success bg-opacity-10 px-3 py-1 rounded-pill">
+                        <span class="live-dot me-2"></span> Live
+                    </div>
+                </div>
 
-                <div class="chart-box">
+                <!-- 차트 영역 -->
+                <div style="height: 250px;">
                     <canvas id="statusChart"></canvas>
                 </div>
+                <!--
+                    ⭐ [범례 색상 통일]
+                    ON (밝은 초록), OFF (밝은 빨강)
+                -->
                 <div class="mt-4 text-center">
-                    <span class="badge bg-success bg-opacity-10 text-success fs-6 me-2 px-3 py-2">
+                    <span class="badge bg-opacity-10 text-success fs-6 me-2 px-3 py-2" style="background-color: #34d39920; color: #34d399 !important;">
                         ON : [[${stats.onCount}]]
                     </span>
-                    <span class="badge bg-danger bg-opacity-10 text-danger fs-6 px-3 py-2">
+                    <span class="badge bg-opacity-10 text-danger fs-6 px-3 py-2" style="background-color: #f8717120; color: #f87171 !important;">
                         OFF : [[${stats.offCount}]]
                     </span>
                 </div>
@@ -159,22 +177,37 @@
         </div>
     </div>
 
-    <!-- 최근 로그 -->
+    <!-- 최근 로그 (Log Table) - ⭐ [업데이트됨: Cyber Style 적용] -->
     <div class="row mt-5">
         <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-secondary"><i class="bi bi-clock-history"></i> Recent System Activity</h5>
+            <!-- 기존 bg-white 등 제거하고 .log-card 클래스 적용 -->
+            <div class="card log-card rounded-4 overflow-hidden border-0">
+                <div class="card-header log-header">
+                    <h5 class="log-title">
+                        <i class="bi bi-clock-history text-info"></i> Recent System Activity
+                    </h5>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                        <tr><th>Time</th><th>User</th><th>Activity</th></tr>
+                <div class="table-responsive">
+                    <!-- .log-table 클래스 적용 -->
+                    <table class="table log-table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th class="ps-4">Time</th>
+                            <th>User</th>
+                            <th>Activity</th>
+                        </tr>
                         </thead>
                         <tbody>
                         <tr th:each="log : ${recentLogs}">
-                            <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm')}"></td>
-                            <td><span class="badge bg-secondary" th:text="${log.actor}"></span></td>
+                            <!-- 시간: 모노스페이스 폰트로 테크 느낌 -->
+                            <td class="ps-4 log-time" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm')}"></td>
+
+                            <!-- 유저 배지: 커스텀 Neon 스타일 (.log-badge) -->
+                            <td>
+                                <span class="log-badge" th:text="${log.actor}">Admin</span>
+                            </td>
+
+                            <!-- 활동 내용 -->
                             <td th:text="${log.actionDescription}"></td>
                         </tr>
                         </tbody>
@@ -192,16 +225,19 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/index.js"></script>
 
+<!-- 타임리프 데이터 전달용 인라인 스크립트 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
+    // 서버에서 전달된 stats 객체가 null일 경우를 대비해 기본값 처리 (안전장치)
     const chartData = {
-        svr: [[${stats.svrCount}]],
-        net: [[${stats.netCount}]],
-        sto: [[${stats.stoCount}]],
-        ups: [[${stats.upsCount}]],
-        on:  [[${stats.onCount}]],
-        off: [[${stats.offCount}]]
+        svr: [[${stats != null ? stats.svrCount : 10}]],
+        net: [[${stats != null ? stats.netCount : 5}]],
+        sto: [[${stats != null ? stats.stoCount : 3}]],
+        ups: [[${stats != null ? stats.upsCount : 2}]],
+        on:  [[${stats != null ? stats.onCount : 18}]],
+        off: [[${stats != null ? stats.offCount : 2}]]
     };
+
     document.addEventListener("DOMContentLoaded", function() {
         initDashboardCharts(chartData);
     });

@@ -5,7 +5,7 @@
 
 :root {
     --primary-bg: #0f172a;       /* 아주 짙은 남색 (우주 배경) */
-    --card-bg: #1e293b;          /* 카드/섹션 배경 */
+    --card-bg: #1e293b;          /* (어두운 버전용) 카드 배경 */
     --accent-cyan: #06b6d4;      /* 형광 청록 (포인트 1) */
     --accent-purple: #8b5cf6;    /* 보라 (포인트 2) */
     --text-main: #f1f5f9;        /* 메인 텍스트 (밝은 회색) */
@@ -104,7 +104,15 @@ body {
     filter: brightness(0.5) contrast(1.1); /* 약간 어둡고 선명하게 */
 }
 
+/* [수정됨] 텍스트가 이미지 위에 뜨도록 위치 설정 추가 */
 .hero-caption {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 80%;
+    color: #fff;
     z-index: 10;
     text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
 }
@@ -117,6 +125,40 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 1rem;
+}
+
+/* ⭐ [추가됨] Hero 버튼 스타일 (StarRoot 컨셉) */
+/* slide.html 내의 버튼을 자동으로 타겟팅하여 디자인 변경 */
+.hero-caption .btn {
+    position: relative;
+    font-family: 'Orbitron', sans-serif; /* 테크 폰트 적용 */
+    font-weight: 700;
+    color: #fff !important; /* 글자는 항상 흰색 */
+    border: 2px solid #22d3ee; /* StarRoot Cyan 테두리 */
+    background-color: transparent; /* 기본 배경 투명 */
+
+    /* 그라데이션 차오르는 효과 준비 */
+    background-image: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+    background-size: 0% 100%; /* 처음엔 너비 0% */
+    background-repeat: no-repeat;
+    background-position: left center;
+
+    transition: background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s ease,
+                transform 0.3s ease,
+                border-color 0.3s ease;
+
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); /* 은은한 기본 광채 */
+    overflow: hidden; /* 내부 넘침 방지 */
+}
+
+/* 호버 시 효과: 그라데이션 채우기 + 네온 글로우 */
+.hero-caption .btn:hover {
+    background-size: 100% 100%; /* 배경 꽉 채우기 (Sliding effect) */
+    border-color: #a855f7; /* 테두리색을 보라색으로 자연스럽게 블렌딩 */
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8), /* 강한 네온 빛 */
+                0 0 5px rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px); /* 살짝 떠오르는 느낌 */
 }
 
 /* -----------------------------------------
@@ -264,4 +306,92 @@ body {
     border-color: var(--accent-cyan);
     color: #0f172a;
     transform: rotate(360deg);
+}
+
+/* -----------------------------------------
+   6. Recent Logs (최근 로그) - Light Tech Style
+   [수정됨] 배경을 흰색으로 변경하여 밝은 느낌 + 포인트 컬러 유지
+   ----------------------------------------- */
+.log-card {
+    background: #ffffff; /* 기존 어두운 배경에서 흰색으로 변경 */
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+}
+
+.log-header {
+    background: #ffffff; /* 헤더도 흰색 */
+    border-bottom: 2px solid #f1f5f9; /* 연한 회색 구분선 */
+    padding: 1.2rem 1.5rem;
+}
+
+.log-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #1e293b; /* 짙은 남색 텍스트 (가독성 UP) */
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.log-table {
+    margin-bottom: 0;
+    color: #333; /* 기본 텍스트 색상 */
+    width: 100%;
+}
+
+/* 테이블 헤더 커스텀 (밝은 버전) */
+.log-table thead th {
+    background-color: #f8fafc !important; /* 아주 연한 회색 배경 */
+    border-bottom: 2px solid var(--accent-cyan); /* 포인트 컬러 라인 유지 */
+    color: #64748b; /* 차분한 회색 텍스트 */
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 1rem;
+    border-top: none;
+}
+
+/* 테이블 바디 커스텀 (밝은 버전) */
+.log-table tbody td {
+    background-color: transparent !important;
+    border-bottom: 1px solid #f1f5f9; /* 연한 구분선 */
+    padding: 1rem;
+    vertical-align: middle;
+    color: #334155; /* 짙은 회색 */
+}
+
+.log-table tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+/* 행 호버 효과 (밝은 Cyan 틴트) */
+.log-table tbody tr:hover td {
+    background-color: rgba(6, 182, 212, 0.03) !important; /* 아주 연한 Cyan */
+    color: #0f172a;
+}
+.log-table tbody tr:hover {
+    box-shadow: inset 3px 0 0 var(--accent-cyan); /* 왼쪽 빛나는 띠 유지 */
+}
+
+/* 시간 텍스트 (Digital Font) */
+.log-time {
+    color: #64748b;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+/* 유저 뱃지 (가독성 개선) */
+.log-badge {
+    background: rgba(139, 92, 246, 0.1); /* 연한 보라 배경 */
+    color: #7c3aed; /* 진한 보라 텍스트 */
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-block;
 }
