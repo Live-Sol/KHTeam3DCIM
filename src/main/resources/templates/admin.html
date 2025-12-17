@@ -28,7 +28,7 @@
                     <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 승인 대기</div>
                     <div class="card-body">
                         <h5 class="card-title"><span th:text="${pendingRequestCount}">0</span> 건</h5>
-                        <p class="card-text">새로운 입주 신청 승인을 기다리고 있습니다.</p>
+                        <p class="card-text">새로운 입고 신청 승인을 기다리고 있습니다.</p>
                         <a href="/requests" class="btn btn-light btn-sm mt-2">자세히 보기</a>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="card card-success mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-server me-1"></i> 총 등록 장비</div>
+                    <div class="card-header"><i class="bi bi-cpu me-1"></i> 총 등록 장비</div>
                     <div class="card-body">
                         <h5 class="card-title"><span th:text="${totalDeviceCount}">0</span> 대</h5>
                         <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
@@ -47,7 +47,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="card card-warning mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-server me-1"></i> 총 등록 Rack</div>
+                    <div class="card-header"><i class="bi bi-stack me-1"></i> 총 등록 Rack</div>
                     <div class="card-body">
                         <h5 class="card-title"><span th:text="${totalRackCount}">0</span> 대</h5>
                         <p class="card-text">현재 시스템에 등록된 전체 Rack의 수입니다.</p>
@@ -96,10 +96,10 @@
                 </table>
             </div>
         </div>
-        <!-- 푸터 추가 (메인 컨텐츠 영역 하단에 배치) -->
-        <footer class="mt-auto">
-            <div th:replace="~{fragments/footer :: footer}"></div>
-        </footer>
+<!--        &lt;!&ndash; 푸터 추가 (메인 컨텐츠 영역 하단에 배치) &ndash;&gt;-->
+<!--        <footer class="mt-auto">-->
+<!--            <div th:replace="~{fragments/footer :: footer}"></div>-->
+<!--        </footer>-->
     </main>
 </div>
 

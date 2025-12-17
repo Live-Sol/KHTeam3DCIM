@@ -28,6 +28,10 @@ body {
 h2 {
     font-weight: 700;
 }
+/* 제목 하단 보더 스타일 커스텀 */
+h2.border-bottom {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important; /* 살짝 투명한 흰색 선 */
+}
 
 /* ===============================
    Alert

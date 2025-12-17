@@ -4,6 +4,7 @@
     import com.example.KHTeam3DCIM.domain.Member;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
+    import com.example.KHTeam3DCIM.dto.admin.MemberFindByIdAdmin;
     import com.example.KHTeam3DCIM.repository.RequestRepository;
     import com.example.KHTeam3DCIM.service.AdminService;
     import com.example.KHTeam3DCIM.service.AuditLogService;
@@ -81,37 +82,39 @@
          *  Method: GET
          */
         @GetMapping("/members")
-        public String findAllMembersAdmin(Model model, HttpServletRequest request) {
+        public String findAllMembersAdmin(Model model, HttpServletRequest request,
+                                          @ModelAttribute("searchForm") MemberFindByIdAdmin searchForm) {
 
             model.addAttribute("request", request);
 
-            // 1️⃣ Service 계층을 통해 전체 회원 정보를 조회
-            //    - Member 엔티티가 아닌
-            //    - 관리자 화면에 필요한 정보만 담은 DTO(MemberAdminResponse) 목록
-            List<MemberAdminResponse> members =
-                    adminService.findAllMembersAdmin();
+            List<MemberAdminResponse> members;
+            String searchKeyword = searchForm.getSearchId();
+            boolean searchPerformed = false;
 
-            // 2️⃣ 조회한 회원 목록을 "members"라는 이름으로 Model에 저장
-            //    → Thymeleaf 템플릿에서 ${members}로 접근 가능
+            // 1. 검색 로직 (Service 호출)
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                members = adminService.findMembersByMemberIdAdmin(searchKeyword.trim());
+                searchPerformed = true;
+                model.addAttribute("searchKeyword", searchKeyword.trim());
+            } else {
+                members = adminService.findAllMembersAdmin();
+            }
+
+            // 2. 모델에 데이터 담기
             model.addAttribute("members", members);
+            model.addAttribute("searchPerformed", searchPerformed);
 
-            // 3️⃣ 최근 감사 로그(Audit Log) 조회
-            //    - 관리자 화면에서 최근 시스템 활동을 확인하기 위함
-            //    - 최근 5건만 조회
-            List<AuditLog> recentLogs =
-                    auditLogService.findRecentLogs(5);
-
-            // 4️⃣ 감사 로그 목록을 Model에 저장
-            //    → 템플릿에서 ${recentLogs}로 접근 가능
+            // 3. 감사 로그 조회
+            List<AuditLog> recentLogs = auditLogService.findRecentLogs(5);
             model.addAttribute("recentLogs", recentLogs);
 
-
-            // 5️⃣ 관리자 회원 목록 화면 반환
-            //    - templates/admin/findMembersAdmin.html
             return "admin/findMembersAdmin";
         }
-
-
+        // 폼 바인딩을 위한 초기 객체 생성
+        @ModelAttribute("searchForm")
+        public MemberFindByIdAdmin memberFindByIdAdmin() {
+            return new MemberFindByIdAdmin();
+        }
 
         // ⭐️ 관리자 회원 정보 수정 기능 (/admin/members-edit/**) ⭐️
         // (2-1) 관리자 정보 수정 폼 제공 (GET)

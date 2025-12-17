@@ -1,0 +1,49 @@
+/* =========================================
+   [StarRoot Member System]
+   File: memberEdit.css
+   (Profile Edit Page Specific Styles)
+   ========================================= */
+
+/* 1. 읽기 전용 정보 표시 스타일 */
+.info-display {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem !important;
+}
+
+.form-label-custom {
+    display: block;
+    color: var(--accent-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+}
+
+.info-value-readonly {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* 2. 구분선 스타일 */
+.divider-line {
+    border-top: 2px solid rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    opacity: 0.7;
+}
+
+/* 3. 성공 알림창 스타일 (memberStyle.css의 alert-custom과 짝을 이룸) */
+.alert-success-custom {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}

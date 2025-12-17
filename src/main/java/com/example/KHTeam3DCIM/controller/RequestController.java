@@ -29,9 +29,10 @@ public class RequestController {
     // 1. [고객] 입주 신청서 작성 화면 (수정됨)
     // =======================================
     @GetMapping("/requests/new")
-    public String requestForm(Model model, Principal principal) {
+    public String requestForm(Model model, Principal principal,HttpServletRequest request) {
         // 1. 카테고리 목록 전달
         model.addAttribute("categories", categoryService.findAllCategories());
+        model.addAttribute("request", request);
 
         // 2. 로그인한 사용자 정보 가져오기 (자동완성용)
         if (principal != null) {

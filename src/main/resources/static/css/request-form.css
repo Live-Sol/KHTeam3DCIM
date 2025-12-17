@@ -1,0 +1,181 @@
+/* =========================================
+   장비 입고 신청서 전용 (request-form.css)
+   ========================================= */
+
+:root {
+    --admin-bg: #0f172a;
+    --admin-card: #1e293b;
+    --admin-border: #334155;
+    --admin-text: #f1f5f9;
+    --admin-primary: #3b82f6;
+    --admin-accent: #22d3ee;
+}
+
+body.admin-body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text);
+    margin: 0;
+    padding: 0;
+}
+
+/* 중앙 정렬용 래퍼 */
+.form-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.container-form {
+    width: 100%;
+    max-width: 850px;
+}
+
+/* 카드 및 헤더 */
+.request-card {
+    background-color: var(--admin-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.request-header {
+    background-color: #334155 !important;
+    border-bottom: 1px solid var(--admin-border);
+    padding: 25px;
+}
+
+/* 섹션 제목 */
+.section-title {
+    color: var(--admin-accent);
+    font-weight: 700;
+    border-bottom: 2px solid var(--admin-border) !important;
+}
+
+/* 입력창 공통 */
+.custom-input {
+    background-color: #0f172a;
+    border: 1px solid var(--admin-border);
+    color: #fff;
+    padding: 12px 15px;
+}
+
+.custom-input:focus {
+    background-color: #0f172a;
+    border-color: var(--admin-primary);
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.custom-input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+.custom-input-dark::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+.text-sub {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+/* 전력/EMS 특수 박스 */
+.ems-box {
+    background-color: rgba(15, 23, 42, 0.7);
+    border: 1px dashed var(--admin-border);
+}
+
+.custom-input-dark {
+    background-color: #1e293b;
+    border: 1px solid var(--admin-border);
+    color: #fff;
+}
+
+/* 1. 유닛 선택 버튼 (Radio Group) Hover 수정 */
+.btn-outline-unit:hover {
+    background-color: rgba(59, 130, 246, 0.1) !important; /* 살짝 푸른 빛만 돌게 */
+    color: var(--admin-accent) !important;
+    border-color: var(--admin-primary) !important;
+    opacity: 1 !important; /* 투명해지는 현상 방지 */
+}
+
+/* 체크된 상태에서 마우스를 올려도 색상 유지 */
+.btn-check:checked + .btn-outline-unit:hover {
+    background-color: var(--admin-primary) !important;
+    color: #fff !important;
+}
+
+/* 2. 입력창 (etcInput) Hover 수정 */
+.custom-input:hover:not(:disabled) {
+    background-color: #0f172a !important; /* 배경색 유지 */
+    border-color: var(--admin-primary) !important;
+    opacity: 1 !important;
+}
+
+/* 비활성화된 상태에서 hover 해도 투명해지지 않게 */
+.custom-input:disabled:hover {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+    border-color: var(--admin-border) !important;
+    cursor: not-allowed;
+}
+
+/* 유닛 선택 버튼 그룹 */
+.btn-outline-unit {
+    border: 1px solid var(--admin-border);
+    color: #94a3b8;
+    padding: 12px;
+    font-weight: 500;
+}
+
+.btn-check:checked + .btn-outline-unit {
+    background-color: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+/* 입력그룹 애드온 */
+.custom-addon {
+    background-color: #334155;
+    border: 1px solid var(--admin-border);
+    color: #f1f5f9;
+}
+
+/* 비활성화(disabled) 상태일 때의 스타일 */
+.custom-input:disabled {
+    background-color: rgba(15, 23, 42, 0.5) !important; /* 배경색을 더 어둡게 (부모 배경과 비슷하게) */
+    color: #64748b !important;                       /* 글자색을 흐리게 */
+    border-color: var(--admin-border) !important;    /* 테두리 유지 */
+    cursor: not-allowed;                             /* 금지 표시 커서 */
+    opacity: 1;                                      /* 브라우저 기본 투명도 제거 */
+}
+
+/* 하단 제출 버튼 */
+.btn-primary-admin {
+    background-color: var(--admin-primary);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-admin:hover {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+}
+
+.btn-outline-secondary-admin {
+    border: 1px solid var(--admin-border);
+    color: #94a3b8;
+}
+
+.btn-outline-secondary-admin:hover {
+    background-color: var(--admin-border);
+    color: #fff;
+}
+
+/* 날짜 입력 아이콘 흰색 처리 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}

@@ -1,123 +1,96 @@
-/* =======================================
-   Custom Variables (requests.css 등 공통 파일에서 참조)
-   ======================================= */
-:root {
-    --dark-bg: #0f172a;      /* 전체 배경 */
-    --card-bg: #1f2937;      /* 카드/폼 컨테이너 배경 */
-    --border-color: #374151; /* 경계선 */
-    --primary: #6366f1;      /* 주요 색상 */
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;       /* Danger 색상 */
-    --text-main: #e5e7eb;    /* 메인 텍스트 (밝은 색) */
-    --text-sub: #9ca3af;     /* 서브 텍스트 (회색) */
+/* =========================================
+   [StarRoot Admin System]
+   File: adminMemberEdit.css
+   (Member Edit Specific Styles - Admin View)
+   ========================================= */
+
+/* 1. 관리자 전용 테마 (Purple Accent) */
+.admin-title {
+    /* 기존 login-title 스타일 기반 */
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.7); /* Purple Glow */
 }
 
-/* =======================================
-   Base Layout & Container
-   ======================================= */
-body {
-    background-color: var(--dark-bg);
-    color: var(--text-main);
-}
-
-.container {
-    /* 중앙 폼을 카드 형태로 감싸기 */
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    margin-top: 50px !important;
-    margin-bottom: 50px;
-}
-
-h2 {
-    color: var(--text-main);
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px !important;
-}
-
-h2 .text-danger {
-    color: var(--danger) !important;
-}
-
-hr {
-    border-color: var(--border-color);
-    opacity: 0.5;
-}
-
-/* =======================================
-   Form Controls
-   ======================================= */
-.form-label {
-    color: var(--text-main);
-    font-weight: 500;
-}
-
-/* 일반 폼 컨트롤 (Input, Select) */
-.form-control, .form-select {
-    background-color: #111827; /* Darker background than card-bg */
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-}
-
-.form-control:focus, .form-select:focus {
-    background-color: #111827;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25); /* primary 색상 섀도우 */
-    color: var(--text-main);
-}
-
-.form-control::placeholder {
-    color: var(--text-sub);
-    opacity: 0.7;
-}
-
-/* 회원 ID 필드 (수정 불가 필드처럼 보이게) */
-#memberId {
-    background-color: #2c3a4d; /* Slightly different background to show it's static */
-    color: var(--text-sub);
+/* 2. 읽기 전용 필드 (ID) 스타일 */
+.form-control-readonly {
+    /* memberStyle.css의 form-control-custom 기반 */
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    border: 1px dashed rgba(139, 92, 246, 0.3);
+    color: var(--text-muted) !important;
+    border-radius: 10px;
+    height: 55px;
+    padding-left: 15px;
     cursor: not-allowed;
+    transition: all 0.3s ease;
 }
 
-/* 에러 메시지 */
-.text-danger {
-    color: var(--danger) !important;
-    font-size: 0.85rem;
-}
-.alert-danger {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: var(--danger);
-    border-color: var(--danger);
+.form-control-readonly:focus {
+    box-shadow: none; /* Focus 효과 제거 */
 }
 
+/* 3. Role Select Label (플로팅이 아니므로 별도 스타일링) */
+.form-label-custom-select {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
 
-/* =======================================
-   Buttons
-   ======================================= */
-/* 주 제출 버튼 */
-.btn-danger {
-    background-color: var(--danger);
-    border-color: var(--danger);
+/* 4. 구분선 스타일 (Purple Accent) */
+.divider-line {
+    border-top: 2px solid rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    opacity: 0.8;
+}
+
+/* 5. 관리자 액션 버튼 (Danger/Purple 강조) */
+.btn-admin-danger {
+    /* memberStyle.css의 btn-login 기반 */
+    background: linear-gradient(135deg, var(--accent-purple) 0%, #dc2626 100%); /* Purple to Red */
+    border: none;
     color: #fff;
-    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 12px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
-.btn-danger:hover {
-    background-color: #cc3636;
-    border-color: #cc3636;
+
+.btn-admin-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+    background: linear-gradient(135deg, #a78bfa 0%, #f87171 100%);
     color: #fff;
 }
 
-/* 보조 버튼 (취소/목록) */
-.btn-outline-secondary {
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-sub);
+/* 6. 에러 메시지/알림 스타일 (관리자 경고 강조) */
+.alert-custom-danger {
+    /* memberStyle.css의 alert-custom 기반 */
+    background: rgba(239, 68, 68, 0.1); /* Red background */
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+    font-size: 0.9rem;
+    border-radius: 10px;
 }
-.btn-outline-secondary:hover {
-    background-color: var(--border-color);
-    color: var(--text-main);
-    border-color: var(--border-color);
+
+/* 7. 카드 하단 Glow (Purple) */
+.card-footer-glow-admin {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 100px;
+    background: var(--accent-purple);
+    filter: blur(60px);
+    opacity: 0.2; /* 기존보다 조금 더 진하게 */
+    z-index: 0;
+    pointer-events: none;
 }

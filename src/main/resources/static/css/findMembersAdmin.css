@@ -1,44 +1,117 @@
-/* requests.css에 정의된 공통 다크 모드 변수 (--dark-bg, --primary, etc.)를 사용합니다. */
+/* =========================================
+   관리자 회원 목록 - 이전 스타일 (Dark & Simple)
+   ========================================= */
 
-/* --- Custom Alerts (회원 관리 페이지 전용) --- */
-
-/* alert-success 대체 */
-.custom-alert-success {
-    background-color: #153229; /* Darker green background */
-    color: #4ade80; /* Brighter green text */
-    border: 1px solid #10b981;
+:root {
+    --admin-bg: #0f172a;      /* 전체 배경 */
+    --admin-card: #1e293b;    /* 컨테이너 배경 */
+    --admin-border: #334155;
+    --admin-text: #f1f5f9;
+    --admin-primary: #3b82f6; /* 블루 */
 }
 
-/* alert-danger 대체 */
-.custom-alert-danger {
-    background-color: #451a3a; /* Darker red/magenta background */
-    color: #fca5a5; /* Lighter red text */
-    border: 1px solid #f87171;
+body.admin-body {
+    background-color: var(--admin-bg);
+    color: var(--admin-text);
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* --- Main Content Layout --- */
-/* (sidebar.css 또는 requests.css에 정의되어 있어야 함) */
-.main-content {
-    padding: 32px;
-    flex-grow: 1;
-}
-.main-content h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 28px;
-    color: var(--text-main);
+/* 1. 검색창 스타일 */
+.search-container {
+    background-color: var(--admin-card);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
 }
 
-/* 기존 인라인 스타일 유지: 버튼 정렬 및 폼 배치 */
-.action-cell {
-    min-width: 320px;
-    white-space: nowrap;
+.form-control-dark {
+    background-color: #0f172a;
+    border: 1px solid var(--admin-border);
+    color: #fff;
+}
+
+.form-control-dark:focus {
+    background-color: #0f172a;
+    border-color: var(--admin-primary);
+    color: #fff;
+    box-shadow: none;
+}
+
+/* 2. 테이블 스타일 */
+.table-container {
+    background-color: var(--admin-card);
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
+    overflow: hidden;
+}
+
+.admin-table {
+    margin-bottom: 0;
+    color: var(--admin-text);
+}
+
+.admin-table thead th {
+    background-color: #334155;
+    color: #fff;
+    border-bottom: none;
+    font-weight: 500;
+    padding: 12px;
+}
+
+.admin-table tbody td {
+    border-bottom: 1px solid var(--admin-border);
+    padding: 12px;
     vertical-align: middle;
-    text-align: center;
 }
 
-.action-cell form {
-    margin: 0;
-    padding: 0;
-    display: inline;
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 3. 버튼 스타일 */
+.btn-primary-admin {
+    background-color: var(--admin-primary);
+    border: none;
+    color: #fff;
+    padding: 6px 16px;
+}
+
+.btn-outline-secondary-admin {
+    border: 1px solid var(--admin-border);
+    color: #94a3b8;
+    padding: 6px 16px;
+}
+
+.btn-outline-secondary-admin:hover {
+    background-color: var(--admin-border);
+    color: #fff;
+}
+
+/* 4. 알림창 스타일 */
+.alert-success-admin {
+    background-color: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+}
+
+.alert-danger-admin {
+    background-color: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+/* 일반적인 브라우저용 */
+.form-control-dark::placeholder {
+    color: #ffffff !important;
+    opacity: 0.8; /* 너무 쨍하면 0.7~0.8 정도로 조절하세요 */
+}
+
+/* Internet Explorer용 */
+.form-control-dark:-ms-input-placeholder {
+    color: #ffffff !important;
+}
+
+/* Edge용 */
+.form-control-dark::-ms-input-placeholder {
+    color: #ffffff !important;
 }

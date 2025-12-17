@@ -34,7 +34,8 @@
     <div class="card custom-card-dark shadow-lg border-0 mb-5">
 
         <div class="card-header bg-primary custom-card-header text-white p-3">
-            <h4 class="mb-0 fw-bold" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h4>
+            <h4 class="mb-0 fw-bold" th:text="${isEdit == true} ? '장비 정보 수정' : '신규 장비 등록'"></h4>
+<!--            <h4 class="mb-0 fw-bold" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h4>-->
         </div>
 
         <div class="card-body p-4">
@@ -54,7 +55,8 @@
                 <div class="card custom-card-light mb-4 border-secondary border-opacity-25"
                      th:if="${isEdit != true and waitingRequests != null and !waitingRequests.isEmpty()}">
                     <div class="card-body p-3">
-                        <label class="form-label fw-bold text-primary">📥 입주 대기 신청서 불러오기</label>
+                        <label class="form-label fw-bold text-primary">입주 대기 신청서 불러오기</label>
+<!--                        <label class="form-label fw-bold text-primary">📥 입주 대기 신청서 불러오기</label>-->
                         <select id="requestSelect" class="form-select custom-select border-primary" onchange="loadRequestData(this)">
                             <option value="">--- 선택 안 함 (직접 입력) ---</option>
 

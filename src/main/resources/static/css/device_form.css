@@ -52,11 +52,41 @@
     border-color: var(--border-color);
 }
 
-/* Readonly 필드 스타일 (reqId가 있을 경우 적용되는 스타일) */
-input[readonly], select:disabled {
-    opacity: 0.7;
-    /* HTML에서 bg-secondary bg-opacity-25를 사용했기 때문에 이 부분은 Bootstrap이 처리합니다. */
+/* Readonly 및 Disabled 필드 스타일 수정 */
+input[readonly],
+textarea[readonly],
+select:disabled,
+input:disabled,
+textarea:disabled {
+    /* 투명도를 1로 올려서 글자가 흐릿해지는 것을 방지합니다 */
+    opacity: 1 !important;
+
+    /* 배경은 어둡게 유지 (부모 배경보다 약간만 밝게) */
+    background-color: rgba(51, 65, 85, 0.5) !important;
+
+    /* 글자색을 완전 흰색 혹은 아주 밝은 회색으로 고정 */
+    color: #f1f5f9 !important;
+
+    /* 테두리를 흐리게 하여 비활성 상태임을 암시 */
+    border-color: rgba(255, 255, 255, 0.1) !important;
+
+    /* 마우스 커서 모양 변경 */
+    cursor: not-allowed;
 }
+
+/* Placeholder도 같이 보이게 하려면 */
+input[readonly]::placeholder,
+input:disabled::placeholder,
+textarea[readonly]::placeholder,
+textarea:disabled::placeholder{
+    color: rgba(241, 245, 249, 0.5) !important;
+}
+
+/*!* Readonly 필드 스타일 (reqId가 있을 경우 적용되는 스타일) *!*/
+/*input[readonly], select:disabled {*/
+/*    opacity: 0.7;*/
+/*    !* HTML에서 bg-secondary bg-opacity-25를 사용했기 때문에 이 부분은 Bootstrap이 처리합니다. *!*/
+/*}*/
 
 /* 소비 전력/EMS 강조 박스 */
 .custom-highlight-box {
