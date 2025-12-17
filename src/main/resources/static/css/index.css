@@ -4,7 +4,7 @@
    ========================================= */
 
 :root {
-    --primary-bg: #0f172a;       /* 메인 배경색 (짙은 남색 - Footer와 동일) */
+    --primary-bg: #0f172a;       /* 메인 배경색 (짙은 남색) */
     --card-bg: #ffffff;          /* 카드 배경 (흰색) */
     --accent-cyan: #06b6d4;      /* 형광 청록 (포인트 1) */
     --accent-purple: #8b5cf6;    /* 보라 (포인트 2) */
@@ -20,27 +20,45 @@ body {
 }
 
 /* -----------------------------------------
-   1. Header (네비게이션) - 색상 통일
+   1. Header (네비게이션)
    ----------------------------------------- */
 .navbar-custom {
-    /* 기존 반투명 유지하되, 베이스 컬러를 Footer와 정확히 일치시킴 */
-    background: rgba(15, 23, 42, 0.95);
+    background: rgba(15, 23, 42, 0.95); /* 스크롤 무관하게 항상 진한 색상 유지 */
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--glass-border);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     padding: 1rem 0;
-    transition: all 0.3s ease;
+    transition: padding 0.3s ease; /* 패딩 애니메이션만 유지 */
 }
 
+/* ⭐ [Cosmic Flow 로고 적용됨] */
 .brand-logo {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+    letter-spacing: 1px;
+    text-decoration: none;
+
+    /* 3가지 색상을 섞어서 배경으로 지정 (반복 흐름) */
+    background: linear-gradient(
+        120deg,
+        #22d3ee 0%,
+        #a855f7 30%,
+        #22d3ee 60%,
+        #a855f7 100%
+    );
+    background-size: 200% auto; /* 배경을 크게 늘려서 이동할 공간 확보 */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-    letter-spacing: 1px;
+
+    /* 흐르는 애니메이션 실행 */
+    animation: shine-flow 3s linear infinite;
+}
+
+@keyframes shine-flow {
+    to {
+        background-position: 200% center;
+    }
 }
 
 .nav-link-custom {
@@ -152,15 +170,12 @@ body {
 }
 
 /* -----------------------------------------
-   3. Summary Strip (요약 띠) - 색상 통일
+   3. Summary Strip (요약 띠)
    ----------------------------------------- */
 .summary-strip {
-    /* [수정됨] Footer와 동일한 단일 색상 적용 (Gradient 제거) */
     background-color: var(--primary-bg);
     color: white;
     padding: 2rem 0;
-    /* 슬라이드와 겹치지 않고 평면적으로 배치하고 싶다면 top, margin-bottom 제거 가능
-       여기서는 통일감을 위해 유지하되 색상만 맞춥니다. */
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -168,7 +183,6 @@ body {
     position: relative;
 }
 
-/* 구분선 */
 .summary-item:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -252,10 +266,10 @@ body {
 }
 
 /* -----------------------------------------
-   5. Footer - 색상 통일
+   5. Footer
    ----------------------------------------- */
 .footer-custom {
-    background-color: var(--primary-bg); /* 변수 사용으로 통일 */
+    background-color: var(--primary-bg);
     color: #94a3b8;
     font-size: 0.9rem;
 }

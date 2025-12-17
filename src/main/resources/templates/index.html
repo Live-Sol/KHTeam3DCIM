@@ -15,8 +15,7 @@
 
 <!-- 1. 메인 히어로 슬라이드 -->
 <div class="position-relative main-slider-wrapper">
-    <!-- 슬라이드 파일 불러오기 -->
-    <div th:replace="~{main/slide :: slide}"></div>
+    <div th:replace="~{fragments/slide :: slide}"></div>
 </div>
 
 <!-- 2. 핵심 요약 띠 (Summary Strip) -->
@@ -69,7 +68,7 @@
     </div>
 </div>
 
-<!-- 4. 상세 대시보드 (Charts & Cards) -->
+<!-- 3. 상세 대시보드 (Charts & Cards) -->
 <div class="container py-5">
 
     <div class="row mb-4">
@@ -218,7 +217,7 @@
     </div>
 </div>
 
-<!-- 5. 푸터 (분리됨) -->
+<!-- 4. 푸터 (분리됨) -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
