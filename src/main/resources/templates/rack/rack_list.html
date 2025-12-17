@@ -32,57 +32,66 @@
             장비를 설치할 랙의 <strong>[실장도]</strong> 버튼을 눌러주세요.
         </div>
 
-        <table class="table table-bordered table-hover align-middle custom-table-dark">
-            <thead class="table-dark">
-            <tr>
-                <th style="width: 5%">ID</th>
-                <th style="width: 15%">랙 이름</th>
-                <th style="width: 15%">위치 설명</th>
-                <th style="width: 35%">가동률 (Utilization)</th>
-                <th style="width: 30%">관리</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="rack : ${racks}">
-                <td th:text="${rack.id}">1</td>
-                <td>
-                    <span th:text="${rack.rackName}" class="fw-bold">[위치 코드]</span>
-                </td>
-                <td th:text="${rack.locationDesc}">[건물내 랙 장비 위치]</td>
+        <div class="table-responsive table-container">
+            <table class="table table-hover admin-table">
+                <thead>
+                <tr>
+                    <th style="width: 8%">ID</th>
+                    <th style="width: 15%">랙 이름</th>
+                    <th style="width: 17%">위치 설명</th>
+                    <th style="width: 30%">가동률 (Utilization)</th>
+                    <th style="width: 30%" class="text-center">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="rack : ${racks}">
+                    <td th:text="${rack.id}" class="fw-bold text-info">1</td>
 
-                <td>
-                    <div th:with="percent=${rack.totalUnit > 0 ? ((rack.usedUnit * 100.0) / rack.totalUnit) : 0}">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
-                            <small class="fw-bold">[[${#numbers.formatDecimal(percent, 0, 0)}]]%</small>
-                        </div>
-                        <div class="progress custom-progress" style="height: 10px;">
-                            <div class="progress-bar" role="progressbar"
-                                 th:style="'width: ' + ${#numbers.formatDecimal(percent, 0, 0)} + '%'"
+                    <td>
+                        <span th:text="${rack.rackName}" class="fw-bold text-white">[위치 코드]</span>
+                    </td>
 
-                                 th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}">
+                    <td th:text="${rack.locationDesc}" class="text-sub-muted">[건물내 위치]</td>
+
+                    <td>
+                        <div th:with="percent=${rack.totalUnit > 0 ? ((rack.usedUnit * 100.0) / rack.totalUnit) : 0}">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="text-sub-muted">사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
+                                <small class="fw-bold text-white">[[${#numbers.formatDecimal(percent, 0, 0)}]]%</small>
+                            </div>
+                            <div class="progress" style="height: 8px; background-color: #0f172a; border-radius: 10px;">
+                                <div class="progress-bar" role="progressbar"
+                                     th:style="'width: ' + ${#numbers.formatDecimal(percent, 0, 0)} + '%'"
+                                     th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}"
+                                     style="border-radius: 10px;">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </td>
+                    </td>
 
-                <td>
-                    <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
-                       class="btn btn-sm custom-btn-info">실장도</a>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
+                               class="btn btn-sm btn-outline-info">실장도</a>
 
-                    <a th:href="@{/racks/{id}/edit(id=${rack.id})}" class="btn btn-sm custom-btn-warning">수정</a>
-                    <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
-                       class="btn btn-sm custom-btn-danger"
-                       onclick="return confirm('정말 이 랙을 삭제하시겠습니까? 안에 있는 장비도 다 사라집니다!');">삭제</a>
-                </td>
-            </tr>
-            <tr th:if="${racks.isEmpty()}">
-                <td colspan="5" class="text-center py-4 text-sub">
-                    등록된 서버 랙이 없습니다.
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                            <a th:href="@{/racks/{id}/edit(id=${rack.id})}"
+                               class="btn btn-sm btn-outline-warning">수정</a>
+
+                            <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('정말 이 랙을 삭제하시겠습니까?');">삭제</a>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${racks.isEmpty()}">
+                    <td colspan="5" class="text-center py-5 text-sub-muted">
+                        등록된 서버 랙이 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 </div>
 

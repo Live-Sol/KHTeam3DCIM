@@ -57,94 +57,85 @@
             </div>
         </div>
 
-        <table class="table table-bordered table-hover align-middle custom-table-dark">
-            <thead class="table-dark text-center">
-            <tr>
-                <th>ID</th>
-                <th>위치(Rack)</th>
-                <th>장비 종류</th>
-                <th>제조사/모델</th>
-                <th>소비전력</th>
-                <th>EMS</th>
-                <th>설치위치</th>
-                <th>계약 (만료일)</th>
-                <th>상태</th>
-                <th>관리</th>
-            </tr>
-            </thead>
-            <tbody class="text-center">
-            <tr th:each="device : ${devices}">
-                <td th:text="${device.id}">1</td>
-                <td th:text="${device.rack != null ? device.rack.rackName : '미배정'}">A-01</td>
-                <td>
-                    <span th:if="${device.category != null}" th:text="${device.category.name}">서버</span>
-                    <span th:unless="${device.category != null}" class="text-muted">-</span>
-                </td>
-                <td class="text-start text-black">
-                    <div class="fw-bold" th:text="${device.vendor}">Dell</div>
-                    <div class="small text-sub" th:text="${device.modelName}">R740</div>
-                </td>
+        <div class="table-responsive table-container">
+            <table class="table table-hover admin-table">
+                <thead>
+                <tr class="text-center">
+                    <th style="width: 5%">ID</th>
+                    <th style="width: 10%">위치(Rack)</th>
+                    <th style="width: 10%">장비 종류</th>
+                    <th style="width: 20%">제조사/모델</th>
+                    <th style="width: 8%">소비전력</th>
+                    <th style="width: 7%">EMS</th>
+                    <th style="width: 10%">설치위치</th>
+                    <th style="width: 12%" class="text-start">계약 (만료일)</th>
+                    <th style="width: 8%">상태</th>
+                    <th style="width: 10%">관리</th>
+                </tr>
+                </thead>
+                <tbody class="text-center">
+                <tr th:each="device : ${devices}">
+                    <td th:text="${device.id}" class="fw-bold text-info">1</td>
 
-                <td>
-                    <span th:text="${device.powerWatt != null ? device.powerWatt : 0}">500</span> W
-                </td>
+                    <td class="text-white fw-bold" th:text="${device.rack != null ? device.rack.rackName : '미배정'}">A-01</td>
 
-                <td>
-                    <span th:if="${device.emsStatus == 'ON'}" class="badge bg-primary">
-                        <i class="bi bi-activity"></i> ON
-                    </span>
-                    <span th:unless="${device.emsStatus == 'ON'}" class="badge bg-secondary">
-                        OFF
-                    </span>
-                </td>
+                    <td th:text="${device.category != null ? device.category.name : '-'}">서버</td>
 
-                <td>
-                    <span th:text="${device.startUnit}">10</span>U ~
-                    <span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
-                </td>
+                    <td class="text-center">
+                        <div class="fw-bold text-white" th:text="${device.vendor}">Dell</div>
+                        <div class="text-sub-muted" th:text="${device.modelName}">R740</div>
+                    </td>
 
-                <td class="text-start">
-                    <div th:if="${device.contractDate != null}">
-                        <span th:text="${device.contractDate}">2025-01-01</span>
-                        <br>
-                        <small class="fw-bold"
-                               th:with="expireDate=${device.contractDate.plusMonths(device.contractMonth)}"
-                               th:classappend="${expireDate.isBefore(#temporals.createToday())} ? 'text-danger' : 'text-success'">
-                            ~ [[${expireDate}]]
-                        </small>
-                    </div>
-                    <div th:unless="${device.contractDate != null}" class="text-sub">-</div>
-                </td>
+                    <td class="text-white">
+                        <span th:text="${device.powerWatt != null ? device.powerWatt : 0}">500</span>W
+                    </td>
 
-                <td>
+                    <td>
+                        <span th:if="${device.emsStatus == 'ON'}" class="badge bg-primary px-2">ON</span>
+                        <span th:unless="${device.emsStatus == 'ON'}" class="badge bg-secondary px-2">OFF</span>
+                    </td>
+
+                    <td class="text-white">
+                        <span th:text="${device.startUnit}">10</span>U~<span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
+                    </td>
+
+                    <td class="text-start">
+                        <div th:if="${device.contractDate != null}">
+                            <span class="text-white small" th:text="${device.contractDate}">2025-01-01</span><br>
+                            <small class="fw-bold"
+                                   th:with="expireDate=${device.contractDate.plusMonths(device.contractMonth)}"
+                                   th:classappend="${expireDate.isBefore(#temporals.createToday())} ? 'text-danger' : 'text-success'">
+                                ~ [[${expireDate}]]
+                            </small>
+                        </div>
+                        <div th:unless="${device.contractDate != null}" class="text-sub-muted">-</div>
+                    </td>
+
+                    <td>
                     <span th:if="${device.status != null}">
-                    <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
-                    <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
-                    <span class="badge bg-secondary" th:if="${device.status == 'STOPPED'}">STOPPED</span>
+                        <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
+                        <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
+                        <span class="badge bg-secondary" th:if="${device.status == 'STOPPED'}">STOPPED</span>
+                        <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'STOPPED'}">[[${device.status}]]</span>
+                    </span>
+                        <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
+                    </td>
 
-                    <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'STOPPED'}">
-                    [[${device.status}]]
-                    </span>
-                    </span>
-                    <span th:unless="${device.status != null}" class="badge bg-warning text-dark">
-                    UNKNOWN
-                    </span>
-                </td>
-
-                <td>
-                    <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm custom-btn-warning">수정</a>
-                    <a th:href="@{/devices/{id}/delete(id=${device.id})}"
-                       class="btn btn-sm custom-btn-danger"
-                       onclick="return confirm('정말 이 장비를 폐기(삭제) 하시겠습니까?');">삭제</a>
-                </td>
-            </tr>
-            <tr th:if="${devices.isEmpty()}">
-                <td colspan="10" class="text-center py-4 text-sub">
-                    등록된 장비(서버)가 없습니다.
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    <td>
+                        <div class="d-flex justify-content-center gap-1">
+                            <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-outline-warning">수정</a>
+                            <a th:href="@{/devices/{id}/delete(id=${device.id})}"
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('정말 이 장비를 폐기하시겠습니까?');">삭제</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${devices.isEmpty()}">
+                    <td colspan="10" class="text-center py-5 text-sub-muted">등록된 장비가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
 </div>
 

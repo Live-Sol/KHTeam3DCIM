@@ -41,8 +41,9 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title fw-bold">회사명: [[${req.companyName}]] <small class="text-white-50 fs-6">회사번호: ([[${req.companyPhone}]])</small></h5>
-                        <p class="card-text mb-1"><strong>담당자:</strong> [[${req.userName}]] (연락처: [[${req.contact}]])</p>
+                        <h5 class="card-title fw-bold">회사명: [[${req.companyName}]] <small class="text-white-50 fs-6">(회사번호: [[${req.companyPhone}]])</small></h5>
+                        <h5 class="card-title fw-bold">담당자: [[${req.userName}]] <small class="text-white-50 fs-6">(연락처: [[${req.contact}]])</small></h5>
+<!--                        <p class="card-text mb-1"><strong>담당자:</strong> [[${req.userName}]] (연락처: [[${req.contact}]])</p>-->
 
                         <hr class="custom-hr">
 
@@ -61,7 +62,7 @@
 
                         <div class="d-flex gap-2 mt-3">
                             <a th:href="@{/racks(reqId=${req.id})}" class="btn custom-btn-primary flex-grow-1">
-                                🔍 자리 배정 (승인)
+                                🔍 승인(자리 배정)
                             </a>
 
                             <a th:href="@{/requests/{id}/reject(id=${req.id})}"

@@ -130,3 +130,67 @@
        명시적으로 흰색으로 지정하여 안전하게 만듭니다. */
     color: var(--text-main) !important;
 }
+
+/* =========================================
+   [테이블css] 회원 조회 페이지 스타일 100% 복제 (장비관리용)
+   ========================================= */
+
+/* 1. 테이블 전체 컨테이너 */
+.table-container {
+    background-color: #1e293b !important;
+    border-radius: 8px !important;
+    border: 1px solid #334155 !important;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. 테이블 본체 */
+.admin-table {
+    margin-bottom: 0 !important;
+    color: #f1f5f9 !important;
+    width: 100%;
+}
+
+/* 3. 헤더: 회원 조회 페이지의 시그니처 (진한 회색 #334155) */
+.admin-table thead th {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    font-weight: 500 !important;
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+    text-align: center;
+}
+
+/* 4. 바디 셀 스타일 */
+.admin-table tbody td {
+    border-bottom: 1px solid #334155 !important;
+    padding: 12px !important;
+    vertical-align: middle;
+    background-color: transparent !important;
+    color: #f1f5f9;
+}
+
+/* 5. 행 호버 효과 */
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 6. 강조 스타일 (회원 ID 스타일 복제) */
+.text-info-custom {
+    color: #3b82f6 !important; /* 회원조회의 admin-primary 색상 */
+    font-weight: bold;
+}
+
+/* 보조 텍스트 (작은 글씨용) */
+.text-sub-muted {
+    color: #94a3b8 !important;
+    font-size: 0.85rem;
+}
+
+/* 버튼 아웃라인 스타일 */
+.btn-outline-warning { border: 1px solid #f59e0b !important; color: #f59e0b !important; }
+.btn-outline-warning:hover { background-color: #f59e0b !important; color: #000 !important; }
+.btn-outline-danger { border: 1px solid #ef4444 !important; color: #ef4444 !important; }
+.btn-outline-danger:hover { background-color: #ef4444 !important; color: #fff !important; }
