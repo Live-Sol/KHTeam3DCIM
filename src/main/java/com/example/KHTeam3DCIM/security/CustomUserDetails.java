@@ -1,40 +1,51 @@
 package com.example.KHTeam3DCIM.security;
+
 import com.example.KHTeam3DCIM.domain.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-//
+
 @Getter
 public class CustomUserDetails implements UserDetails {
 
     /**
      * 실제 회원 정보 (DB의 Member 엔티티)
-     * → memberId, name, role 등 모든 컬럼 접근 가능
      */
     private final Member member;
 
     /**
      * Spring Security 권한 정보
-     * → ROLE_USER, ROLE_ADMIN 등
      */
     private final Collection<? extends GrantedAuthority> authorities;
 
+    // ⭐️ [추가 1] 프로필 이미지 경로를 담을 변수
+    private String profileImage;
+
     /**
-     * 로그인 성공 시
-     * CustomUserDetailsService에서 생성되어
-     * SecurityContext에 저장되는 인증 객체
+     * 로그인 성공 시 생성자
      */
     public CustomUserDetails(Member member,
                              Collection<? extends GrantedAuthority> authorities) {
         this.member = member;
         this.authorities = authorities;
+
+        // ⭐️ [추가 2] Member 엔티티에서 이미지 경로를 꺼내와 저장
+        // (주의: Member.java에 getProfileImage() 메서드가 있어야 오류가 안 납니다!)
+        this.profileImage = member.getProfileImage();
     }
+
+    // ⭐️ [추가 3] 헤더(HTML)에서 이미지를 꺼내 쓰기 위한 메서드
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+
+    // --- 아래는 기존 코드와 동일합니다 ---
 
     /**
      * 로그인 ID (Spring Security에서 username으로 사용)
-     * → memberId 반환
      */
     @Override
     public String getUsername() {
@@ -50,8 +61,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     /**
-     * ⭐ 사용자 실명 / 이름
-     * → Thymeleaf: sec:authentication="principal.name"
+     * 사용자 실명 / 이름
      */
     public String getName() {
         return member.getName();
@@ -65,25 +75,25 @@ public class CustomUserDetails implements UserDetails {
         return authorities;
     }
 
-    // ===== 계정 상태 관련 (필요 시 확장 가능) =====
+    // ===== 계정 상태 관련 =====
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // 계정 만료 여부
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // 계정 잠금 여부
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // 비밀번호 만료 여부
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // 계정 활성화 여부
+        return true;
     }
 }

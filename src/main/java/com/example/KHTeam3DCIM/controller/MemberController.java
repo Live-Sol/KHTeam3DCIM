@@ -3,21 +3,24 @@ package com.example.KHTeam3DCIM.controller;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.dto.Member.*;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
+import com.example.KHTeam3DCIM.security.CustomUserDetails; // Import 추가
 import com.example.KHTeam3DCIM.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Import 추가
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -39,20 +42,22 @@ public class MemberController {
     // 회원가입 폼 페이지
     @GetMapping("/signup")
     public String signupForm() {
-        return "member/signup";  // templates/member/signup.html
+        return "member/signup";
     }
+
     // 회원 등록
     @PostMapping
     public String createMember(@ModelAttribute MemberCreateRequest member, Model model) {
         try {
-            MemberResponse response = memberService.addMember(member);
+            memberService.addMember(member);
             model.addAttribute("message", "회원가입 성공");
-            return "redirect:/members/login";  // 회원가입 성공 후 로그인 페이지로 리다이렉트
+            return "redirect:/members/login";
         } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());  // 유효성 검사 오류 메시지 전달
-            return "member/signup";  // 오류가 발생하면 회원가입 페이지로 돌아감
+            model.addAttribute("error", e.getMessage());
+            return "member/signup";
         }
     }
+
     // 아이디 중복체크
     @GetMapping("/check-id")
     @ResponseBody
@@ -63,34 +68,28 @@ public class MemberController {
 
     // 로그인 페이지로 이동
     @GetMapping("/login")
-    public String loginForm(@RequestParam(value = "error", required = false) String error,
-                            Model model) {
-
-        // ⭐️ ?error 파라미터가 존재하면 Model에 메시지를 추가 ⭐️
+    public String loginForm(@RequestParam(value = "error", required = false) String error, Model model) {
         if (error != null) {
-            // 여기서는 간단히 '로그인 실패' 메시지를 사용합니다.
             model.addAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
         return "member/login";
     }
+
     // 로그아웃
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); // 세션 삭제 → 로그인 상태 초기화
-        return "redirect:/";   // 로그아웃 후 메인페이지로 이동
+        session.invalidate();
+        return "redirect:/";
     }
 
     // GET: 회원 수정 폼 보기
     @GetMapping("/edit")
     public String editMemberForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         String memberId = userDetails.getUsername();
-
-        // 1. 현재 엔티티 정보 조회
         Member member = memberService.findMember(memberId);
 
-        // 2. DTO에 현재 정보를 담아 폼에 미리 채워줍니다.
+        // 현재 정보 채우기
         MemberUpdateRequest currentInfo = new MemberUpdateRequest();
-        // 비밀번호는 보안상 DTO에 담지 않습니다.
         currentInfo.setEmail(member.getEmail());
         currentInfo.setContact(member.getContact());
         currentInfo.setCompanyName(member.getCompanyName());
@@ -98,13 +97,16 @@ public class MemberController {
 
         model.addAttribute("memberId", memberId);
         model.addAttribute("memberUpdateByUserRequest", currentInfo);
-        model.addAttribute("memberName", member.getName()); // 이름은 수정 불가하지만 폼에 표시용
-        model.addAttribute("memberRole", member.getRole()); // Role은 수정 불가하지만 폼에 표시용
+        model.addAttribute("memberName", member.getName());
+        model.addAttribute("memberRole", member.getRole());
+
+        // 프로필 이미지 경로 추가 (없으면 null)
+        model.addAttribute("profileImage", member.getProfileImage());
 
         return "member/editMember";
     }
 
-    // POST: 회원 수정 처리
+    // POST: 회원 수정 처리 (이미지 업로드 포함)
     @PostMapping("/edit")
     public String updateMemberUser(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -112,90 +114,89 @@ public class MemberController {
             BindingResult bindingResult,
             Model model, RedirectAttributes redirectAttributes) {
 
-        // 유효성 검사 실패 시
+        // 1. 유효성 검사 실패 시
         if (bindingResult.hasErrors()) {
             model.addAttribute("memberId", userDetails.getUsername());
-            // 폼을 다시 렌더링할 때 이름과 역할 정보를 다시 넣어줘야 합니다.
             Member member = memberService.findMember(userDetails.getUsername());
             model.addAttribute("memberName", member.getName());
             model.addAttribute("memberRole", member.getRole());
+            model.addAttribute("profileImage", member.getProfileImage()); // 에러 시에도 기존 이미지 유지
             return "member/editMember";
         }
 
         try {
-            memberService.updateMember(userDetails.getUsername(), request);
+            // 2. 서비스 호출 (DB 업데이트 & 파일 저장)
+            String memberId = userDetails.getUsername();
+            memberService.updateMember(memberId, request);
+
+            // ⭐️ [중요] 세션 정보(SecurityContext) 강제 갱신 ⭐️
+            // DB 내용은 바뀌었지만, 현재 로그인된 정보(Authentication)는 옛날 상태입니다.
+            // 헤더의 이미지가 바로 바뀌려면 여기서 최신 정보를 다시 불러와 세션에 덮어씌워야 합니다.
+            updateSecurityContext(memberId);
+
             redirectAttributes.addFlashAttribute("updateSuccess", true);
             redirectAttributes.addFlashAttribute("successMessage", "회원 정보가 성공적으로 수정되었습니다.");
-            return "redirect:/"; // 수정 완료 후 리다이렉트
+            return "redirect:/";
+
+        } catch (IOException e) {
+            model.addAttribute("error", "파일 업로드 중 오류가 발생했습니다: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", "수정 실패: " + e.getMessage());
-            // 오류 발생 시에도 이름과 역할 정보를 다시 넣어줘야 합니다.
-            Member member = memberService.findMember(userDetails.getUsername());
-            model.addAttribute("memberName", member.getName());
-            model.addAttribute("memberRole", member.getRole());
-            model.addAttribute("memberId", userDetails.getUsername());
-            return "member/editMember";
         }
+
+        // 오류 발생 시 데이터 복구하여 폼 다시 보여주기
+        Member member = memberService.findMember(userDetails.getUsername());
+        model.addAttribute("memberName", member.getName());
+        model.addAttribute("memberRole", member.getRole());
+        model.addAttribute("memberId", userDetails.getUsername());
+        model.addAttribute("profileImage", member.getProfileImage());
+        return "member/editMember";
     }
 
+    // ⭐️ 세션 갱신을 위한 헬퍼 메서드 ⭐️
+    private void updateSecurityContext(String memberId) {
+        // 1. 최신 회원 정보 DB에서 가져오기
+        Member updatedMember = memberService.findMember(memberId);
 
-//    // 회원 정보 수정 폼 페이지
-//    @GetMapping("/edit")
-//    public String editUserForm(Model model) { // HttpSession 제거
-//        String loginId = getLoggedInUserId(); // Security Context에서 ID 가져옴
-//
-//        if (loginId.equals("anonymousUser")) { // 익명 사용자(로그인 안함) 체크
-//            return "redirect:/members/login";
-//        }
-//
-//        Member member = memberService.findMember(loginId);
-//        model.addAttribute("member", member);
-//
-//        return "member/editMember"; // 일반 회원 본인 수정 폼
-//    }
-//    // 회원 정보 수정 (본인)
-//    @PatchMapping("/{memberId}")
-//    public ResponseEntity<MemberResponse> patchMember(@PathVariable String memberId,
-//        @RequestBody MemberUpdateRequest patch) {
-//        try{
-//            MemberResponse response = memberService.updateMember(memberId, patch);
-//            return ResponseEntity.ok(response);
-//        }catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+        // 2. 현재 인증 정보 가져오기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-    // 회원 탈퇴 페이지로 이동
+        // 3. 새 UserDetails 객체 생성 (여기서 갱신된 profileImage가 들어감)
+        CustomUserDetails newPrincipal = new CustomUserDetails(updatedMember, auth.getAuthorities());
+
+        // 4. 새로운 인증 토큰 생성 (기존 자격증명과 권한 유지)
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                newPrincipal, auth.getCredentials(), newPrincipal.getAuthorities());
+
+        // 5. 시큐리티 컨텍스트에 새 토큰 설정 (즉시 반영)
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+    }
+
+    // 회원 탈퇴 페이지
     @GetMapping("/delete")
-    public String deleteUserForm(Model model) { // HttpSession 제거
-        String loginId = getLoggedInUserId(); // Security Context에서 ID 가져옴
-
+    public String deleteUserForm(Model model) {
+        String loginId = getLoggedInUserId();
         if (loginId.equals("anonymousUser")) {
             return "redirect:/members/login";
         }
-
         Member member = memberService.findMember(loginId);
         model.addAttribute("member", member);
-        return "member/deleteMember";   // 일반 회원 본인 탈퇴 폼
+        return "member/deleteMember";
     }
 
-    // 회원 정보 삭제 (회원 본인)
+    // 회원 정보 삭제
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> deleteMember(
-            @PathVariable String memberId,
-            @RequestBody Map<String, String> body) { // HttpSession 제거
-
-        String loggedInId = getLoggedInUserId(); // Security Context에서 ID 가져옴
+    public ResponseEntity<?> deleteMember(@PathVariable String memberId, @RequestBody Map<String, String> body) {
+        String loggedInId = getLoggedInUserId();
         String password = body.get("password");
 
-        // 로그인 상태가 아니거나, 토큰의 ID와 Path Variable의 ID가 다르면 권한 없음
         if (loggedInId.equals("anonymousUser") || !loggedInId.equals(memberId)) {
             return ResponseEntity.status(403).body(Map.of("message", "권한이 없거나 로그인 세션이 만료되었습니다."));
         }
 
         try {
             memberService.deleteMemberWithPassword(memberId, password);
-            SecurityContextHolder.getContext().setAuthentication(null); // 로그아웃 처리
+            SecurityContextHolder.getContext().setAuthentication(null);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
@@ -204,41 +205,32 @@ public class MemberController {
 
     private String getLoggedInUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            // 인증되지 않았거나 익명 사용자인 경우 (로그인 안함)
             return "anonymousUser";
         }
         if (authentication.getPrincipal() instanceof UserDetails) {
             return ((UserDetails) authentication.getPrincipal()).getUsername();
         }
-        // 기본적으로 Principal 객체가 ID 문자열일 경우
         return authentication.getName();
     }
 
-    // 비밀번호 찾기(재설정) 페이지 이동
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
         return "member/forgot_password";
     }
 
-    // 비밀번호 재설정 처리
     @PostMapping("/forgot-password")
     public String resetPassword(@ModelAttribute MemberPasswordResetRequest request, Model model) {
         try {
-            // 유효성 검사 (간단히 패턴만 체크하거나 Service에서 처리)
             if (request.getNewPassword() == null || !request.getNewPassword().matches("^(?=.*[a-zA-Z])(?=.*\\d).{5,20}$")) {
                 throw new IllegalArgumentException("비밀번호는 영문자와 숫자를 포함하여 5~20자여야 합니다.");
             }
-
             memberService.resetPassword(request);
             model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다. 로그인해주세요.");
-            return "member/login"; // 성공 시 로그인 페이지로 이동하며 메시지 전달
-
+            return "member/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return "member/forgot_password"; // 실패 시 다시 폼으로
+            return "member/forgot_password";
         }
     }
-
 }

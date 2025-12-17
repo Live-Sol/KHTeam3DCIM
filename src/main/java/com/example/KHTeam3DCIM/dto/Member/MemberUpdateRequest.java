@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder // Lombok의 Builder 패턴 사용
@@ -38,4 +39,7 @@ public class MemberUpdateRequest {
     // 5. 회사 대표 번호 (필수 수정)
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "회사 대표 번호 형식이 올바르지 않습니다.")
     private String companyPhone;
+
+    // 6. 프로필 이미지 파일
+    private MultipartFile profileImage;
 }
