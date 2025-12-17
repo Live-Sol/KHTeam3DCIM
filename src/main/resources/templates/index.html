@@ -179,46 +179,6 @@
         </div>
     </div>
 
-    <!-- 최근 로그 (Log Table) -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card log-card">
-                <div class="card-header log-header">
-                    <h5 class="log-title">
-                        <i class="bi bi-activity text-cyan"></i> RECENT SYSTEM ACTIVITY
-                    </h5>
-                    <span class="badge bg-dark border border-secondary text-secondary">Real-time</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table log-table align-middle mb-0">
-                        <thead>
-                        <tr>
-                            <th class="ps-4">Timestamp</th>
-                            <th>User Agent</th>
-                            <th>Activity Log</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="log : ${recentLogs}">
-                            <!-- 시간: 모노스페이스 폰트 -->
-                            <td class="ps-4 log-time" th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
-
-                            <!-- 유저 배지 -->
-                            <td>
-                                <span class="log-badge" th:text="${log.actor}">Admin</span>
-                            </td>
-
-                            <!-- 활동 내용 -->
-                            <td class="text-white-50" th:text="${log.actionDescription}"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- 4. 푸터 -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 

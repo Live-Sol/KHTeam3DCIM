@@ -310,67 +310,6 @@ a { text-decoration: none; }
     animation: pulse 2s infinite;
 }
 
-/* 6. Log Table (Cyber Style) */
-.log-card {
-    background: var(--card-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-.log-header {
-    background: rgba(15, 23, 42, 0.8);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1.2rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.log-title {
-    font-family: 'Orbitron', sans-serif;
-    color: #fff;
-    margin: 0;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.log-table { width: 100%; border-collapse: collapse; }
-.log-table thead th {
-    background: rgba(15, 23, 42, 0.9) !important;
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.85rem;
-    padding: 1rem;
-    border-bottom: 1px solid var(--glass-border);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-.log-table tbody td {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    color: #cbd5e1;
-    background: transparent !important;
-}
-.log-table tbody tr:hover td {
-    background-color: rgba(6, 182, 212, 0.05) !important;
-    color: #fff;
-}
-.log-time {
-    font-family: 'Consolas', monospace;
-    color: var(--accent-purple) !important;
-    font-weight: 600;
-}
-.log-badge {
-    background: rgba(139, 92, 246, 0.15);
-    color: #a78bfa;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
 
 /* -----------------------------------------
    5. Footer
