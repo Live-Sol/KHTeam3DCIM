@@ -1,168 +1,175 @@
-/* 기본 스타일 */
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-}
+/* =========================================
+   [StarRoot Member System]
+   File: memberStyle.css
+   (Login & Signup Integrated)
+   ========================================= */
 
-/* 컨테이너 스타일 */
-.container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 헤더 스타일 */
-h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 25px;
-}
-
-/* -------------------- 폼 요소 스타일 -------------------- */
-
-/* 입력 필드 그룹 (라벨+입력창) */
-div {
-    margin-bottom: 15px;
-}
-
-/* 라벨 스타일 (정렬을 위해) */
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-
-/* 입력 필드, Select 박스 스타일 통일 */
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="tel"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1em;
-}
-
-/* Readonly 필드 스타일 */
-input[readonly] {
-    background-color: #eee;
-    color: #777;
-    cursor: not-allowed;
-}
-
-/* -------------------- 버튼 및 링크 스타일 -------------------- */
-
-/* 버튼 기본 스타일 */
-button, .btn {
-    display: inline-block;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    font-size: 1em;
-    transition: background-color 0.3s;
-}
-
-button[type="submit"] {
-    width: 100%;
-    background-color: #4CAF50;
-    margin-bottom: 10px;
-}
-
-button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-/* 목록으로 버튼 (보조 버튼 스타일) */
-.btn-secondary {
-    width: 100%;
-    background-color: #6c757d;
-}
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-/* -------------------- 메시지 및 오류 스타일 -------------------- */
-
-/* 서버 메시지 박스 기본 스타일 */
-.message-box {
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-}
-
-.error-message { /* HTML에서 class="message-box error-message" 사용 */
-    background-color: #fdd;
-    border: 1px solid #f00;
-}
-
-.success-message { /* HTML에서 class="message-box success-message" 사용 */
-    background-color: #dff;
-    border: 1px solid #0f0;
-}
-
-/* DTO 유효성 검사 오류 메시지 스타일 */
-.error-text, ul li {
-    color: darkred;
-    font-size: 0.85em;
-    margin-top: 5px;
-    list-style-type: disc;
-    margin-left: 20px;
-}
-/* ====================== 아이디 중복 확인 그룹 스타일 추가 ====================== */
-
-.id-check-group {
-    /* 입력창과 버튼을 포함하는 컨테이너에 Flexbox 적용 */
+/* 1. 배경 및 레이아웃 설정 */
+.login-body {
+    background-color: var(--primary-bg); /* #0f172a */
+    background-image:
+        radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 25%);
+    min-height: 100vh;
     display: flex;
-    gap: 10px; /* 입력 필드와 버튼 사이의 간격 */
-    align-items: center; /* 세로 중앙 정렬 */
-    /* 부모 <div>에 설정된 margin-bottom을 유지하기 위해 width 100% 설정 */
+    flex-direction: column;
+}
+
+.login-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 80px 0;
+}
+
+/* 2. 카드 디자인 (Glassmorphism) */
+.login-card {
+    background: rgba(30, 41, 59, 0.75); /* 조금 더 불투명하게 조정 */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+/* 회원가입용 넓은 카드 */
+.signup-card-width {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.login-card:hover {
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
 }
 
-/* 중복 확인 버튼 스타일 */
-.id-check-group button {
-    /* 기본 버튼 스타일을 덮어쓰고, 크기를 줄입니다 */
-    padding: 8px 15px;
-    font-size: 14px;
-    background-color: #5cb85c; /* 원하는 색상 (기존 폼 제출 버튼 색상과 구별되게 설정) */
-    color: white;
+/* 3. 타이포그래피 */
+.login-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+}
+
+/* 4. 입력 폼 디자인 */
+.form-control-custom {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff !important;
+    border-radius: 10px;
+    height: 55px;
+    padding-left: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
+}
+
+/* 플로팅 라벨 스타일 */
+.form-floating > label {
+    color: rgba(255, 255, 255, 0.5);
+    padding-left: 15px;
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--accent-cyan);
+    opacity: 1;
+    transform: scale(0.85) translateY(-0.7rem) translateX(0.15rem);
+}
+
+/* 5. 버튼 스타일 */
+.btn-login {
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, #3b82f6 100%);
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    height: 38px; /* 입력 필드의 높이와 비슷하게 설정 */
-    min-width: 80px; /* 버튼의 최소 너비 */
-    flex-shrink: 0; /* 버튼이 줄어들지 않도록 고정 */
-
-    /* 기존 button 스타일에서 상속된 width: 100%를 무시 */
-    width: auto;
-    margin: 0; /* 불필요한 마진 제거 */
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 12px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
 }
 
-.id-check-group button:hover {
-    background-color: #4cae4c;
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+    background: linear-gradient(135deg, #22d3ee 0%, #60a5fa 100%);
+    color: #fff;
 }
 
-/* 아이디 입력 필드 (버튼 옆에 배치) */
-/* .id-check-group 내부에 있는 input 스타일 */
-.id-check-group input[type="text"] {
-    /* 남은 공간을 모두 차지하도록 하여 버튼 옆에 깔끔하게 배치 */
-    flex-grow: 1;
-    margin: 0; /* 상위 input[type="text"] 스타일에 포함된 마진 5px 0 0을 제거 */
+/* 중복확인 버튼 (Outline Style) */
+.btn-check-custom {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-check-custom:hover {
+    background: rgba(6, 182, 212, 0.1);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+/* 6. 유효성 검사 메시지 */
+.validation-msg {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.text-error { color: #f87171; text-shadow: 0 0 5px rgba(248, 113, 113, 0.2); }
+.text-success-custom { color: #4ade80; text-shadow: 0 0 5px rgba(74, 222, 128, 0.2); }
+
+/* 7. 유틸리티 */
+.link-cyan {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.link-cyan:hover {
+    color: #fff;
+    text-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.alert-custom {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #fca5a5;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+.card-footer-glow {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 100px;
+    background: var(--accent-purple);
+    filter: blur(60px);
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
 }

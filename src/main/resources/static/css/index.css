@@ -1,125 +1,93 @@
 /* =========================================
    [StarRoot Design System]
-   Cyber Tech & Deep Space Concept
+   Theme: Cyber Tech & Deep Space (Dark Mode)
    ========================================= */
 
 :root {
-    --primary-bg: #0f172a;       /* 메인 배경색 (짙은 남색) */
-    --card-bg: #ffffff;          /* 카드 배경 (흰색) */
-    --accent-cyan: #06b6d4;      /* 형광 청록 (포인트 1) */
-    --accent-purple: #8b5cf6;    /* 보라 (포인트 2) */
-    --text-main: #f1f5f9;        /* 메인 텍스트 */
+    --primary-bg: #0f172a;       /* 짙은 우주색 */
+    --card-bg: rgba(30, 41, 59, 0.7); /* 반투명 카드 배경 */
+    --accent-cyan: #06b6d4;      /* 네온 시안 */
+    --accent-purple: #8b5cf6;    /* 네온 퍼플 */
+    --text-main: #f1f5f9;        /* 메인 텍스트 (흰색) */
+    --text-muted: #94a3b8;       /* 보조 텍스트 (회색) */
     --glass-border: rgba(255, 255, 255, 0.1);
+    --neon-glow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
-body {
+/* 1. Global & Body */
+body.dashboard-body {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    /* 로그인 페이지와 동일한 Deep Space 배경 */
+    background-color: var(--primary-bg);
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+    color: var(--text-main);
     overflow-x: hidden;
 }
 
-/* -----------------------------------------
-   1. Header (네비게이션)
-   ----------------------------------------- */
+a { text-decoration: none; }
+
+/* 2. Header Style */
 .navbar-custom {
-    background: rgba(15, 23, 42, 0.95); /* 스크롤 무관하게 항상 진한 색상 유지 */
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    padding: 1rem 0;
-    transition: padding 0.3s ease; /* 패딩 애니메이션만 유지 */
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+    padding: 0.8rem 0;
+    transition: all 0.3s ease;
 }
 
-/* ⭐ [Cosmic Flow 로고 적용됨] */
 .brand-logo {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
-    letter-spacing: 1px;
-    text-decoration: none;
-
-    /* 3가지 색상을 섞어서 배경으로 지정 (반복 흐름) */
-    background: linear-gradient(
-        120deg,
-        #22d3ee 0%,
-        #a855f7 30%,
-        #22d3ee 60%,
-        #a855f7 100%
-    );
-    background-size: 200% auto; /* 배경을 크게 늘려서 이동할 공간 확보 */
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #22d3ee 0%, #a855f7 50%, #22d3ee 100%);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-
-    /* 흐르는 애니메이션 실행 */
-    animation: shine-flow 3s linear infinite;
+    animation: shine-flow 4s linear infinite;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
 }
 
 @keyframes shine-flow {
-    to {
-        background-position: 200% center;
-    }
+    to { background-position: 200% center; }
 }
 
 .nav-link-custom {
-    color: rgba(255, 255, 255, 0.8) !important;
+    color: rgba(241, 245, 249, 0.7) !important;
     font-weight: 500;
-    position: relative;
-    margin: 0 10px;
-    transition: color 0.3s;
+    margin: 0 8px;
+    padding: 0.5rem 0.8rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
-
 .nav-link-custom:hover {
     color: #fff !important;
-    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+    background: rgba(255, 255, 255, 0.05);
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
 }
 
-.nav-link-custom::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -2px;
-    left: 50%;
-    background: var(--accent-cyan);
-    transition: width 0.3s ease, left 0.3s ease;
-}
-
-.nav-link-custom:hover::after {
-    width: 100%;
-    left: 0;
-}
-
-.user-badge {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 15px;
-    border-radius: 20px;
-    border: 1px solid var(--glass-border);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #fff !important;
-}
-
-/* -----------------------------------------
-   2. Hero Section (메인 슬라이드)
-   ----------------------------------------- */
+/* 3. Hero Slider (복구 및 스타일링) */
 .main-slider-wrapper {
     position: relative;
-    border-bottom: 4px solid var(--accent-cyan);
+    border-bottom: 2px solid var(--accent-cyan);
 }
 
+/* [중요] 슬라이드 높이 및 이미지 설정 (누락되었던 부분 복구) */
 .carousel-item {
-    height: 550px;
+    height: 600px; /* 높이 고정 */
 }
-
 .carousel-item img {
     object-fit: cover;
     height: 100%;
     width: 100%;
-    filter: brightness(0.5) contrast(1.1);
+    /* 배경과 어울리게 명도 조절 */
+    filter: brightness(0.6) contrast(1.1);
 }
 
+/* 캡션 중앙 정렬 */
 .hero-caption {
     position: absolute;
     top: 50%;
@@ -139,50 +107,79 @@ body {
     background: linear-gradient(to right, #fff, #a5f3fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+    margin-bottom: 1.5rem;
 }
 
-/* 버튼 스타일 (StarRoot 컨셉) */
+.hero-desc {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.95);
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+}
+
+/* 슬라이드 버튼 (네온 효과 복구) */
 .hero-caption .btn {
     position: relative;
     font-family: 'Orbitron', sans-serif;
     font-weight: 700;
     color: #fff !important;
-    border: 2px solid #22d3ee;
-    background-color: transparent;
-    background-image: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
-    background-size: 0% 100%;
-    background-repeat: no-repeat;
-    background-position: left center;
-    transition: background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.3s ease,
-                transform 0.3s ease,
-                border-color 0.3s ease;
-    box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
-    overflow: hidden;
+    border: 1px solid var(--accent-cyan);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    padding: 12px 30px;
 }
 
 .hero-caption .btn:hover {
-    background-size: 100% 100%;
-    border-color: #a855f7;
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8), 0 0 5px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+    border-color: transparent;
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
     transform: translateY(-3px);
 }
 
-/* -----------------------------------------
-   3. Summary Strip (요약 띠)
-   ----------------------------------------- */
+/* 슬라이드 하단 자연스러운 연결 오버레이 */
+.slider-overlay-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, transparent, var(--primary-bg));
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 4. Summary Strip (Cyber Glass) */
 .summary-strip {
-    background-color: var(--primary-bg);
-    color: white;
-    padding: 2rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.summary-item {
+    background: rgba(15, 23, 42, 0.7);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem 0;
+    margin-top: -5px; /* 슬라이드와 딱 붙이기 */
     position: relative;
+    z-index: 6;
 }
+.summary-label {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+.summary-value {
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    font-size: 2rem;
+}
+.text-cyan { color: var(--accent-cyan) !important; text-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
 
+.summary-item { position: relative; }
+/* 구분선 스타일 */
 .summary-item:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -190,80 +187,190 @@ body {
     top: 20%;
     height: 60%;
     width: 1px;
-    background: rgba(255,255,255,0.1);
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.2), transparent);
 }
 
-.trend-badge {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 5px;
-    vertical-align: middle;
-}
-.trend-up { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-.trend-down { background: rgba(6, 182, 212, 0.2); color: #67e8f9; }
-.trend-neutral { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
-
-/* -----------------------------------------
-   4. Dashboard Cards
-   ----------------------------------------- */
-.section-title {
+/* 5. Dashboard Cards (Glassmorphism) */
+.section-header {
+    font-family: 'Orbitron', sans-serif;
     font-weight: 800;
-    color: #1e293b;
-    position: relative;
-    display: inline-block;
-    margin-bottom: 10px;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
-.section-title::after {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 4px;
-    background: var(--accent-purple);
-    margin-top: 8px;
+.section-divider {
+    height: 3px;
+    width: 60px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
     border-radius: 2px;
+    margin-top: 1rem;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
 .stat-card {
     background: var(--card-bg);
-    border: none;
+    border: 1px solid var(--glass-border);
     border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
+    padding: 2rem;
     height: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
-
 .stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    transform: translateY(-5px);
+    border-color: rgba(6, 182, 212, 0.3);
+    box-shadow: 0 15px 40px rgba(6, 182, 212, 0.1);
 }
 
-.card-header-line {
-    height: 6px;
-    width: 100%;
+/* 카드 상단 컬러 라인 (Glowing) */
+.card-glow-line {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 3px;
+    box-shadow: 0 0 10px currentColor;
 }
-.line-primary { background: linear-gradient(90deg, #0072ff, #00c6ff); }
-.line-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.line-success { background: linear-gradient(90deg, #10b981, #34d399); }
+.line-primary { background: var(--accent-cyan); color: var(--accent-cyan); }
+.line-warning { background: #facc15; color: #facc15; }
+.line-success { background: #34d399; color: #34d399; }
 
-.live-dot {
-    width: 10px;
+.card-title-custom {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.chart-container { height: 250px; position: relative; }
+
+/* 내부 작은 박스 (Glass Box) */
+.glass-box {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: background 0.3s;
+}
+.glass-box:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+}
+
+/* 프로그레스 바 */
+.progress-dark {
     height: 10px;
-    background-color: #22c55e;
-    border-radius: 50%;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.bg-gradient-cyan {
+    background: linear-gradient(90deg, #22d3ee, #06b6d4);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* 배지 스타일 */
+.status-badge-live {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.badge-status {
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.badge-on {
+    background: rgba(34, 197, 94, 0.1);
+    color: #34d399;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.badge-off {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+.live-dot {
     display: inline-block;
-    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
-    animation: pulse-dot 2s infinite;
+    width: 8px;
+    height: 8px;
+    background-color: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+    animation: pulse 2s infinite;
 }
-@keyframes pulse-dot {
-    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-    70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+
+/* 6. Log Table (Cyber Style) */
+.log-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
+.log-header {
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.log-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table thead th {
+    background: rgba(15, 23, 42, 0.9) !important;
+    color: var(--accent-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.log-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #cbd5e1;
+    background: transparent !important;
+}
+.log-table tbody tr:hover td {
+    background-color: rgba(6, 182, 212, 0.05) !important;
+    color: #fff;
+}
+.log-time {
+    font-family: 'Consolas', monospace;
+    color: var(--accent-purple) !important;
+    font-weight: 600;
+}
+.log-badge {
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
 
 /* -----------------------------------------
    5. Footer
@@ -307,77 +414,4 @@ body {
     border-color: var(--accent-cyan);
     color: #0f172a;
     transform: rotate(360deg);
-}
-
-/* -----------------------------------------
-   6. Recent Logs
-   ----------------------------------------- */
-.log-card {
-    background: #ffffff;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-}
-.log-header {
-    background: #ffffff;
-    border-bottom: 2px solid #f1f5f9;
-    padding: 1.2rem 1.5rem;
-}
-.log-title {
-    font-family: 'Orbitron', sans-serif;
-    color: #1e293b;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-.log-table {
-    margin-bottom: 0;
-    color: #333;
-    width: 100%;
-}
-.log-table thead th {
-    background-color: #f8fafc !important;
-    border-bottom: 2px solid var(--accent-cyan);
-    color: #64748b;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    padding: 1rem;
-    border-top: none;
-}
-.log-table tbody td {
-    background-color: transparent !important;
-    border-bottom: 1px solid #f1f5f9;
-    padding: 1rem;
-    vertical-align: middle;
-    color: #334155;
-}
-.log-table tbody tr {
-    transition: all 0.2s ease-in-out;
-}
-.log-table tbody tr:hover td {
-    background-color: rgba(6, 182, 212, 0.03) !important;
-    color: #0f172a;
-}
-.log-table tbody tr:hover {
-    box-shadow: inset 3px 0 0 var(--accent-cyan);
-}
-.log-time {
-    color: #64748b;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-.log-badge {
-    background: rgba(139, 92, 246, 0.1);
-    color: #7c3aed;
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    display: inline-block;
 }
