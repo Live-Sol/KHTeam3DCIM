@@ -1,164 +1,267 @@
-/* index.css - 메인 대시보드 스타일 */
+/* =========================================
+   [StarRoot Design System]
+   Cyber Tech & Deep Space Concept
+   ========================================= */
 
-/* ... (기존 스타일 유지: hero-carousel, stat-card 등) ... */
+:root {
+    --primary-bg: #0f172a;       /* 아주 짙은 남색 (우주 배경) */
+    --card-bg: #1e293b;          /* 카드/섹션 배경 */
+    --accent-cyan: #06b6d4;      /* 형광 청록 (포인트 1) */
+    --accent-purple: #8b5cf6;    /* 보라 (포인트 2) */
+    --text-main: #f1f5f9;        /* 메인 텍스트 (밝은 회색) */
+    --glass-border: rgba(255, 255, 255, 0.1); /* 유리 테두리 */
+}
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f0f2f5;
+    color: #333;
+    overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
-/* 1. 히어로 슬라이드 섹션 */
-.hero-carousel {
-    height: 600px;
+/* -----------------------------------------
+   1. Header (네비게이션)
+   ----------------------------------------- */
+.navbar-custom {
+    background: rgba(15, 23, 42, 0.85); /* 반투명 배경 */
+    backdrop-filter: blur(12px);        /* 유리 블러 효과 */
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+/* 로고 스타일 */
+.brand-logo {
+    font-family: 'Orbitron', sans-serif; /* 테크 느낌 폰트 */
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    letter-spacing: 1px;
+}
+
+/* 메뉴 아이템 호버 효과 */
+.nav-link-custom {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500;
     position: relative;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.nav-link-custom:hover {
+    color: #fff !important;
+    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+.nav-link-custom::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 50%;
+    background: var(--accent-cyan);
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-link-custom:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+/* 사용자 뱃지 (로그인 정보) */
+.user-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff !important;
+}
+
+/* -----------------------------------------
+   2. Hero Section (메인 슬라이드)
+   ----------------------------------------- */
+.main-slider-wrapper {
+    position: relative;
+    border-bottom: 4px solid var(--accent-cyan);
 }
 
 .carousel-item {
-    height: 600px;
+    height: 550px;
 }
 
 .carousel-item img {
     object-fit: cover;
     height: 100%;
     width: 100%;
-    filter: brightness(0.6);
+    filter: brightness(0.5) contrast(1.1); /* 약간 어둡고 선명하게 */
 }
 
 .hero-caption {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
     z-index: 10;
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
 }
 
-.hero-caption h1 {
+.hero-title {
+    font-family: 'Orbitron', sans-serif;
     font-size: 3.5rem;
     font-weight: 700;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
+    background: linear-gradient(to right, #fff, #a5f3fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
 }
 
-.hero-caption p {
-    font-size: 1.3rem;
-    font-weight: 300;
-    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-}
-
-/* 2. 통계 카드 스타일 */
-.stat-card {
-    border: none;
+/* -----------------------------------------
+   3. Summary Strip (요약 띠)
+   ----------------------------------------- */
+.summary-strip {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    color: white;
+    padding: 2rem 0;
+    position: relative;
+    top: -40px; /* 슬라이드 위로 겹침 */
+    margin-bottom: -40px;
     border-radius: 15px;
-    background: white;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    z-index: 20;
+}
+
+.summary-item {
+    position: relative;
+}
+/* 각 아이템 사이 구분선 */
+.summary-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+.trend-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+.trend-up { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.trend-down { background: rgba(6, 182, 212, 0.2); color: #67e8f9; }
+.trend-neutral { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+
+/* -----------------------------------------
+   4. Dashboard Cards (차트 카드)
+   ----------------------------------------- */
+.section-title {
+    font-weight: 800;
+    color: #1e293b;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.section-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--accent-purple);
+    margin-top: 8px;
+    border-radius: 2px;
+}
+
+.stat-card {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
     height: 100%;
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-.chart-box {
-    height: 250px;
+/* 카드 상단 컬러 라인 */
+.card-header-line {
+    height: 6px;
     width: 100%;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
+.line-primary { background: linear-gradient(90deg, #0072ff, #00c6ff); }
+.line-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.line-success { background: linear-gradient(90deg, #10b981, #34d399); }
 
-.icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-}
-
-/* 깜빡임 효과 (경고용 - 빨강) */
-.blink {
-    animation: blinker 1.5s linear infinite;
-}
-
-@keyframes blinker {
-    50% { opacity: 0.5; }
-}
-
-/* ⭐ [추가 1] 실시간 상태 점멸 (녹색) */
-.live-indicator {
-    display: inline-block;
+/* 라이브 점멸 효과 */
+.live-dot {
     width: 10px;
     height: 10px;
-    background-color: #00ff00; /* 형광 초록 */
+    background-color: #22c55e;
     border-radius: 50%;
-    box-shadow: 0 0 0 rgba(0, 255, 0, 0.4);
-    animation: pulse-green 2s infinite;
-    margin-right: 8px;
-    vertical-align: middle;
-    margin-bottom: 3px;
+    display: inline-block;
+    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
+    animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
-@keyframes pulse-green {
-    0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+/* -----------------------------------------
+   5. Footer
+   ----------------------------------------- */
+.footer-custom {
+    background: #0f172a;
+    color: #94a3b8;
+    font-size: 0.9rem;
 }
-
-/* ⭐ [추가 2] 날씨 위젯 (슬라이드 위에 둥둥 떠있음) */
-.weather-widget {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    z-index: 100; /* 슬라이드보다 위에 */
-    background: rgba(0, 0, 0, 0.5); /* 반투명 검정 */
-    backdrop-filter: blur(5px); /* 유리 효과 */
-    padding: 10px 20px;
-    border-radius: 30px;
-    color: white;
-    display: flex;
+.footer-title {
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 1.2rem;
+}
+.footer-link {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: block;
+    margin-bottom: 8px;
+}
+.footer-link:hover {
+    color: var(--accent-cyan);
+    padding-left: 5px;
+}
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: inline-flex;
     align-items: center;
-    gap: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    justify-content: center;
+    color: white;
+    transition: all 0.3s;
+    margin-right: 8px;
+    text-decoration: none;
 }
-
-.weather-widget i {
-    font-size: 1.5rem;
-}
-
-.weather-info {
-    line-height: 1.2;
-    text-align: right;
-}
-
-.weather-temp {
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.weather-desc {
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-/* ⭐ [추가 3] 증감 추세 뱃지 */
-.trend-badge {
-    font-size: 0.8rem;
-    padding: 3px 8px;
-    border-radius: 12px;
-    vertical-align: middle;
-    margin-left: 10px;
-}
-.trend-up { background-color: rgba(25, 135, 84, 0.2); color: #198754; } /* 초록 */
-.trend-down { background-color: rgba(13, 202, 240, 0.2); color: #0dcaf0; } /* 파랑 */
-.trend-neutral { background-color: rgba(108, 117, 125, 0.2); color: #adb5bd; } /* 회색 */
-
-/* ⭐ [추가 4] 푸터 링크 호버 효과 (HTML style 태그에서 이동됨) */
-.hover-white:hover {
-    color: #fff !important;
-    transition: color 0.3s;
+.social-btn:hover {
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+    color: #0f172a;
+    transform: rotate(360deg);
 }

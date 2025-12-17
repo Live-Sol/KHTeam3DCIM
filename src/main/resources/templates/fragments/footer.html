@@ -3,88 +3,87 @@
 <body>
 
 <!--
-    th:fragment="footer" 선언
-    다른 파일에서 <div th:replace="~{fragments/footer :: footer}"></div> 로 불러올 수 있습니다.
+    [수정됨] .footer-custom 클래스 및 새로운 디자인 적용
 -->
-<footer th:fragment="footer" class="bg-dark text-white pt-5 pb-4 mt-5">
+<footer th:fragment="footer" class="footer-custom pt-5 pb-4 mt-5">
     <div class="container text-center text-md-start">
         <div class="row text-center text-md-start">
 
-            <!-- (1) 회사 소개 -->
-            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                <h5 class="text-uppercase mb-4 fw-bold text-warning">StarRoot</h5>
-                <p class="text-white-50">
+            <!-- (1) 회사 브랜드 및 소개 -->
+            <div class="col-md-4 mb-4">
+                <h4 class="footer-title brand-logo" style="font-size: 1.5rem;">StarRoot</h4>
+                <p class="text-white-50 small">
                     차세대 데이터센터 인프라 관리 시스템.<br>
                     실시간 모니터링과 효율적인 자산 관리로<br>
-                    귀사의 비즈니스 연속성을 보장합니다.
-                    StarRoot와 함께 데이터센터 운영의 미래를 경험하세요.
+                    귀사의 비즈니스 연속성을 보장합니다.<br>
+                    StarRoot와 함께 데이터센터의 미래를 경험하세요.
                 </p>
             </div>
 
-            <!-- (2) 주요 솔루션 -->
-            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h6 class="text-uppercase mb-4 fw-bold text-light">Solutions</h6>
-                <p><a href="/racks" class="text-white-50 text-decoration-none hover-white">랙 관리(추가)</a></p>
-                <p><a href="/devices" class="text-white-50 text-decoration-none hover-white">장비 관리(추가)</a></p>
-                <p><a href="#" class="text-white-50 text-decoration-none hover-white">전력 모니터링(추가)</a></p>
-                <p><a href="#" class="text-white-50 text-decoration-none hover-white">냉각 시스템(추가)</a></p>
+            <!-- (2) 주요 솔루션 (Solutions) -->
+            <div class="col-md-2 mb-4">
+                <h6 class="text-white fw-bold text-uppercase mb-3">Solutions</h6>
+                <a href="/racks" class="footer-link">Rack Management</a>
+                <a href="/devices" class="footer-link">Asset Tracking</a>
+                <a href="#" class="footer-link">Power Monitoring</a>
+                <a href="#" class="footer-link">Cooling System</a>
             </div>
 
-            <!-- (3) 바로가기 링크 -->
-            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
-                <h6 class="text-uppercase mb-4 fw-bold text-light">Quick Links</h6>
-                <p><a href="/" class="text-white-50 text-decoration-none hover-white">메인화면</a></p>
-                <p><a href="/requests/new" class="text-white-50 text-decoration-none hover-white">장비 예약하기</a></p>
-                <p><a href="#" class="text-white-50 text-decoration-none hover-white">시스템 상태(추가)</a></p>
-                <p><a href="#" class="text-white-50 text-decoration-none hover-white">고객센터(추가)</a></p>
+            <!-- (3) 바로가기 (Quick Links) -->
+            <div class="col-md-2 mb-4">
+                <h6 class="text-white fw-bold text-uppercase mb-3">Quick Links</h6>
+                <a href="/" class="footer-link">Dashboard</a>
+                <a href="/requests/new" class="footer-link">Reservation</a>
+                <a href="#" class="footer-link">Support</a>
+                <a href="#" class="footer-link">Contact Us</a>
             </div>
 
-            <!-- (4) 연락처 -->
-            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+            <!-- (4) 연락처 (Contact Us) -->
+            <div class="col-md-4 mb-4">
                 <h6 class="text-uppercase mb-4 fw-bold text-light">Contact</h6>
-                <p class="text-white-50"><i class="bi bi-geo-alt me-2 text-warning"></i> Ulsan, nam-gu, KH B/D</p>
-                <p class="text-white-50"><i class="bi bi-envelope me-2 text-warning"></i> StarRoot@KHteam3.com</p>
-                <p class="text-white-50"><i class="bi bi-phone me-2 text-warning"></i> +82 02-1234-5678</p>
-                <p class="text-white-50"><i class="bi bi-printer me-2 text-warning"></i> +82 02-9876-5432</p>
+                <p class="text-white-50"><i class="bi bi-geo-alt me-2 text-info"></i> Ulsan, nam-gu, KH B/D</p>
+                <p class="text-white-50"><i class="bi bi-envelope me-2 text-info"></i> StarRoot@KHteam3.com</p>
+                <p class="text-white-50"><i class="bi bi-phone me-2 text-info"></i> +82 02-1234-5678</p>
+                <p class="text-white-50"><i class="bi bi-printer me-2 text-info"></i> +82 02-9876-5432</p>
             </div>
-        </div>
 
-        <hr class="mb-4 border-secondary">
+            <hr class="mb-4 border-secondary">
 
-        <!-- 하단: 저작권 및 소셜 아이콘 -->
-        <div class="row align-items-center">
-            <div class="col-md-7 col-lg-8">
-                <p class="text-center text-md-start text-white-50">
-                    © 2025 Copyright:
-                    <a href="#" class="text-white text-decoration-none">
-                        <strong>KH Information Educational Institute</strong>
-                    </a>
-                </p>
-            </div>
-            <div class="col-md-5 col-lg-4">
-                <div class="text-center text-md-end">
-                    <ul class="list-unstyled list-inline">
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                <i class="bi bi-twitter-x"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                <i class="bi bi-google"></i>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
-                        </li>
-                    </ul>
+            <!-- 하단: 저작권 및 소셜 아이콘 -->
+            <div class="row align-items-center">
+                <div class="col-md-7 col-lg-8">
+                    <p class="text-center text-md-start text-white-50">
+                        © 2025 Copyright:
+                        <a href="#" class="text-white text-decoration-none">
+                            <strong>KH Information Educational Institute</strong>
+                        </a>
+                    </p>
+                </div>
+                <div class="col-md-5 col-lg-4">
+                    <div class="text-center text-md-end">
+                        <ul class="list-unstyled list-inline">
+                            <li class="list-inline-item">
+                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
+                                    <i class="bi bi-twitter-x"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
+                                    <i class="bi bi-google"></i>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
