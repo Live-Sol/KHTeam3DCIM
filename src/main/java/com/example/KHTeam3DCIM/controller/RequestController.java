@@ -9,6 +9,7 @@ import com.example.KHTeam3DCIM.repository.RequestRepository;
 import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.MemberService;
 import com.example.KHTeam3DCIM.domain.Member;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -61,7 +62,9 @@ public class RequestController {
     // 3. [관리자] 들어온 요청 목록 확인하기
     // =======================================
     @GetMapping("/requests")
-    public String requestList(Model model) {
+    public String requestList(Model model, HttpServletRequest request) {
+        // 2. request 객체를 "request"라는 이름으로 Model에 추가
+        model.addAttribute("request", request);
         // 대기 중(WAITING)인 목록만 가져오기
         model.addAttribute("requests", requestRepository.findByStatusOrderByReqDateDesc("WAITING"));
         return "request/RequestList";

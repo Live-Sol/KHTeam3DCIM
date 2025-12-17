@@ -4,6 +4,7 @@
     import com.example.KHTeam3DCIM.domain.Member;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
+    import com.example.KHTeam3DCIM.repository.RequestRepository;
     import com.example.KHTeam3DCIM.service.AdminService;
     import com.example.KHTeam3DCIM.service.AuditLogService;
     import com.example.KHTeam3DCIM.service.MemberService;
@@ -31,6 +32,15 @@
         private final AuditLogService auditLogService;
         private final AdminService adminService;
         private final MemberService memberService;
+        private final RequestRepository requestRepository;
+
+//        public AdminController(AuditLogService auditLogService, AdminService adminService,
+//                               MemberService memberService, RequestRepository requestRepository) {
+//            this.auditLogService = auditLogService;
+//            this.adminService = adminService;
+//            this.memberService = memberService;
+//            this.requestRepository = requestRepository;
+//        }
 
         @GetMapping
         public String adminDashboard(Model model, HttpServletRequest request) { // ⭐️ HttpSession 제거 ⭐️
@@ -40,7 +50,7 @@
             // 🚨 헤더용 모델 속성 제거: header.html이 sec:authorize로 정보를 직접 가져감..
 
             // --- 4. 통계/로그 데이터 추가 (데이터 처리만 남김) ---
-            int pendingRequestCount = auditLogService.getPendingRequestCount();
+            long pendingRequestCount = requestRepository.countByStatus("WAITING");
             int totalDeviceCount = auditLogService.getTotalDeviceCount();
             int totalMemberCount = auditLogService.getTotalMemberCount();
             int totalRackCount = auditLogService.getTotalRackCount();
@@ -71,7 +81,9 @@
          *  Method: GET
          */
         @GetMapping("/members")
-        public String findAllMembersAdmin(Model model) {
+        public String findAllMembersAdmin(Model model, HttpServletRequest request) {
+
+            model.addAttribute("request", request);
 
             // 1️⃣ Service 계층을 통해 전체 회원 정보를 조회
             //    - Member 엔티티가 아닌

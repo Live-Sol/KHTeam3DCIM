@@ -9,6 +9,7 @@ import com.example.KHTeam3DCIM.repository.RackRepository;
 import com.example.KHTeam3DCIM.repository.RequestRepository;
 import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.DeviceService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -38,10 +39,11 @@ public class DeviceController {
     public String list(Model model,
                        @RequestParam(required = false) String keyword,
                        @RequestParam(required = false, defaultValue = "latest") String sort,
-                       @RequestParam(required = false, defaultValue = "asc") String sortDir) {
+                       @RequestParam(required = false, defaultValue = "asc") String sortDir,
+                       HttpServletRequest request) {
 
         List<Device> devices = deviceService.searchDevices(keyword, sort, sortDir);
-
+        model.addAttribute("request", request);
         model.addAttribute("devices", devices);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sort", sort);

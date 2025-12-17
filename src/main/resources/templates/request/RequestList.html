@@ -5,67 +5,76 @@
     <title>요청 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
 </head>
 <body>
 
-<div class="container mt-5">
-    <h2 class="mb-4">🔔 입주 승인 대기 목록</h2>
-    <div class="mb-3 text-end">
-        <a href="/" class="btn btn-secondary">🏠 홈으로</a>
-    </div>
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="alert alert-info" th:if="${requests.isEmpty()}">
-        현재 대기 중인 신청 내역이 없습니다.
-    </div>
+<div class="d-flex">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <main class="main-content flex-grow-1">
 
-        <div class="col" th:each="req : ${requests}">
+        <h1 class="h3 mb-4 text-white"><i class="bi bi-bell-fill me-2"></i> 입주 승인 대기 목록</h1>
 
-            <div class="card border-warning h-100 shadow-sm">
-                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="badge bg-dark me-1">WAITING</span>
-                        <strong>No. [[${req.id}]]</strong>
+<!--        <div class="mb-3 text-end">-->
+<!--            <a href="/" class="btn custom-btn-secondary">🏠 홈으로</a>-->
+<!--        </div>-->
+
+        <div class="alert alert-info custom-alert" th:if="${requests.isEmpty()}">
+            현재 대기 중인 신청 내역이 없습니다.
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <div class="col" th:each="req : ${requests}">
+
+                <div class="card custom-card-warning h-100 shadow-sm">
+                    <div class="card-header custom-card-header-warning d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-dark custom-badge me-1">WAITING</span>
+                            <strong>No. [[${req.id}]]</strong>
+                        </div>
+                        <small class="text-white-50">신청일: [[${#temporals.format(req.reqDate, 'yyyy-MM-dd')}]]</small>
                     </div>
-                    <small>신청일: [[${#temporals.format(req.reqDate, 'yyyy-MM-dd')}]]</small>
-                </div>
 
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">회사명: [[${req.companyName}]] <small class="text-muted fs-6">회사번호: ([[${req.companyPhone}]])</small></h5>
-                    <p class="card-text mb-1"><strong>담당자:</strong> [[${req.userName}]] (연락처: [[${req.contact}]])</p>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">회사명: [[${req.companyName}]] <small class="text-white-50 fs-6">회사번호: ([[${req.companyPhone}]])</small></h5>
+                        <p class="card-text mb-1"><strong>담당자:</strong> [[${req.userName}]] (연락처: [[${req.contact}]])</p>
 
-                    <hr>
+                        <hr class="custom-hr">
 
-                    <p class="card-text mb-1"><strong>장비명:</strong> [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)</p>
+                        <p class="card-text mb-1"><strong>장비명:</strong> [[${req.vendor}]] [[${req.modelName}]] ([[${req.heightUnit}]]U)</p>
 
-                    <!-- ⭐ [추가] 전력 및 EMS 정보 표시 -->
-                    <p class="card-text mb-1">
-                        <strong>전력/EMS:</strong>
-                        <span class="text-danger fw-bold">[[${req.powerWatt}]] W</span> /
-                        <span th:if="${req.emsStatus == 'ON'}" class="badge bg-success">EMS 신청</span>
-                        <span th:unless="${req.emsStatus == 'ON'}" class="badge bg-secondary">EMS 미신청</span>
-                    </p>
+                        <p class="card-text mb-1">
+                            <strong>전력/EMS:</strong>
+                            <span class="text-danger fw-bold">[[${req.powerWatt}]] W</span> /
+                            <span th:if="${req.emsStatus == 'ON'}" class="badge custom-badge-success">EMS 신청</span>
+                            <span th:unless="${req.emsStatus == 'ON'}" class="badge custom-badge-secondary">EMS 미신청</span>
+                        </p>
 
-                    <p class="card-text mb-1"><strong>계약기간:</strong> [[${req.startDate}]] (계약: [[${req.termMonth}]]개월)</p>
-                    <p class="card-text mb-1"><strong>입고 목적:</strong></p>
-                    <p class="card-text bg-light p-2 rounded">[[${req.purpose}]]</p>
+                        <p class="card-text mb-1"><strong>계약기간:</strong> [[${req.startDate}]] (계약: [[${req.termMonth}]]개월)</p>
+                        <p class="card-text mb-1 mt-3"><strong>입고 목적:</strong></p>
+                        <p class="card-text custom-purpose-box p-2 rounded">[[${req.purpose}]]</p>
 
-                    <div class="d-flex gap-2 mt-3">
-                        <a th:href="@{/racks(reqId=${req.id})}" class="btn btn-primary flex-grow-1">
-                            🔍 자리 배정 (승인)
-                        </a>
+                        <div class="d-flex gap-2 mt-3">
+                            <a th:href="@{/racks(reqId=${req.id})}" class="btn custom-btn-primary flex-grow-1">
+                                🔍 자리 배정 (승인)
+                            </a>
 
-                        <a th:href="@{/requests/{id}/reject(id=${req.id})}"
-                           class="btn btn-outline-danger flex-grow-1"
-                           onclick="return confirm('이 신청을 반려하시겠습니까?');">
-                            ⛔ 반려
-                        </a>
+                            <a th:href="@{/requests/{id}/reject(id=${req.id})}"
+                               class="btn custom-btn-outline-danger flex-grow-1"
+                               onclick="return confirm('이 신청을 반려하시겠습니까?');">
+                                ⛔ 반려
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-
-        </div> </div> </div>
-
+        </div>
+    </main>
+</div>
 </body>
 </html>

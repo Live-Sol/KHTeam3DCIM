@@ -5,72 +5,84 @@
     <title>랙 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <link rel="stylesheet" th:href="@{/css/racks.css}">
 </head>
 <body>
 
-<!-- 🚑 [수술 완료] 헤더 이식 -->
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="container mt-5">
-    <h2 class="mb-4">🏢 서버 랙(Rack) 관리</h2>
+<div class="d-flex">
+    <div th:replace="fragments/sidebar :: sidebar"></div>
 
-    <!-- (이하 내용은 기존 파일과 동일하므로 생략하지 않고, 사용자가 덮어쓰기 좋게 전체 제공할 수도 있음) -->
-    <!-- ... 기존 테이블 코드 ... -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="/racks/new" class="btn btn-primary">➕ 새 랙 추가</a>
-        <a href="/" class="btn btn-secondary ms-2">🏠 홈으로</a>
-    </div>
+    <main class="main-content flex-grow-1">
 
-    <!-- (중략) 기존 코드 유지 -->
-    <div class="alert alert-success border-success" th:if="${reqId != null}">
-        <strong>🚀 자리 배정 모드:</strong> 현재 입주 신청서(No.[[${reqId}]])를 처리 중입니다.
-        장비를 설치할 랙의 <strong>[실장도]</strong> 버튼을 눌러주세요.
-    </div>
+        <h1 class="h3 mb-4 text-white"><i class="bi bi-server me-2"></i> 서버 랙(Rack) 관리</h1>
 
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-        <tr>
-            <th style="width: 5%">ID</th>
-            <th style="width: 15%">랙 이름</th>
-            <th style="width: 15%">위치 설명</th>
-            <th style="width: 35%">가동률 (Utilization)</th>
-            <th style="width: 30%">관리</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="rack : ${racks}">
-            <td th:text="${rack.id}">1</td>
-            <td>
-                <span th:text="${rack.rackName}" class="fw-bold">[위치 코드]</span>
-            </td>
-            <td th:text="${rack.locationDesc}">[건물내 랙 장비 위치]</td>
+        <div class="d-flex justify-content-end mb-4">
+            <a href="/racks/new" class="btn custom-btn-primary me-2">➕ 새 랙 추가</a>
+<!--            <a href="/" class="btn custom-btn-secondary">🏠 홈으로</a>-->
+        </div>
 
-            <td>
-                <div th:with="percent=${rack.totalUnit > 0 ? (rack.usedUnit * 100 / rack.totalUnit) : 0}">
-                    <div class="d-flex justify-content-between mb-1">
-                        <small>사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
-                        <small class="fw-bold">[[${percent}]]%</small>
-                    </div>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar" role="progressbar"
-                             th:style="'width: ' + ${percent} + '%'"
-                             th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}">
+        <div class="alert custom-alert-info border-info" th:if="${reqId != null}">
+            <strong>🚀 자리 배정 모드:</strong> 현재 입주 신청서(No.[[${reqId}]])를 처리 중입니다.
+            장비를 설치할 랙의 <strong>[실장도]</strong> 버튼을 눌러주세요.
+        </div>
+
+        <table class="table table-bordered table-hover align-middle custom-table-dark">
+            <thead class="table-dark">
+            <tr>
+                <th style="width: 5%">ID</th>
+                <th style="width: 15%">랙 이름</th>
+                <th style="width: 15%">위치 설명</th>
+                <th style="width: 35%">가동률 (Utilization)</th>
+                <th style="width: 30%">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rack : ${racks}">
+                <td th:text="${rack.id}">1</td>
+                <td>
+                    <span th:text="${rack.rackName}" class="fw-bold">[위치 코드]</span>
+                </td>
+                <td th:text="${rack.locationDesc}">[건물내 랙 장비 위치]</td>
+
+                <td>
+                    <div th:with="percent=${rack.totalUnit > 0 ? ((rack.usedUnit * 100.0) / rack.totalUnit) : 0}">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
+                            <small class="fw-bold">[[${#numbers.formatDecimal(percent, 0, 0)}]]%</small>
+                        </div>
+                        <div class="progress custom-progress" style="height: 10px;">
+                            <div class="progress-bar" role="progressbar"
+                                 th:style="'width: ' + ${#numbers.formatDecimal(percent, 0, 0)} + '%'"
+
+                                 th:classappend="${percent > 80 ? 'bg-danger' : (percent > 50 ? 'bg-warning' : 'bg-success')}">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </td>
+                </td>
 
-            <td>
-                <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
-                   class="btn btn-sm btn-info text-white">실장도</a>
-                <a th:href="@{/racks/{id}/edit(id=${rack.id})}" class="btn btn-sm btn-warning">수정</a>
-                <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
-                   class="btn btn-sm btn-danger"
-                   onclick="return confirm('정말 이 랙을 삭제하시겠습니까? 안에 있는 장비도 다 사라집니다!');">삭제</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                <td>
+                    <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
+                       class="btn btn-sm custom-btn-info">실장도</a>
+
+                    <a th:href="@{/racks/{id}/edit(id=${rack.id})}" class="btn btn-sm custom-btn-warning">수정</a>
+                    <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
+                       class="btn btn-sm custom-btn-danger"
+                       onclick="return confirm('정말 이 랙을 삭제하시겠습니까? 안에 있는 장비도 다 사라집니다!');">삭제</a>
+                </td>
+            </tr>
+            <tr th:if="${racks.isEmpty()}">
+                <td colspan="5" class="text-center py-4 text-sub">
+                    등록된 서버 랙이 없습니다.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
 </div>
 
 </body>

@@ -6,6 +6,7 @@ import com.example.KHTeam3DCIM.dto.Rack.RackResponse;
 import com.example.KHTeam3DCIM.dto.Rack.RackUpdateRequest;
 import com.example.KHTeam3DCIM.service.DeviceService;
 import com.example.KHTeam3DCIM.service.RackService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,8 +28,9 @@ public class RackController {
     // 1. 랙 목록 페이지
     // ==========================================
     @GetMapping("/racks")
-    public String list(Model model, @RequestParam(required = false) Long reqId) {
+    public String list(Model model, @RequestParam(required = false) Long reqId, HttpServletRequest request) {
         List<RackResponse> racks = rackService.findAllRacks();
+        model.addAttribute("request", request);
         model.addAttribute("racks", racks);
         // 신청서 승인 중이라면 reqId를 화면으로 넘겨줌
         model.addAttribute("reqId", reqId);

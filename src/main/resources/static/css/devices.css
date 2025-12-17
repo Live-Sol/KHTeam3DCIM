@@ -1,0 +1,115 @@
+/* requests.css (공통 스타일)에 아래 항목이 정의되어 있다고 가정합니다. */
+:root {
+    --dark-bg: #0f172a;
+    --card-bg: #1f2937;
+    --border-color: #374151;
+    --primary: #6366f1;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text-main: #e5e7eb; /* 흰색 텍스트 */
+    --text-sub: #9ca3af;  /* 회색 텍스트 */
+}
+
+/* Main Content Layout (sidebar.css에 없었다면 추가) */
+.main-content {
+    padding: 32px;
+    flex-grow: 1;
+}
+
+.main-content h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: var(--text-main);
+}
+
+
+/* --- Custom Table (Dark Mode) --- */
+.custom-table-dark {
+    /* 테이블 배경 */
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+.custom-table-dark thead th {
+    /* 헤더 배경 */
+    background-color: #111827 !important;
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+.custom-table-dark tbody tr {
+    /* 기본 행 색상 */
+    border-color: var(--border-color);
+}
+
+.custom-table-dark tbody tr:hover {
+    /* 마우스 오버 시 색상 */
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- Form Controls --- */
+.custom-form-control, .custom-select {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.custom-form-control::placeholder {
+    color: var(--text-sub);
+}
+
+.custom-form-control:focus, .custom-select:focus {
+    background-color: var(--dark-bg);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25); /* primary 색상 섀도우 */
+    color: var(--text-main);
+}
+
+/* --- Custom Buttons --- */
+.custom-btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+.custom-btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: #fff;
+}
+
+.custom-btn-secondary {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.custom-btn-secondary:hover {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+    color: #fff;
+}
+
+/* 수정/삭제 버튼 */
+.custom-btn-warning {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    color: #1f2937; /* 진한 텍스트 */
+}
+.custom-btn-warning:hover {
+    background-color: #d9900a;
+    border-color: #d9900a;
+    color: #1f2937;
+}
+
+.custom-btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+.custom-btn-danger:hover {
+    background-color: #cc3636;
+    border-color: #cc3636;
+    color: #fff;
+}

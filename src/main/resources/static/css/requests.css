@@ -1,0 +1,177 @@
+/* ===============================
+   Color System (관리자 테마) - 공통 변수 재정의
+================================ */
+:root {
+    --dark-bg: #0f172a;        /* 전체 배경 */
+    --card-bg: #1f2937;       /* 카드 */
+    --border-color: #374151;
+
+    --primary: #6366f1;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444; /* 반려 버튼용 추가 */
+
+    --text-main: #e5e7eb;
+    --text-sub: #9ca3af;
+    --text-muted: #6b7280;
+}
+
+/* ===============================
+   Global
+================================ */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+
+h2 {
+    font-weight: 700;
+}
+
+/* ===============================
+   Alert
+================================ */
+.custom-alert {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+}
+
+/* ===============================
+   HR
+================================ */
+.custom-hr {
+    border-top: 1px solid var(--border-color);
+    opacity: 0.5;
+}
+
+/* ===============================
+   Cards (Request Items)
+================================ */
+.custom-card-warning {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    border-left: 4px solid var(--warning); /* 강조색 */
+    transition: all 0.25s ease;
+}
+
+.custom-card-warning:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.custom-card-header-warning {
+    background-color: rgba(245, 158, 11, 0.2); /* Warning 색상에 투명도 적용 */
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    padding: 12px 20px;
+}
+
+.card-body {
+    color: var(--text-main);
+    padding: 24px 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+}
+
+/* 입고 목적 텍스트 박스 */
+.custom-purpose-box {
+    background-color: #111827; /* Darker background */
+    color: var(--text-sub);
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+/* ===============================
+   Badges
+================================ */
+.custom-badge {
+    background-color: #020617 !important;
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+}
+
+.custom-badge-success {
+    background-color: var(--success) !important;
+    color: var(--dark-bg);
+    font-weight: 600;
+}
+
+.custom-badge-secondary {
+    background-color: var(--text-muted) !important;
+    color: var(--dark-bg);
+    font-weight: 600;
+}
+
+
+/* ===============================
+   Buttons
+================================ */
+
+/* 홈으로 버튼 (Secondary) */
+.custom-btn-secondary {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.custom-btn-secondary:hover {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+    color: #fff;
+}
+
+/* 자리 배정 (Primary) - 기존 btn-light 스타일을 활용하여 재정의 */
+.custom-btn-primary {
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.custom-btn-primary:hover {
+    background-color: #4f46e5; /* Slightly darker primary on hover */
+    border-color: #4f46e5;
+}
+
+/* 반려 (Outline Danger) */
+.custom-btn-outline-danger {
+    background-color: var(--card-bg);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.custom-btn-outline-danger:hover {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+/* ===============================
+   Main Content Layout (Sidebar 옆 메인 영역)
+================================ */
+.main-content {
+    /* * 좌우에 충분한 패딩을 주어 사이드바와 콘텐츠 사이의 간격을 확보합니다.
+     * 상하 패딩은 32px, 좌우 패딩은 50px로 설정합니다.
+     */
+    padding: 32px 50px;
+    flex-grow: 1; /* flex 속성을 통해 남은 공간을 모두 차지하도록 보장 */
+}
+
+.main-content h1 {
+    font-size: 1.6rem; /* 요청 목록 제목 크기 */
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: var(--text-main);
+}
