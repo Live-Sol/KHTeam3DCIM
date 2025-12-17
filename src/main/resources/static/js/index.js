@@ -142,10 +142,10 @@ window.addEventListener('scroll', function() {
     if (!navbar) return;
 
     if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(15, 23, 42, 0.95)';
+//        navbar.style.background = 'rgba(15, 23, 42, 0.95)';
         navbar.style.padding = '0.8rem 0';
     } else {
-        navbar.style.background = 'rgba(15, 23, 42, 0.85)';
+//        navbar.style.background = 'rgba(15, 23, 42, 0.85)';
         navbar.style.padding = '1rem 0';
     }
 });
