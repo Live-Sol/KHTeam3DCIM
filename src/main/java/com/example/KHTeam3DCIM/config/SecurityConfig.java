@@ -36,7 +36,8 @@ public class SecurityConfig {
                                 "/members/signup",      // 회원가입
                                 "/members/check-id",    // 아이디 중복 확인
                                 "/members/login",       // 로그인
-                                "/members/forgot-password" // 비밀번호 찾기
+                                "/members/forgot-password", // 비밀번호 찾기
+                                "/solutions/**"         // 솔루션 페이지 전체 공개
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/members").permitAll()
                         // 관리자 페이지(/members/admin/**)는 'ADMIN' 역할을 가진 사용자만 접근 허용

@@ -31,6 +31,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
 
+                <!-- Solutions 드롭다운 메뉴 ️ -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-grid-fill me-1"></i> Solutions
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item dropdown-item-custom" href="/solutions/racks"><i class="bi bi-hdd-rack me-2 text-info"></i>Rack Management</a></li>
+                        <li><a class="dropdown-item dropdown-item-custom" href="/solutions/assets"><i class="bi bi-qr-code-scan me-2 text-warning"></i>Asset Tracking</a></li>
+                        <li><a class="dropdown-item dropdown-item-custom" href="/solutions/power"><i class="bi bi-lightning-charge me-2 text-danger"></i>Power Monitoring</a></li>
+                        <li><a class="dropdown-item dropdown-item-custom" href="/solutions/cooling"><i class="bi bi-snow me-2 text-primary"></i>Cooling System</a></li>
+                    </ul>
+                </li>
+
                 <!-- 1. 로그인한 사용자 정보 (뱃지 스타일 적용) -->
                 <li class="nav-item" sec:authorize="isAuthenticated()">
                     <span class="nav-link-custom user-badge">

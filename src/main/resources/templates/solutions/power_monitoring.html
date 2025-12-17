@@ -15,8 +15,9 @@
 <!-- 헤더 -->
 <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- 1. 페이지 히어로 (배경 이미지를 전력/에너지 테마로 변경) -->
-<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2000&auto=format&fit=crop');">
+<!-- 1. 페이지 히어로 -->
+<!-- 팁: url('') 안에 원하시는 이미지 경로를 넣으세요! -->
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/solutions/solutions_Power Monitoring.png');">
     <div class="container position-relative z-1">
         <h1 class="page-title">POWER MONITORING</h1>
         <p class="page-subtitle">
@@ -30,7 +31,6 @@
 <section class="py-5">
     <div class="container py-4">
         <div class="row g-4">
-            <!-- 특징 1 -->
             <div class="col-md-4">
                 <div class="glass-box feature-box text-center">
                     <i class="bi bi-lightning-charge feature-icon"></i>
@@ -41,7 +41,6 @@
                     </p>
                 </div>
             </div>
-            <!-- 특징 2 -->
             <div class="col-md-4">
                 <div class="glass-box feature-box text-center">
                     <i class="bi bi-graph-up-arrow feature-icon"></i>
@@ -52,7 +51,6 @@
                     </p>
                 </div>
             </div>
-            <!-- 특징 3 -->
             <div class="col-md-4">
                 <div class="glass-box feature-box text-center">
                     <i class="bi bi-battery-charging feature-icon"></i>
@@ -67,7 +65,7 @@
     </div>
 </section>
 
-<!-- 3. 시각적 신뢰 섹션 -->
+<!-- 3. 시각적 신뢰 섹션 (수정됨: 목업 대신 차트 적용) -->
 <section class="py-5 mb-5">
     <div class="container">
         <div class="stat-card">
@@ -84,11 +82,17 @@
                         에너지 리포트 예시 <i class="bi bi-file-earmark-bar-graph"></i>
                     </a>
                 </div>
-                <div class="col-lg-6 text-center mt-4 mt-lg-0">
-                    <div class="glass-box p-5 d-flex align-items-center justify-content-center" style="min-height: 300px; border: 2px dashed rgba(6,182,212,0.3);">
-                        <div class="text-center">
-                            <i class="bi bi-activity text-cyan" style="font-size: 5rem; opacity: 0.5;"></i>
-                            <p class="mt-3 text-white-50 small">Power Graph Mockup</p>
+
+                <!-- [변경됨] 목업 영역 -> 실제 차트 영역 -->
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="glass-box p-4" style="border: 1px solid rgba(6,182,212,0.3); background: rgba(15, 23, 42, 0.6);">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-white fw-bold mb-0"><i class="bi bi-activity text-cyan me-2"></i>Real-time Power Usage</h6>
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Live</span>
+                        </div>
+                        <!-- 차트 캔버스 -->
+                        <div style="height: 300px;">
+                            <canvas id="powerTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -101,5 +105,85 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js 라이브러리 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- 차트 생성 스크립트 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('powerTrendChart').getContext('2d');
+
+        // 그라데이션 효과 (Cyan 색상)
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(6, 182, 212, 0.5)'); // 위쪽: 밝은 Cyan
+        gradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)'); // 아래쪽: 투명
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                // 가상의 시간 데이터 (X축)
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                datasets: [{
+                    label: 'Total Power (kW)',
+                    data: [120, 115, 140, 180, 170, 150, 130], // 가상의 전력량 데이터
+                    borderColor: '#06b6d4', // 선 색상 (Cyan)
+                    backgroundColor: gradient, // 배경 그라데이션
+                    borderWidth: 2,
+                    tension: 0.4, // 부드러운 곡선
+                    fill: true,   // 아래 채우기
+                    pointBackgroundColor: '#0f172a',
+                    pointBorderColor: '#06b6d4',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // 범례 숨김 (깔끔하게)
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)' // 격자선 연하게
+                        },
+                        ticks: {
+                            color: '#94a3b8' // 글자색
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: function(value) {
+                                return value + ' kW';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
