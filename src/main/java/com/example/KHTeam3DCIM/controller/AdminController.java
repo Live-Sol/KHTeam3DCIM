@@ -37,7 +37,7 @@
 
             // 🚨 권한 체크 로직 제거: Spring SecurityConfig가 이미 hasRole('ADMIN')을 검사했음.
 
-            // 🚨 헤더용 모델 속성 제거: header.html이 sec:authorize로 정보를 직접 가져감.
+            // 🚨 헤더용 모델 속성 제거: header.html이 sec:authorize로 정보를 직접 가져감..
 
             // --- 4. 통계/로그 데이터 추가 (데이터 처리만 남김) ---
             int pendingRequestCount = auditLogService.getPendingRequestCount();
