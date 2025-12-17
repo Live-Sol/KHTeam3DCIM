@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-
 <nav class="sidebar" th:fragment="sidebar">
     <div class="position-sticky">
         <h5 class="text-white text-center mt-3 mb-4">
-            <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+<!--            <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard-->
         </h5>
         <ul class="nav flex-column">
 
@@ -13,7 +12,7 @@
                 <a class="nav-link"
                    th:classappend="${request.requestURI == '/admin' or request.requestURI == '/' ? 'active' : ''}"
                    aria-current="page" href="/admin">
-                    <i class="bi bi-house-door me-2"></i> 대시보드 홈.
+                    <i class="bi bi-house-door me-2"></i> 관리자 페이지
                 </a>
             </li>
 
@@ -29,7 +28,15 @@
                 <a class="nav-link"
                    th:classappend="${request.requestURI.startsWith('/devices') ? 'active' : ''}"
                    href="/devices">
-                    <i class="bi bi-pc-display me-2"></i> 장비/랙 관리
+                    <i class="bi bi-pc-display me-2"></i> 장비 관리
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${request.requestURI.startsWith('/racks') ? 'active' : ''}"
+                   href="/racks">
+                    <i class="bi bi-pc-display me-2"></i> 랙 관리
                 </a>
             </li>
 
@@ -51,12 +58,5 @@
         </ul>
     </div>
 </nav>
-
 </body>
 </html>
-
-<!--
-사이드바 추가 시
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
--->
-

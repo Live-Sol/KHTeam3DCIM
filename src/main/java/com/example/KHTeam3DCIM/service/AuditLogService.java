@@ -2,10 +2,7 @@ package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.AuditLog;
 import com.example.KHTeam3DCIM.domain.LogType;
-import com.example.KHTeam3DCIM.repository.AuditLogRepository;
-import com.example.KHTeam3DCIM.repository.DeviceRepository;
-import com.example.KHTeam3DCIM.repository.MemberRepository;
-import com.example.KHTeam3DCIM.repository.RequestRepository;
+import com.example.KHTeam3DCIM.repository.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +17,16 @@ public class AuditLogService {
     private final MemberRepository memberRepository;
     private final DeviceRepository deviceRepository;
     private final RequestRepository requestRepository;
+    private final RackRepository rackRepository;
 
     public AuditLogService(AuditLogRepository auditLogRepository, MemberRepository memberRepository,
-                           DeviceRepository deviceRepository, RequestRepository requestRepository) {
+                           DeviceRepository deviceRepository, RequestRepository requestRepository,
+                           RackRepository rackRepository) {
         this.auditLogRepository = auditLogRepository;
         this.memberRepository = memberRepository;
         this.deviceRepository = deviceRepository;
         this.requestRepository = requestRepository;
+        this.rackRepository = rackRepository;
     }
 
     // 관리자 대시보드용 로그 조회
@@ -45,6 +45,8 @@ public class AuditLogService {
         return (int) deviceRepository.count(); }
     public int getTotalMemberCount() {
         return (int) memberRepository.count(); }
+    public int getTotalRackCount() {
+        return (int) rackRepository.count(); }
 
     // 🚨 [수술 부위] 쓰기 전용 트랜잭션 추가!
     @Transactional

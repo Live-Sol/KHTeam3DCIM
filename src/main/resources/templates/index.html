@@ -10,11 +10,16 @@
 </head>
 <body>
 
-<!-- 네비게이션 헤더 -->
-<div th:replace="~{fragments/header :: header}"></div>
+<!--&lt;!&ndash; 네비게이션 헤더 &ndash;&gt;-->
+<!--<div th:replace="~{fragments/header :: header}"></div>-->
 
-<!-- 1. 메인 히어로 슬라이드 -->
-<div th:replace="~{main/slide :: slide}"></div>
+<!-- 네비게이션 헤더 -->
+<div th:replace="fragments/header :: header"></div>
+
+<!--&lt;!&ndash; 1. 메인 히어로 슬라이드 &ndash;&gt;-->
+<!--<div th:replace="~{main/slide :: slide}"></div>-->
+<!-- 메인 슬라이드 -->
+<div th:replace="main/slide :: slide"></div>
 
 <!-- 2. 핵심 요약 띠 (Summary Strip) -->
 <div class="bg-dark text-white py-4 shadow">

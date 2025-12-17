@@ -1,0 +1,42 @@
+
+/* ===============================
+   Header
+================================ */
+.navbar {
+    background-color: #020617 !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    color: var(--text-main) !important;
+    font-size: 0.9rem;
+}
+
+.nav-link:hover {
+    color: var(--primary) !important;
+}
+
+/* ===============================
+   Global
+================================ */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* ===============================
+   HR (전역)
+================================ */
+hr {
+    border-color: var(--border-color);
+}

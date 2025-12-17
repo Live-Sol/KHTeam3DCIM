@@ -43,13 +43,16 @@
             int pendingRequestCount = auditLogService.getPendingRequestCount();
             int totalDeviceCount = auditLogService.getTotalDeviceCount();
             int totalMemberCount = auditLogService.getTotalMemberCount();
+            int totalRackCount = auditLogService.getTotalRackCount();
+
             int logLimit = 5;
             List<AuditLog> recentLogs = auditLogService.getRecentActivityLogs(logLimit);
 
-            model.addAttribute("pageTitle", "대시보드 홈");
+            model.addAttribute("pageTitle", "관리자 페이지");
             model.addAttribute("pendingRequestCount", pendingRequestCount);
             model.addAttribute("totalDeviceCount", totalDeviceCount);
             model.addAttribute("totalMemberCount", totalMemberCount);
+            model.addAttribute("totalRackCount", totalRackCount);
             model.addAttribute("recentLogs", recentLogs);
             model.addAttribute("request", request);
 
