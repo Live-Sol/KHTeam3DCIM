@@ -15,51 +15,50 @@
 
 <!-- 1. 메인 히어로 슬라이드 -->
 <div class="position-relative main-slider-wrapper">
-    <!-- 슬라이드 파일 불러오기 -->
-    <div th:replace="~{main/slide :: slide}"></div>
+    <div th:replace="~{fragments/slide :: slide}"></div>
 </div>
 
 <!-- 2. 핵심 요약 띠 (Summary Strip) -->
-<div class="bg-dark text-white py-4 shadow">
+<div class="summary-strip shadow">
     <div class="container">
-        <div class="row text-center g-4">
+        <div class="row text-center m-0">
 
-            <!-- (1) 총 랙 (증가 추세) -->
-            <div class="col-md-3 border-end border-secondary">
-                <h6 class="text-secondary text-uppercase mb-2">Total Racks</h6>
+            <!-- (1) Total Racks -->
+            <div class="col-md-3 summary-item">
+                <h6 class="text-white-50 text-uppercase mb-2" style="font-size: 0.85rem;">Total Racks</h6>
                 <h2 class="fw-bold">
-                    <i class="bi bi-hdd-rack text-primary"></i> [[${totalRacks}]]
-                    <!-- ⭐ 추세 표시 -->
+                    <i class="bi bi-hdd-rack text-info me-2"></i>[[${totalRacks}]]
                     <span class="trend-badge trend-neutral" title="변동 없음"><i class="bi bi-dash"></i></span>
                 </h2>
             </div>
 
-            <!-- (2) 총 장비 (증가 추세) -->
-            <div class="col-md-3 border-end border-secondary">
-                <h6 class="text-secondary text-uppercase mb-2">Total Devices</h6>
+            <!-- (2) Total Devices -->
+            <div class="col-md-3 summary-item">
+                <h6 class="text-white-50 text-uppercase mb-2" style="font-size: 0.85rem;">Total Devices</h6>
                 <h2 class="fw-bold">
-                    <i class="bi bi-server text-success"></i> [[${stats.totalDevices}]]
-                    <!-- ⭐ 추세 표시 (하드코딩 예시: +5) -->
-                    <span class="trend-badge trend-up" title="전월 대비 증가"><i class="bi bi-arrow-up-short"></i> 5</span>
+                    <i class="bi bi-server text-success me-2"></i>[[${stats.totalDevices}]]
+                    <span class="trend-badge trend-up" title="전월 대비 증가">
+                        <i class="bi bi-arrow-up-short"></i> 5
+                    </span>
                 </h2>
             </div>
 
-            <!-- (3) PUE 지수 (감소=좋음 추세) -->
-            <div class="col-md-3 border-end border-secondary">
-                <h6 class="text-secondary text-uppercase mb-2">Power Usage (PUE)</h6>
+            <!-- (3) PUE 지수 -->
+            <div class="col-md-3 summary-item">
+                <h6 class="text-white-50 text-uppercase mb-2" style="font-size: 0.85rem;">Power Usage (PUE)</h6>
                 <h2 class="fw-bold text-info">
-                    <i class="bi bi-lightning-charge"></i> [[${stats.pue}]]
-                    <!-- ⭐ 추세 표시 (하드코딩 예시: -0.02 개선됨) -->
-                    <span class="trend-badge trend-down" title="효율 개선됨"><i class="bi bi-arrow-down-short"></i> 0.02</span>
+                    <i class="bi bi-lightning-charge me-2"></i>[[${stats.pue}]]
+                    <span class="trend-badge trend-down" title="효율 개선됨">
+                        <i class="bi bi-arrow-down-short"></i> 0.02
+                    </span>
                 </h2>
             </div>
 
-            <!-- (4) 데이터센터 환경 정보 (날씨) - 위치 변경됨 -->
-            <div class="col-md-3">
-                <h6 class="text-secondary text-uppercase mb-2">Environment (Ulsan)</h6>
+            <!-- (4) Environment (Ulsan) -->
+            <div class="col-md-3 summary-item border-0">
+                <h6 class="text-white-50 text-uppercase mb-2" style="font-size: 0.85rem;">Environment (Ulsan)</h6>
                 <h2 class="fw-bold text-warning">
-                    <i class="bi bi-cloud-sun"></i> 8℃
-                    <!-- 습도 및 냉방 부하 표시 -->
+                    <i class="bi bi-cloud-sun me-2"></i> 8℃
                     <span class="fs-6 text-white-50 ms-2" title="Humidity">
                         <i class="bi bi-droplet-fill text-primary"></i> 25%
                     </span>
@@ -69,7 +68,7 @@
     </div>
 </div>
 
-<!-- 4. 상세 대시보드 (Charts & Cards) -->
+<!-- 3. 상세 대시보드 (Charts & Cards) -->
 <div class="container py-5">
 
     <div class="row mb-4">
@@ -218,7 +217,7 @@
     </div>
 </div>
 
-<!-- 5. 푸터 (분리됨) -->
+<!-- 4. 푸터 (분리됨) -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

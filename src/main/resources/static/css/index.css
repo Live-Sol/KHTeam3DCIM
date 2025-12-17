@@ -4,46 +4,63 @@
    ========================================= */
 
 :root {
-    --primary-bg: #0f172a;       /* 아주 짙은 남색 (우주 배경) */
-    --card-bg: #1e293b;          /* (어두운 버전용) 카드 배경 */
+    --primary-bg: #0f172a;       /* 메인 배경색 (짙은 남색) */
+    --card-bg: #ffffff;          /* 카드 배경 (흰색) */
     --accent-cyan: #06b6d4;      /* 형광 청록 (포인트 1) */
     --accent-purple: #8b5cf6;    /* 보라 (포인트 2) */
-    --text-main: #f1f5f9;        /* 메인 텍스트 (밝은 회색) */
-    --glass-border: rgba(255, 255, 255, 0.1); /* 유리 테두리 */
+    --text-main: #f1f5f9;        /* 메인 텍스트 */
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #f0f2f5;
     color: #333;
-    overflow-x: hidden; /* 가로 스크롤 방지 */
+    overflow-x: hidden;
 }
 
 /* -----------------------------------------
    1. Header (네비게이션)
    ----------------------------------------- */
 .navbar-custom {
-    background: rgba(15, 23, 42, 0.85); /* 반투명 배경 */
-    backdrop-filter: blur(12px);        /* 유리 블러 효과 */
+    background: rgba(15, 23, 42, 0.95); /* 스크롤 무관하게 항상 진한 색상 유지 */
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--glass-border);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     padding: 1rem 0;
-    transition: all 0.3s ease;
+    transition: padding 0.3s ease; /* 패딩 애니메이션만 유지 */
 }
 
-/* 로고 스타일 */
+/* ⭐ [Cosmic Flow 로고 적용됨] */
 .brand-logo {
-    font-family: 'Orbitron', sans-serif; /* 테크 느낌 폰트 */
+    font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
+    letter-spacing: 1px;
+    text-decoration: none;
+
+    /* 3가지 색상을 섞어서 배경으로 지정 (반복 흐름) */
+    background: linear-gradient(
+        120deg,
+        #22d3ee 0%,
+        #a855f7 30%,
+        #22d3ee 60%,
+        #a855f7 100%
+    );
+    background-size: 200% auto; /* 배경을 크게 늘려서 이동할 공간 확보 */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-    letter-spacing: 1px;
+
+    /* 흐르는 애니메이션 실행 */
+    animation: shine-flow 3s linear infinite;
 }
 
-/* 메뉴 아이템 호버 효과 */
+@keyframes shine-flow {
+    to {
+        background-position: 200% center;
+    }
+}
+
 .nav-link-custom {
     color: rgba(255, 255, 255, 0.8) !important;
     font-weight: 500;
@@ -73,7 +90,6 @@ body {
     left: 0;
 }
 
-/* 사용자 뱃지 (로그인 정보) */
 .user-badge {
     background: rgba(255, 255, 255, 0.1);
     padding: 5px 15px;
@@ -101,10 +117,9 @@ body {
     object-fit: cover;
     height: 100%;
     width: 100%;
-    filter: brightness(0.5) contrast(1.1); /* 약간 어둡고 선명하게 */
+    filter: brightness(0.5) contrast(1.1);
 }
 
-/* [수정됨] 텍스트가 이미지 위에 뜨도록 위치 설정 추가 */
 .hero-caption {
     position: absolute;
     top: 50%;
@@ -127,59 +142,47 @@ body {
     margin-bottom: 1rem;
 }
 
-/* ⭐ [추가됨] Hero 버튼 스타일 (StarRoot 컨셉) */
-/* slide.html 내의 버튼을 자동으로 타겟팅하여 디자인 변경 */
+/* 버튼 스타일 (StarRoot 컨셉) */
 .hero-caption .btn {
     position: relative;
-    font-family: 'Orbitron', sans-serif; /* 테크 폰트 적용 */
+    font-family: 'Orbitron', sans-serif;
     font-weight: 700;
-    color: #fff !important; /* 글자는 항상 흰색 */
-    border: 2px solid #22d3ee; /* StarRoot Cyan 테두리 */
-    background-color: transparent; /* 기본 배경 투명 */
-
-    /* 그라데이션 차오르는 효과 준비 */
+    color: #fff !important;
+    border: 2px solid #22d3ee;
+    background-color: transparent;
     background-image: linear-gradient(135deg, #22d3ee 0%, #a855f7 100%);
-    background-size: 0% 100%; /* 처음엔 너비 0% */
+    background-size: 0% 100%;
     background-repeat: no-repeat;
     background-position: left center;
-
     transition: background-size 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 box-shadow 0.3s ease,
                 transform 0.3s ease,
                 border-color 0.3s ease;
-
-    box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); /* 은은한 기본 광채 */
-    overflow: hidden; /* 내부 넘침 방지 */
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+    overflow: hidden;
 }
 
-/* 호버 시 효과: 그라데이션 채우기 + 네온 글로우 */
 .hero-caption .btn:hover {
-    background-size: 100% 100%; /* 배경 꽉 채우기 (Sliding effect) */
-    border-color: #a855f7; /* 테두리색을 보라색으로 자연스럽게 블렌딩 */
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8), /* 강한 네온 빛 */
-                0 0 5px rgba(255, 255, 255, 0.5);
-    transform: translateY(-3px); /* 살짝 떠오르는 느낌 */
+    background-size: 100% 100%;
+    border-color: #a855f7;
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8), 0 0 5px rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
 }
 
 /* -----------------------------------------
    3. Summary Strip (요약 띠)
    ----------------------------------------- */
 .summary-strip {
-    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    background-color: var(--primary-bg);
     color: white;
     padding: 2rem 0;
-    position: relative;
-    top: -40px; /* 슬라이드 위로 겹침 */
-    margin-bottom: -40px;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-    z-index: 20;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .summary-item {
     position: relative;
 }
-/* 각 아이템 사이 구분선 */
+
 .summary-item:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -202,7 +205,7 @@ body {
 .trend-neutral { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
 
 /* -----------------------------------------
-   4. Dashboard Cards (차트 카드)
+   4. Dashboard Cards
    ----------------------------------------- */
 .section-title {
     font-weight: 800;
@@ -222,7 +225,7 @@ body {
 }
 
 .stat-card {
-    background: #fff;
+    background: var(--card-bg);
     border: none;
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -236,7 +239,6 @@ body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* 카드 상단 컬러 라인 */
 .card-header-line {
     height: 6px;
     width: 100%;
@@ -248,7 +250,6 @@ body {
 .line-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 .line-success { background: linear-gradient(90deg, #10b981, #34d399); }
 
-/* 라이브 점멸 효과 */
 .live-dot {
     width: 10px;
     height: 10px;
@@ -268,7 +269,7 @@ body {
    5. Footer
    ----------------------------------------- */
 .footer-custom {
-    background: #0f172a;
+    background-color: var(--primary-bg);
     color: #94a3b8;
     font-size: 0.9rem;
 }
@@ -309,24 +310,21 @@ body {
 }
 
 /* -----------------------------------------
-   6. Recent Logs (최근 로그) - Light Tech Style
-   [수정됨] 배경을 흰색으로 변경하여 밝은 느낌 + 포인트 컬러 유지
+   6. Recent Logs
    ----------------------------------------- */
 .log-card {
-    background: #ffffff; /* 기존 어두운 배경에서 흰색으로 변경 */
+    background: #ffffff;
     border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
-
 .log-header {
-    background: #ffffff; /* 헤더도 흰색 */
-    border-bottom: 2px solid #f1f5f9; /* 연한 회색 구분선 */
+    background: #ffffff;
+    border-bottom: 2px solid #f1f5f9;
     padding: 1.2rem 1.5rem;
 }
-
 .log-title {
     font-family: 'Orbitron', sans-serif;
-    color: #1e293b; /* 짙은 남색 텍스트 (가독성 UP) */
+    color: #1e293b;
     margin: 0;
     display: flex;
     align-items: center;
@@ -334,59 +332,47 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
 }
-
 .log-table {
     margin-bottom: 0;
-    color: #333; /* 기본 텍스트 색상 */
+    color: #333;
     width: 100%;
 }
-
-/* 테이블 헤더 커스텀 (밝은 버전) */
 .log-table thead th {
-    background-color: #f8fafc !important; /* 아주 연한 회색 배경 */
-    border-bottom: 2px solid var(--accent-cyan); /* 포인트 컬러 라인 유지 */
-    color: #64748b; /* 차분한 회색 텍스트 */
+    background-color: #f8fafc !important;
+    border-bottom: 2px solid var(--accent-cyan);
+    color: #64748b;
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.85rem;
     padding: 1rem;
     border-top: none;
 }
-
-/* 테이블 바디 커스텀 (밝은 버전) */
 .log-table tbody td {
     background-color: transparent !important;
-    border-bottom: 1px solid #f1f5f9; /* 연한 구분선 */
+    border-bottom: 1px solid #f1f5f9;
     padding: 1rem;
     vertical-align: middle;
-    color: #334155; /* 짙은 회색 */
+    color: #334155;
 }
-
 .log-table tbody tr {
     transition: all 0.2s ease-in-out;
 }
-
-/* 행 호버 효과 (밝은 Cyan 틴트) */
 .log-table tbody tr:hover td {
-    background-color: rgba(6, 182, 212, 0.03) !important; /* 아주 연한 Cyan */
+    background-color: rgba(6, 182, 212, 0.03) !important;
     color: #0f172a;
 }
 .log-table tbody tr:hover {
-    box-shadow: inset 3px 0 0 var(--accent-cyan); /* 왼쪽 빛나는 띠 유지 */
+    box-shadow: inset 3px 0 0 var(--accent-cyan);
 }
-
-/* 시간 텍스트 (Digital Font) */
 .log-time {
     color: #64748b;
     font-family: 'Consolas', 'Monaco', monospace;
     font-weight: 600;
     letter-spacing: -0.5px;
 }
-
-/* 유저 뱃지 (가독성 개선) */
 .log-badge {
-    background: rgba(139, 92, 246, 0.1); /* 연한 보라 배경 */
-    color: #7c3aed; /* 진한 보라 텍스트 */
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
     border: 1px solid rgba(139, 92, 246, 0.2);
     padding: 4px 12px;
     border-radius: 999px;
