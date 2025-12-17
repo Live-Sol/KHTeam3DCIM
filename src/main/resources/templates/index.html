@@ -32,19 +32,19 @@
             <!-- (1) Total Racks -->
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Total Racks</h6>
-                <h2 class="summary-value">
-                    <i class="bi bi-hdd-rack text-info me-2"></i>[[${totalRacks}]]
-                    <span class="trend-badge trend-neutral" title="변동 없음"><i class="bi bi-dash"></i></span>
+                <h2 class="summary-value text-info">
+                    <i class="bi bi-hdd-rack me-2"></i>[[${totalRacks}]]
+                    <span class="trend-badge trend-neutral" title="변동 없음">(<i class="bi bi-dash"></i>)</span>
                 </h2>
             </div>
 
             <!-- (2) Total Devices -->
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Total Devices</h6>
-                <h2 class="summary-value">
-                    <i class="bi bi-server text-success me-2"></i>[[${stats.totalDevices}]]
+                <h2 class="summary-value text-success">
+                    <i class="bi bi-server me-2"></i>[[${stats.totalDevices}]]
                     <span class="trend-badge trend-up" title="전월 대비 증가">
-                        <i class="bi bi-arrow-up-short"></i> 5
+                        (<i class="bi bi-arrow-up-short"></i> 1)
                     </span>
                 </h2>
             </div>
@@ -55,7 +55,7 @@
                 <h2 class="summary-value text-cyan">
                     <i class="bi bi-lightning-charge me-2"></i>[[${stats.pue}]]
                     <span class="trend-badge trend-down" title="효율 개선됨">
-                        <i class="bi bi-arrow-down-short"></i> 0.02
+                        (<i class="bi bi-arrow-down-short"></i> 0.02)
                     </span>
                 </h2>
             </div>
