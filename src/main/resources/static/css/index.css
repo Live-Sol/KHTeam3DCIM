@@ -1,6 +1,7 @@
 /* index.css - 메인 대시보드 스타일 */
 
-/* 폰트 설정 */
+/* ... (기존 스타일 유지: hero-carousel, stat-card 등) ... */
+
 body {
     font-family: 'Noto Sans KR', sans-serif;
     background-color: #f8f9fa;
@@ -8,7 +9,7 @@ body {
 
 /* 1. 히어로 슬라이드 섹션 */
 .hero-carousel {
-    height: 600px; /* 슬라이드 높이 고정 */
+    height: 600px;
     position: relative;
 }
 
@@ -17,10 +18,10 @@ body {
 }
 
 .carousel-item img {
-    object-fit: cover; /* 이미지가 찌그러지지 않고 꽉 차게 */
+    object-fit: cover;
     height: 100%;
     width: 100%;
-    filter: brightness(0.6); /* 글씨 잘 보이게 이미지 살짝 어둡게 */
+    filter: brightness(0.6);
 }
 
 .hero-caption {
@@ -79,13 +80,85 @@ body {
     margin-bottom: 15px;
 }
 
-/* 깜빡임 효과 (경고용) */
+/* 깜빡임 효과 (경고용 - 빨강) */
 .blink {
     animation: blinker 1.5s linear infinite;
 }
 
 @keyframes blinker {
-    50% {
-        opacity: 0.5;
-    }
+    50% { opacity: 0.5; }
+}
+
+/* ⭐ [추가 1] 실시간 상태 점멸 (녹색) */
+.live-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #00ff00; /* 형광 초록 */
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(0, 255, 0, 0.4);
+    animation: pulse-green 2s infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+    margin-bottom: 3px;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+}
+
+/* ⭐ [추가 2] 날씨 위젯 (슬라이드 위에 둥둥 떠있음) */
+.weather-widget {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    z-index: 100; /* 슬라이드보다 위에 */
+    background: rgba(0, 0, 0, 0.5); /* 반투명 검정 */
+    backdrop-filter: blur(5px); /* 유리 효과 */
+    padding: 10px 20px;
+    border-radius: 30px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.weather-widget i {
+    font-size: 1.5rem;
+}
+
+.weather-info {
+    line-height: 1.2;
+    text-align: right;
+}
+
+.weather-temp {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.weather-desc {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* ⭐ [추가 3] 증감 추세 뱃지 */
+.trend-badge {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+.trend-up { background-color: rgba(25, 135, 84, 0.2); color: #198754; } /* 초록 */
+.trend-down { background-color: rgba(13, 202, 240, 0.2); color: #0dcaf0; } /* 파랑 */
+.trend-neutral { background-color: rgba(108, 117, 125, 0.2); color: #adb5bd; } /* 회색 */
+
+/* ⭐ [추가 4] 푸터 링크 호버 효과 (HTML style 태그에서 이동됨) */
+.hover-white:hover {
+    color: #fff !important;
+    transition: color 0.3s;
 }
