@@ -12,10 +12,13 @@ import java.util.List;
 @Repository
 public interface RequestRepository extends JpaRepository<Request, Long> {
 
-    // 1. 상태별로 조회 (WAITING 인 것만 관리자가 봐야 하기 때문!!)
+    // 1. 상태별로 조회 (관리자용)
     List<Request> findByStatusOrderByReqDateDesc(String status);
 
-    // 2. 상태별 '개수' 세기 (대시보드 숫자용)
-    // SQL: SELECT COUNT(*) FROM DC_REQUEST WHERE STATUS = ?
+    // 2. 상태별 '개수' 세기 (대시보드용)
     long countByStatus(String status);
+
+    // 3. [추가] 특정 사용자(memberId)가 신청한 내역을 최신순으로 조회 (이용자 이력용)
+    // 💡 주의: Request 엔티티에 private String memberId; 필드가 있어야 합니다.
+    List<Request> findByMemberIdOrderByReqDateDesc(String memberId);
 }

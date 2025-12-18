@@ -11,4 +11,7 @@ public interface RackRepository extends JpaRepository<Rack,Long> {
     // 모든 랙의 총 높이(Total Unit) 합계 구하기 (전체 공간 계산용)
     @Query("SELECT COALESCE(SUM(r.totalUnit), 0) FROM Rack r")
     Long sumTotalRackUnit();
+
+    // 중복 렉 처리
+    boolean existsByRackName(String rackName);
 }

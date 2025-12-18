@@ -276,34 +276,6 @@ public class DeviceService {
         auditLogService.saveLog(currentMemberId, "장비 정보 및 위치 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
     }
 
-//    @Transactional
-//    public void updateDevice(Long id, Device formDevice) {
-//        Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
-//
-//        // 🚑 [수정] 충돌 검사 로직이 필요하다면 여기에 추가해야 함 (현재는 생략)
-//
-//        target.setVendor(formDevice.getVendor());
-//        target.setModelName(formDevice.getModelName());
-//        target.setSerialNum(formDevice.getSerialNum());
-//        target.setIpAddr(formDevice.getIpAddr());
-//
-//        // ⭐ [수정] 여기가 빠져있어서 수정이 안 됐습니다!
-//        target.setPowerWatt(formDevice.getPowerWatt());
-//        target.setEmsStatus(formDevice.getEmsStatus());
-//        target.setContractMonth(formDevice.getContractMonth());
-//        target.setContractDate(formDevice.getContractDate());
-//        target.setCompanyName(formDevice.getCompanyName());
-//        target.setCompanyPhone(formDevice.getCompanyPhone());
-//        target.setUserName(formDevice.getUserName());
-//        target.setContact(formDevice.getContact());
-//        target.setDescription(formDevice.getDescription());
-//
-//        // 위치 변경은 현재 미지원 (복잡도 때문)
-//
-//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-//        auditLogService.saveLog(currentMemberId, "장비 정보 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
-//    }
-
     @Transactional
     public String toggleStatus(Long id) {
         Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));

@@ -66,12 +66,31 @@
                     </ul>
                 </li>
 
-                <!-- 2. 입고 신청 -->
-                <li class="nav-item" sec:authorize="!hasRole('ADMIN')">
-                    <a class="nav-link nav-link-custom" href="/requests/new">
-                        <i class="bi bi-pencil-square me-1"></i> 장비 입고 신청
+                <!-- 2. 장비 -->
+                <li class="nav-item dropdown" sec:authorize="!hasRole('ADMIN')">
+                    <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-hdd-stack me-2"></i> 장비
                     </a>
+                    <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="navbarDropdown4">
+                        <li sec:authorize="!hasRole('ADMIN')">
+                            <a class="dropdown-item dropdown-item-custom" href="/requests/new">
+                                <i class="bi-plus-circle-dotted me-2 text-success"></i>장비 입고 신청
+                            </a>
+                        </li>
+                        <li sec:authorize="!hasRole('ADMIN')">
+                            <a class="dropdown-item dropdown-item-custom" href="/requests/my">
+                                <i class="bi-clock-history me-2 text-success"></i>나의 입고 이력
+                            </a>
+                        </li>
+                    </ul>
                 </li>
+
+<!--                &lt;!&ndash; 2. 입고 신청 &ndash;&gt;-->
+<!--                <li class="nav-item" sec:authorize="!hasRole('ADMIN')">-->
+<!--                    <a class="nav-link nav-link-custom" href="/requests/new">-->
+<!--                        <i class="bi bi-pencil-square me-1"></i> 장비 입고 신청-->
+<!--                    </a>-->
+<!--                </li>-->
 
                 <!-- 3. 사용자 정보 (디자인 개선됨) -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">

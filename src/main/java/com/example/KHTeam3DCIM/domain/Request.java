@@ -73,4 +73,8 @@ public class Request {
 
     @Column(name = "TERM_MONTH")
     private Integer termMonth; // 계약 기간
+
+    // ⭐ [추가] 이 신청을 작성한 사용자 ID
+    @Column(name = "MEMBER_ID", nullable = false, columnDefinition = "VARCHAR2(255) DEFAULT 'SYSTEM'")
+    private String memberId;
 }

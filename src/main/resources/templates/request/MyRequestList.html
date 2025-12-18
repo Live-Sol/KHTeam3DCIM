@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 입고 신청 내역</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/myRequestList.css">
+</head>
+<body>
+
+<div class="main-content container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-white border-bottom pb-2">
+            <i class="bi bi-list-check me-2"></i>나의 입고 신청 내역
+        </h3>
+        <a th:href="@{/requests/new}" class="btn custom-btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>새 신청 작성
+        </a>
+    </div>
+
+    <div class="table-responsive table-container">
+        <table class="table table-hover admin-table">
+            <thead>
+            <tr>
+                <th style="width: 15%">신청일</th>
+                <th style="width: 35%">장비 정보 (제조사/모델)</th>
+                <th style="width: 15%">규격</th>
+                <th style="width: 15%">입고 희망일</th>
+                <th style="width: 20%">진행 상태</th>
+            </tr>
+            </thead>
+            <tbody class="text-center">
+            <tr th:each="req : ${requests}">
+                <td>
+                    <span class="text-white" th:text="${#temporals.format(req.reqDate, 'yyyy-MM-dd')}">2023-12-01</span>
+                    <br><small class="text-sub-muted" th:text="${#temporals.format(req.reqDate, 'HH:mm')}">14:30</small>
+                </td>
+                <td class="text-center ps-4">
+                    <strong class="text-white" th:text="${req.vendor}">Dell</strong>
+                    <span class="text-sub-muted mx-1">/</span>
+                    <span class="text-white" th:text="${req.modelName}">PowerEdge R740</span>
+                </td>
+                <td>
+                    <span class="badge bg-secondary px-2" th:text="${req.heightUnit} + ' U'">2 U</span>
+                </td>
+                <td class="text-white" th:text="${req.startDate}">2023-12-15</td>
+                <td>
+                    <span th:if="${req.status == 'WAITING'}" class="badge bg-warning text-dark status-badge">
+                        <i class="bi bi-clock-history me-1"></i>대기 중
+                    </span>
+                    <span th:if="${req.status == 'APPROVED'}" class="badge bg-success status-badge">
+                        <i class="bi bi-check-circle me-1"></i>승인 완료
+                    </span>
+                    <span th:if="${req.status == 'REJECTED'}" class="badge bg-danger status-badge">
+                        <i class="bi bi-x-circle me-1"></i>반려됨
+                    </span>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="5" class="text-center py-5 text-sub-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                    신청 내역이 존재하지 않습니다.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a th:href="@{/}" class="btn custom-btn-secondary">홈으로 이동</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+/* ===============================
+   [공통] Color System & Global
+================================ */
+:root {
+    --dark-bg: #0f172a;        /* 전체 배경 */
+    --panel-bg: #1e293b;       /* 사이드바/컨테이너 배경 */
+    --card-bg: #1f2937;        /* 카드 배경 */
+    --border-color: #374151;   /* 보더 색상 */
+    --header-bg: #334155;      /* 테이블 헤더 */
+
+    --primary: #6366f1;        /* 메인 포인트 컬러 */
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+
+    --text-main: #e5e7eb;      /* 주 텍스트 */
+    --text-sub: #9ca3af;       /* 보조 텍스트 */
+    --text-muted: #6b7280;     /* 비활성 텍스트 */
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Noto Sans KR', 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+/* ===============================
+   [레이아웃] Main Content
+================================ */
+.main-content {
+    padding: 32px 50px;
+    flex-grow: 1;
+}
+
+.main-content h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ===============================
+   [테이블] Admin Table Style
+================================ */
+.table-container {
+    background-color: var(--panel-bg) !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color) !important;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.admin-table {
+    margin-bottom: 0 !important;
+    color: var(--text-main) !important;
+    width: 100%;
+}
+
+.admin-table thead th {
+    background-color: var(--header-bg) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    font-weight: 500 !important;
+    padding: 15px !important;
+    text-align: center;
+}
+
+.admin-table tbody td {
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 15px !important;
+    vertical-align: middle;
+    background-color: transparent !important;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ===============================
+   [컴포넌트] Buttons & Badges
+================================ */
+.custom-btn-primary {
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: #fff !important;
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.custom-btn-primary:hover {
+    background-color: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.custom-btn-secondary {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main) !important;
+    border-radius: 6px;
+}
+
+.custom-btn-secondary:hover {
+    background-color: var(--text-muted);
+}
+
+/* 상태 배지 (Badge) */
+.status-badge {
+    width: 90px;
+    padding: 6px 0;
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.text-sub-muted {
+    color: var(--text-sub) !important;
+    font-size: 0.85rem;
+}

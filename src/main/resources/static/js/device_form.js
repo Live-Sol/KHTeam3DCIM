@@ -115,3 +115,52 @@ function loadRequestData(selectObj) {
         alert("신청서 내용이 불러와졌습니다.\n데이터 보호를 위해 신청서 관련 정보는 수정할 수 없습니다.\n\n'랙 위치', '시리얼 번호', 'IP'를 입력 후 등록하세요.");
     }
 }
+
+// 2. 추가: 랙 선택 시 max 속성 업데이트
+/**
+ * 랙 선택 시 호출되는 함수: 시작 유닛과 높이의 max 속성을 업데이트
+ */
+function updateMaxUnit(rackSelect) {
+    if (!rackSelect) return;
+
+    const selectedOption = rackSelect.options[rackSelect.selectedIndex];
+    if (!selectedOption || selectedOption.value === "") return;
+
+    const totalUnit = selectedOption.getAttribute('data-total-unit');
+    const startUnitInput = document.querySelector('input[name="startUnit"]');
+    const heightUnitInput = document.querySelector('input[name="heightUnit"]');
+
+    if (totalUnit) {
+        if (startUnitInput) startUnitInput.max = totalUnit;
+        if (heightUnitInput) heightUnitInput.max = totalUnit;
+        console.log("선택된 랙의 최대 유닛: " + totalUnit + "U");
+    }
+}
+
+// 3. 추가: 페이지 초기화 로직 (HTML에서 호출)
+/**
+ * 페이지 초기화 로직
+ * @param {string} errorMsg - 서버에서 전달된 에러 메시지
+ */
+function initializeForm(errorMsg) {
+    const rackSelect = document.querySelector('select[name="rackId"]');
+
+    // 1. 페이지 로드 시 이미 랙이 선택되어 있다면 max 설정
+    if (rackSelect && rackSelect.value) {
+        updateMaxUnit(rackSelect);
+    }
+
+    // 2. 에러 메시지가 존재하는 경우 처리
+    if (errorMsg) {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.focus();
+        }
+    }
+    // 3. 에러는 없지만 랙을 선택해야 하는 경우 포커스
+    else {
+        if (rackSelect && !rackSelect.value && !rackSelect.disabled) {
+            rackSelect.focus();
+        }
+    }
+}

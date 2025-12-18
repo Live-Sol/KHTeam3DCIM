@@ -132,8 +132,16 @@ public class DeviceController {
             if (cateId == null || cateId.trim().isEmpty()) {
                 throw new IllegalArgumentException("장비 종류(Category)를 선택해야 합니다.");
             }
-
             // 0-1. 필수 입력값 빈 값 체크
+            if (device.getCompanyName() == null || device.getCompanyName().trim().isEmpty()) {
+                throw new IllegalArgumentException("회사명은 필수 입력 항목입니다.");
+            }
+            if (device.getUserName() == null || device.getUserName().trim().isEmpty()) {
+                throw new IllegalArgumentException("담당자 이름은 필수 입력 항목입니다.");
+            }
+            if (device.getContact() == null || device.getContact().trim().isEmpty()) {
+                throw new IllegalArgumentException("담당자 연락처는 필수 입력 항목입니다.");
+            }
             if (device.getSerialNum() == null || device.getSerialNum().trim().isEmpty()) {
                 throw new IllegalArgumentException("시리얼 번호는 필수 입력 항목입니다.");
             }
