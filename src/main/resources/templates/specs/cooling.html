@@ -2,26 +2,118 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>StarRoot - Cooling Specs</title>
+    <title>StarRoot - Power Specs</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="/css/index.css" rel="stylesheet">
     <style>
-        .spec-table {
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
-            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(10px);
+        /* [수정] 스크롤 가능한 테이블 래퍼 */
+        .spec-scroll-wrapper {
+            max-height: 600px; /* 이 높이를 넘어가면 스크롤 생김 */
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(30, 41, 59, 0.4);
+            /* 커스텀 스크롤바 디자인 */
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-cyan) rgba(15, 23, 42, 0.5);
         }
-        .spec-table th, .spec-table td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
-        .spec-table th { background: rgba(59, 130, 246, 0.1); color: #fff; width: 30%; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.05); } /* Blue Tint */
-        .spec-table tr:last-child td, .spec-table tr:last-child th { border-bottom: none; }
+        /* 웹킷(크롬 등) 스크롤바 커스텀 */
+        .spec-scroll-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .spec-scroll-wrapper::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .spec-scroll-wrapper::-webkit-scrollbar-thumb {
+            background-color: var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        /* 스펙 테이블 스타일 (수정됨: 헤더 배경색 불투명 처리) */
+        .spec-table {
+            width: 100%;
+            border-collapse: separate; /* collapse 대신 separate 사용 */
+            border-spacing: 0;
+        }
+        .spec-table th, .spec-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /*  헤더 고정 및 배경색 지정  */
+        .spec-table th {
+            /* 배경색을 반투명이 아닌 완전한 색상으로 지정하여 글자 겹침 방지 */
+            background-color: #1e293b; /* 짙은 남색 배경 */
+            color: #fff; /* 글자색 흰색 */
+            width: 30%;
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.05);
+
+            /* 하단 테두리 추가 (헤더 구분선) */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .spec-table tr:last-child td, .spec-table tr:last-child th {
+            border-bottom: none;
+        }
+
+        /* [수정] 이미지 슬라이더 스타일 개선 */
+        .product-carousel {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #1e293b; /* 이미지가 비어있는 공간을 채울 배경색 */
+        }
+        .product-carousel .carousel-item {
+            height: 500px; /* 높이를 늘려서 랙 장비 전체가 잘 보이게 함 */
+        }
+        .product-carousel .carousel-item img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain; /* 이미지가 잘리지 않고 전체가 다 보이게 설정 */
+            padding: 20px; /* 테두리와 이미지 사이 여백 */
+        }
+
+        /* 제품 섹션 구분선 */
+        .product-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 100px 0;
+            position: relative;
+        }
+        .product-divider::after {
+            content: 'PRODUCT LINEUP';
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--primary-bg);
+            padding: 0 15px;
+            letter-spacing: 2px;
+        }
+
+        /* 특징 박스 */
+        .feature-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent-cyan);
+        }
     </style>
 </head>
 <body class="dashboard-body">
 
 <div th:replace="~{fragments/header :: header}"></div>
 
+<!-- 페이지 히어로 섹션 -->
 <section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1563770095-2889f5c507c5?q=80&w=2000&auto=format&fit=crop');">
     <div class="container position-relative z-1">
         <h1 class="page-title">PRECISION COOLING</h1>
@@ -30,62 +122,587 @@
 </section>
 
 <div class="container py-5">
+
+    <!-- =========================================
+         [제품 1] 팬, 필터 팬, 공기 대 공기 열교환기
+         ========================================= -->
     <div class="row g-5">
-        <div class="col-lg-5">
-            <h3 class="section-header text-primary mb-4">THERMAL MANAGEMENT</h3>
-            <p class="text-white-50 mb-4" style="line-height: 1.8;">
-                서버실의 온습도를 일정하게 유지하는 정밀 공조 시스템입니다.
-                바닥 공조(Downflow) 방식과 열복도/냉복도(Hot/Cold Aisle) 컨테인먼트 구성을 통해
-                냉방 효율을 극대화하고 PUE를 낮춥니다.
-            </p>
-            <div class="glass-box text-center p-4 border border-primary border-opacity-25">
-                <i class="bi bi-thermometer-snow text-primary" style="font-size: 3rem;"></i>
-                <h5 class="text-white mt-3">Target Temperature</h5>
-                <h2 class="text-white fw-bold">22℃ ± 2℃</h2>
-                <small class="text-white-50">Humidity: 45% ± 5%</small>
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">팬, 필터 팬, 공기 대 공기 열교환기</h3>
+            <p class="text-cyan mb-4">주변 공기로 냉각시키는 장치는 특히 경제적으로 열 부하를 분산시키는 데 적합. 전제 조건: 상대적으로 깨끗한 주변 공기, 원하는 인클로저 내부 온도보다 낮은 온도.</p>
+
+            <div id="carouselCooling1" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="1"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling1" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling1" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
             </div>
         </div>
 
-        <div class="col-lg-7">
-            <h4 class="text-white fw-bold mb-3"><i class="bi bi-fan me-2"></i>Cooling Unit Specs</h4>
-            <table class="spec-table">
-                <tr>
-                    <th>Equipment Type</th>
-                    <td>CRAC (Computer Room Air Conditioner)</td>
-                </tr>
-                <tr>
-                    <th>Cooling Capacity</th>
-                    <td>100 kW (Sensible Cooling)</td>
-                </tr>
-                <tr>
-                    <th>Airflow Direction</th>
-                    <td>Downflow (Raised Floor)</td>
-                </tr>
-                <tr>
-                    <th>Fan Type</th>
-                    <td>EC Fan (Variable Speed Control)</td>
-                </tr>
-                <tr>
-                    <th>Refrigerant</th>
-                    <td>R-410A / R-407C (Eco-friendly)</td>
-                </tr>
-                <tr>
-                    <th>Humidifier</th>
-                    <td>Electrode Steam Humidifier (3-10 kg/h)</td>
-                </tr>
-                <tr>
-                    <th>Filter Grade</th>
-                    <td>G4 / F7 Efficiency Filters</td>
-                </tr>
-                <tr>
-                    <th>Control Interface</th>
-                    <td>7" Touchscreen Display & Modbus/SNMP</td>
-                </tr>
-                <tr>
-                    <th>Redundancy</th>
-                    <td>N+1 Configuration</td>
-                </tr>
-            </table>
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 2] 냉각 장치, Thermoelectric Cooler ** 제품이 많아서 따로 진행하자!
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">냉각 장치, Thermoelectric Cooler</h3>
+            <p class="text-cyan mb-4">냉각 장치를 통해 인클로저 내부 온도는 주위온도와 상관없이 일정한 수준으로 유지될 수 있음. 공기 유도는 개별 요구사항을 충족함. 두 개의 순환 회로가 서로 분리되어 있어 인클로저 안으로 먼지가 침투하는 것을 방지</p>
+
+            <div id="carouselCooling2" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="1"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling2" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling2" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 3] 모듈식 온도제어 컨셉트
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">모듈식 온도제어 컨셉트</h3>
+            <p class="text-cyan mb-4">냉각 장치는 인클로저 도어에 통합되어 있어서 전체 인클로저에 잘 어울림. 작동 중에도 기계적 가공 없이 기존 도어와 쉽게 교체 가능. 냉각 출력 최대 1.5kW ~ 2.5kW.</p>
+
+            <div id="carouselCooling3" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="1"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling3" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling3" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 4] 공기-물 열교환기, 냉각기
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">공기-물 열교환기, 냉각기</h3>
+            <p class="text-cyan mb-4">효율적인 액체 냉각은 공정 및 기계 냉각에서 또는 공기 대 물 열교환기를 통해 인클로저에서 열 손실 배출 시 높은 냉각 부하가 필요한 곳이면 어디에서나 사용할 수 있음.</p>
+
+            <div id="carouselCooling4" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="1"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling4" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling4" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 5] IT 냉각
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">IT 냉각</h3>
+            <p class="text-cyan mb-4">리탈의 공조 컨셉트는 단일 랙의 냉각부터 전체 데이터 센터에 이르기까지 모든 적용 분야를 포괄함. 안전과 효율성에 중점을 둠.</p>
+
+            <div id="carouselCooling5" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="5"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="6"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="7"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="8"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="9"></button>
+                    <button type="button" data-bs-target="#carouselCooling5" data-bs-slide-to="10"></button>
+
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 8"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 9"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 10"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling5" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling5" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 6] 히터 ** 제품이 많아서 이건 따로 해보자
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">히터</h3>
+            <p class="text-cyan mb-4">히터는 옥외에 설치할 때 특히 응축수 생성을 방지하기 위해 적합한 열 출력을 제공함.</p>
+
+            <div id="carouselCooling6" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling6" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling6" data-bs-slide-to="1"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling6" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling6" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 7] 옥외용 공조
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">옥외용 공조</h3>
+            <p class="text-cyan mb-4">어떤 날씨에서도 유지되는 기능 및 안전성. 리탈 옥외형 공조 솔루션은 옥외 사용에 매우 적합함. 특히 에너지 효율적인 냉각 장치 외에도 예를 들어 워터젯 후드가 있는 팬 필터, 히터 그리고 해당 "옥외" 옵션이 있는 Blue e+ 칠러도 사용할 수 있음.</p>
+
+            <div id="carouselCooling7" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="5"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="6"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="7"></button>
+                    <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="8"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 8"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling7" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling7" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 8] 공조 액세서리
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">공조 액세서리</h3>
+            <p class="text-cyan mb-4">최적으로 조정된 구성요소로 공조 구성품이 원하는 요구사항에 완벽하게 조화를 이룸. 모니터링, 제어 및 개별 공기 유도를 통해 공조 구성품의 효율성과 안전성을 더욱 향상시킬 수 있음.p>
+
+            <div id="carouselCooling8" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="5"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="6"></button>
+                    <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="7"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling8" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling8" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+     [제품 9] 공조장치 예비 부품
+     ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 -->
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">공조장치 예비 부품</h3>
+            <p class="text-cyan mb-4">활성 구성, 전자부품, 팬, 센서, 인클로저 구성, 액세서리</p>
+
+            <div id="carouselCooling9" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="5"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling9" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselCooling9" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                    <tr><th></th><td></td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
