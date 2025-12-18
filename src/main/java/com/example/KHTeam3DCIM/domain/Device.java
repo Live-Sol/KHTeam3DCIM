@@ -1,9 +1,11 @@
 package com.example.KHTeam3DCIM.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,7 +73,10 @@ public class Device {
     private String ipAddr; // 관리용 IP 주소
 
     // [6] @CreatedDate: 저장(save)할 때 현재 시간을 자동으로 채워줍니다. (개발자가 안 넣어도 됨)
+    @CreatedDate
     @Column(name = "REG_DATE", updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd", timezone = "Asia/Seoul") // JSON 응답용
+    @DateTimeFormat(pattern = "yyyy/MM/dd") // 폼 데이터 바인딩용
     private LocalDateTime regDate;
 
     // ==========================================

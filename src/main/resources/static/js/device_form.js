@@ -112,7 +112,12 @@ function loadRequestData(selectObj) {
 
     // 4. 사용자 알림
     if (isLocked) {
-        alert("신청서 내용이 불러와졌습니다.\n데이터 보호를 위해 신청서 관련 정보는 수정할 수 없습니다.\n\n'랙 위치', '시리얼 번호', 'IP'를 입력 후 등록하세요.");
+        Swal.fire({
+            icon: 'info',
+            title: '신청서 데이터 로드 완료',
+            text: "데이터 보호를 위해 신청 정보는 수정할 수 없습니다. '랙 위치', '시리얼', 'IP'를 입력해 주세요.",
+            confirmButtonColor: '#0d6efd'
+        });
     }
 }
 
@@ -131,36 +136,58 @@ function updateMaxUnit(rackSelect) {
     const heightUnitInput = document.querySelector('input[name="heightUnit"]');
 
     if (totalUnit) {
+        // 1. max 값 설정
         if (startUnitInput) startUnitInput.max = totalUnit;
         if (heightUnitInput) heightUnitInput.max = totalUnit;
+
         console.log("선택된 랙의 최대 유닛: " + totalUnit + "U");
+
+        // 2. 입력 제한 로직 (이벤트 중복 등록 방지를 위해 한 번만)
+        if (startUnitInput && !startUnitInput.dataset.listener) {
+            startUnitInput.addEventListener('change', function() {
+                if (parseInt(this.value) > parseInt(totalUnit)) {
+                    this.value = totalUnit;
+                    // 선택 사항: 너무 큰 숫자를 입력했을 때 안내 토스트를 띄울 수도 있습니다.
+                }
+            });
+            startUnitInput.dataset.listener = "true"; // 리스너 중복 추가 방지
+        }
     }
 }
 
 // 3. 추가: 페이지 초기화 로직 (HTML에서 호출)
-/**
- * 페이지 초기화 로직
- * @param {string} errorMsg - 서버에서 전달된 에러 메시지
- */
 function initializeForm(errorMsg) {
     const rackSelect = document.querySelector('select[name="rackId"]');
 
-    // 1. 페이지 로드 시 이미 랙이 선택되어 있다면 max 설정
+    // 1. 랙 최대 유닛 설정 유지
     if (rackSelect && rackSelect.value) {
         updateMaxUnit(rackSelect);
     }
 
-    // 2. 에러 메시지가 존재하는 경우 처리
+    // 2. 에러 발생 시 처리 (토스트는 HTML 스크립트에서 띄우고, 여기선 포커스만 담당)
     if (errorMsg) {
-        const firstInvalid = document.querySelector('.is-invalid');
-        if (firstInvalid) {
-            firstInvalid.focus();
+        let target = null;
+        if (errorMsg.includes("회사명")) target = document.querySelector('input[name="companyName"]');
+        else if (errorMsg.includes("대표 번호")) target = document.querySelector('input[name="companyPhone"]');
+        else if (errorMsg.includes("담당자 이름")) target = document.querySelector('input[name="userName"]');
+        else if (errorMsg.includes("담당자 연락처")) target = document.querySelector('input[name="contact"]');
+        else if (errorMsg.includes("랙")) target = document.querySelector('select[name="rackId"]');
+        else if (errorMsg.includes("시리얼")) target = document.querySelector('input[name="serialNum"]');
+        else if (errorMsg.includes("시작 유닛")) target = document.querySelector('input[name="startUnit"]');
+        else if (errorMsg.includes("장비 높이")) target = document.querySelector('input[name="heightUnit"]');
+
+        if (target) {
+            // 토스트가 뜬 직후에 바로 입력할 수 있도록 포커스만 줌
+            target.focus();
+            // HTML에서 classappend 처리를 안했다면 아래 줄 유지, 했다면 삭제
+            target.classList.add('is-invalid');
         }
     }
-    // 3. 에러는 없지만 랙을 선택해야 하는 경우 포커스
-    else {
-        if (rackSelect && !rackSelect.value && !rackSelect.disabled) {
-            rackSelect.focus();
-        }
-    }
+    // 입력(input)이나 선택(change)이 발생하면 빨간 테두리 클래스 제거
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
 }
