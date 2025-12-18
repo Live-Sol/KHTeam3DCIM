@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - 고객센터</title>
+    <!-- 공통 라이브러리 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- 스타일 시트 -->
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="/css/memberStyle.css" rel="stylesheet">
+
+    <style>
+        /* Contact 페이지 전용 스타일 */
+        .contact-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15);
+        }
+        .contact-icon-box {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        /* 지도 컨테이너 스타일 (Iframe 반응형 처리) */
+        .map-container {
+            width: 100%;
+            height: 450px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #0f172a;
+            position: relative;
+        }
+
+        /* Iframe 꽉 채우기 */
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            filter: invert(90%) hue-rotate(180deg); /* (선택) 지도 다크모드 효과 */
+        }
+
+        .section-sub-title {
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-purple);
+            padding-left: 1rem;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- 페이지 히어로 -->
+<section class="page-hero" style="padding: 100px 0 60px 0; background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/info/info_contact.png');">
+    <div class="container position-relative z-1 text-center">
+        <h1 class="page-title" style="font-size: 2.5rem;">CONTACT US</h1>
+        <p class="page-subtitle">
+            언제든지 문의해 주세요. StarRoot 고객센터 팀이 도와드리겠습니다.
+        </p>
+    </div>
+</section>
+
+<!-- 1. 연락처 정보 카드 섹션 -->
+<div class="container py-5">
+    <div class="row g-4 mb-5">
+        <!-- 주소 -->
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon-box">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <h5 class="text-white fw-bold mb-3">Location</h5>
+                <p class="text-white-50">
+                    울산광역시 남구 삼산로 35번길 19<br>
+                    (신정동) KH정보교육원
+                </p>
+            </div>
+        </div>
+        <!-- 전화/이메일 -->
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon-box">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <h5 class="text-white fw-bold mb-3">Support</h5>
+                <p class="text-white-50">
+                    Tel: 052-123-4567<br>
+                    Email: support@starroot.com
+                </p>
+            </div>
+        </div>
+        <!-- 운영 시간 -->
+        <div class="col-md-4">
+            <div class="contact-card">
+                <div class="contact-icon-box">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h5 class="text-white fw-bold mb-3">Open Hours</h5>
+                <p class="text-white-50">
+                    Mon - Fri: 09:00 - 18:00<br>
+                    (주말 및 공휴일 휴무)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border-secondary opacity-25 my-5">
+
+    <!-- 2. 문의 폼 & 지도 섹션 -->
+    <div class="row g-5">
+        <!-- 왼쪽: 1:1 문의 폼 -->
+        <div class="col-lg-6">
+            <h4 class="section-sub-title">문의 작성하기</h4>
+            <p class="text-white-50 mb-4">
+                궁금한 점이 있으시거나 제휴 문의가 필요하신가요?<br>
+                아래 양식을 작성해 주시면 담당자가 확인 후 신속하게 연락드리겠습니다.
+            </p>
+
+            <form>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control form-control-custom" id="name" placeholder="Name">
+                            <label for="name">성함</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="email" class="form-control form-control-custom" id="email" placeholder="Email">
+                            <label for="email">이메일</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" class="form-control form-control-custom" id="subject" placeholder="Subject">
+                            <label for="subject">제목</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control form-control-custom" placeholder="Leave a message here" id="message" style="height: 150px"></textarea>
+                            <label for="message">내용을 입력해 주세요.</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button class="btn btn-login w-100 py-3" type="button" onclick="alert('문의가 접수되었습니다. (데모 기능)')">
+                            <i class="bi bi-send-fill me-2"></i> 메일 보내기
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ⭐️ 오른쪽: Google Map Iframe 영역 ⭐️ -->
+        <div class="col-lg-6">
+            <h4 class="section-sub-title">회사 위치</h4>
+            <!-- 지도를 담을 div -->
+            <div class="map-container shadow-lg">
+                <!-- Google Maps Iframe 코드 -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3246.754890247483!2d129.308323476363!3d35.53505437263472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35662d66cf9ecfaf%3A0x2d8f16207dd9335b!2zS0jsnbjsnqzqtZDsnKHsm5A!5e0!3m2!1sko!2skr!4v1766022570132!5m2!1sko!2skr"
+                        width="600" height="450" style="border:0;"
+                        allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 푸터 -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
