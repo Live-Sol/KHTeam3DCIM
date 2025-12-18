@@ -19,7 +19,10 @@
     <div th:replace="fragments/sidebar :: sidebar"></div>
 
     <main class="main-content flex-grow-1">
-        <h1 class="h3 mb-4 text-white" th:text="${pageTitle} ?: '관리자 페이지'">관리자 페이지</h1>
+        <h1 class="h3 mb-4 text-white">
+            <i class="bi bi-house-door me-2"></i>
+            <span th:text="${pageTitle} ?: '관리자 페이지'">관리자 페이지</span>
+        </h1>
 
         <div class="row g-4">
 
@@ -36,7 +39,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="card card-success mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-cpu me-1"></i> 총 등록 장비</div>
+                    <div class="card-header"><i class="bi bi-hdd-stack me-2"></i> 총 등록 장비</div>
                     <div class="card-body">
                         <h5 class="card-title"><span th:text="${totalDeviceCount}">0</span> 대</h5>
                         <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
@@ -47,7 +50,7 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="card card-warning mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-stack me-1"></i> 총 등록 Rack</div>
+                    <div class="card-header"><i class="bi bi-grid-1x2 me-2"></i> 총 등록 Rack</div>
                     <div class="card-body">
                         <h5 class="card-title"><span th:text="${totalRackCount}">0</span> 대</h5>
                         <p class="card-text">현재 시스템에 등록된 전체 Rack의 수입니다.</p>
