@@ -59,4 +59,13 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 5-5. EMS 연동 장비 개수 세기 (EMS_STATUS가 'ON'인 것)
     long countByEmsStatus(String emsStatus);
 
+    // ==========================================
+    // [추가] 중복 검사용 메서드
+    // ==========================================
+
+    // 1. 시리얼 번호가 존재하는지 확인 (신규 등록 시 사용)
+    boolean existsBySerialNum(String serialNum);
+
+    // 2. 본인 ID를 제외하고 해당 시리얼 번호가 존재하는지 확인 (수정 시 사용)
+    boolean existsBySerialNumAndIdNot(String serialNum, Long id);
 }

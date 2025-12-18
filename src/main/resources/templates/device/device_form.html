@@ -52,6 +52,10 @@
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <input type="hidden" id="reqIdField" name="reqId" th:value="${reqId}">
 
+                <div th:if="${errorMessage}" class="text-danger fw-bold small mt-1">
+                    <i class="bi bi-exclamation-triangle"></i> [[${errorMessage}]]
+                </div>
+
                 <div class="card custom-card-light mb-4 border-secondary border-opacity-25"
                      th:if="${isEdit != true and waitingRequests != null and !waitingRequests.isEmpty()}">
                     <div class="card-body p-3">
@@ -136,7 +140,8 @@
                         <span class="input-group-text custom-bg-light"><i class="bi bi-hdd-rack"></i></span>
                         <select name="rackId" class="form-select custom-select"
                                 th:disabled="${selectedRackId != null}"
-                                th:classappend="${selectedRackId != null} ? 'bg-secondary bg-opacity-25'">
+                                th:autofocus="${selectedRackId == null and (device.rack == null or device.rack.id == null)}"
+                                th:classappend="${(errorMessage != null and device.rack == null) ? 'is-invalid ' : ''} + (${selectedRackId != null} ? 'bg-secondary bg-opacity-25' : '')">
                             <option value="" disabled selected>--- 설치할 랙 선택 ---</option>
                             <option th:each="rack : ${racks}"
                                     th:value="${rack.id}"
@@ -164,8 +169,12 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">시리얼 번호<small class="text-danger"> (관리자)</small></label>
-                        <input type="text" name="serialNum" class="form-control custom-form-control"
-                               th:value="${device.serialNum}" placeholder="SN-XXXX-XXXX" required>
+<!--                        에러 메시지에 '시리얼'이라는 단어가 포함된 경우에만 is-invalid 추가-->
+                        <input type="text" name="serialNum"
+                               class="form-control custom-form-control"
+                        th:classappend="${errorMessage != null and #strings.contains(errorMessage, '시리얼')} ? 'is-invalid'"
+                        th:value="${device.serialNum}"
+                        placeholder="SN-XXXX-XXXX" required>
                     </div>
                 </div>
 
@@ -271,13 +280,40 @@
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn custom-btn-primary btn-lg fw-bold"
                             th:text="${isEdit == true} ? '수정 내용 저장' : '장비 등록 완료'"></button>
-                    <a href="/devices" class="btn custom-btn-secondary">취소 및 목록으로</a>
+                    <a th:href="${isEdit == true} ? @{/racks} : @{/requests}"
+                       class="btn custom-btn-secondary"
+                       th:text="${isEdit == true} ? '취소 후 Rack 목록으로' : '취소 후 신청 목록으로'">
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
 <script src="/js/device_form.js"></script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // 타임리프 변수를 자바스크립트 변수로 안전하게 가져옵니다.
+        const errorMsg = [[${errorMessage}]];
+
+        // 1. 에러 메시지가 존재하는 경우
+        if (errorMsg) {
+            // 'is-invalid' 클래스가 붙은 첫 번째 요소를 찾습니다.
+            const firstInvalid = document.querySelector('.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.focus(); // 에러 난 칸에 포커스!
+            }
+        }
+        // 2. 에러는 없지만, 랙을 아직 선택하지 않은 신규 등록 상태라면
+        else {
+            const rackSelect = document.querySelector('select[name="rackId"]');
+            // 랙 선택창이 존재하고, 값이 비어있으며, 비활성화(disabled) 상태가 아닐 때만
+            if (rackSelect && !rackSelect.value && !rackSelect.disabled) {
+                rackSelect.focus(); // 랙 선택창에 포커스!
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

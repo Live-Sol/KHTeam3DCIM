@@ -31,6 +31,9 @@ public class DeviceService {
     // ==========================================
     @Transactional
     public Long registerDevice(Long rackId, String cateId, Device newDevice) {
+        // 공통 검증 메서드 호출 (새 장비이므로 currentDeviceId는 null)
+        checkRackOverlap(rackId, newDevice.getStartUnit(), newDevice.getHeightUnit(), null);
+
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 랙입니다."));
         Category category = categoryRepository.findById(cateId)
@@ -227,19 +230,37 @@ public class DeviceService {
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
     }
-
     @Transactional
-    public void updateDevice(Long id, Device formDevice) {
-        Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+    public void updateDevice(Long id, Device formDevice, Long rackId, String cateId) { // rackId 파라미터 추가 추천
+        // 1. 공간 점유 체크
+        checkRackOverlap(rackId, formDevice.getStartUnit(), formDevice.getHeightUnit(), id);
 
-        // 🚑 [수정] 충돌 검사 로직이 필요하다면 여기에 추가해야 함 (현재는 생략)
+        Device target = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
 
+        // 2. 랙 정보 업데이트
+        if (rackId != null) {
+            Rack newRack = rackRepository.findById(rackId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 랙입니다."));
+            target.setRack(newRack);
+        }
+
+        // 3. ⭐ [추가] 카테고리 정보 업데이트
+        if (cateId != null) {
+            Category newCategory = categoryRepository.findById(cateId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+            target.setCategory(newCategory);
+        }
+
+        // 4. 위치 및 나머지 정보 업데이트 (기존 코드)
+        target.setStartUnit(formDevice.getStartUnit());
+        target.setHeightUnit(formDevice.getHeightUnit());
+
+        // 5. 나머지 정보 업데이트 (기존 코드 유지)
         target.setVendor(formDevice.getVendor());
         target.setModelName(formDevice.getModelName());
         target.setSerialNum(formDevice.getSerialNum());
         target.setIpAddr(formDevice.getIpAddr());
-
-        // ⭐ [수정] 여기가 빠져있어서 수정이 안 됐습니다!
         target.setPowerWatt(formDevice.getPowerWatt());
         target.setEmsStatus(formDevice.getEmsStatus());
         target.setContractMonth(formDevice.getContractMonth());
@@ -250,11 +271,38 @@ public class DeviceService {
         target.setContact(formDevice.getContact());
         target.setDescription(formDevice.getDescription());
 
-        // 위치 변경은 현재 미지원 (복잡도 때문)
-
+        // 로그 기록
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        auditLogService.saveLog(currentMemberId, "장비 정보 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
+        auditLogService.saveLog(currentMemberId, "장비 정보 및 위치 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
     }
+
+//    @Transactional
+//    public void updateDevice(Long id, Device formDevice) {
+//        Device target = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("장비가 없습니다."));
+//
+//        // 🚑 [수정] 충돌 검사 로직이 필요하다면 여기에 추가해야 함 (현재는 생략)
+//
+//        target.setVendor(formDevice.getVendor());
+//        target.setModelName(formDevice.getModelName());
+//        target.setSerialNum(formDevice.getSerialNum());
+//        target.setIpAddr(formDevice.getIpAddr());
+//
+//        // ⭐ [수정] 여기가 빠져있어서 수정이 안 됐습니다!
+//        target.setPowerWatt(formDevice.getPowerWatt());
+//        target.setEmsStatus(formDevice.getEmsStatus());
+//        target.setContractMonth(formDevice.getContractMonth());
+//        target.setContractDate(formDevice.getContractDate());
+//        target.setCompanyName(formDevice.getCompanyName());
+//        target.setCompanyPhone(formDevice.getCompanyPhone());
+//        target.setUserName(formDevice.getUserName());
+//        target.setContact(formDevice.getContact());
+//        target.setDescription(formDevice.getDescription());
+//
+//        // 위치 변경은 현재 미지원 (복잡도 때문)
+//
+//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        auditLogService.saveLog(currentMemberId, "장비 정보 수정: " + target.getSerialNum(), LogType.DEVICE_OPERATION);
+//    }
 
     @Transactional
     public String toggleStatus(Long id) {
@@ -270,5 +318,50 @@ public class DeviceService {
     public Device findById(Long id) {
         return deviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 장비가 존재하지 않습니다."));
+    }
+
+    // ==========================================
+    // 7. 중복 검사 로직
+    // ==========================================
+    public boolean isSerialDuplicate(String serialNum, Long currentId) {
+        if (currentId == null) {
+        // 신규 등록일 때: 전체에서 중복 확인
+        return deviceRepository.existsBySerialNum(serialNum);
+        } else {
+        // 수정 시: 나(currentId)를 제외한 나머지 중에서 동일한 시리얼이 있는지 확인
+        return deviceRepository.existsBySerialNumAndIdNot(serialNum, currentId);
+        }
+    }
+
+    // ==========================================
+    // 8. 랙 공간 점유 체크 로직 (분리)
+    // ==========================================
+    public void checkRackOverlap(Long rackId, Integer startUnit, Integer heightUnit, Long currentDeviceId) {
+        Rack rack = rackRepository.findById(rackId)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 랙입니다."));
+
+        int newEnd = startUnit + heightUnit - 1;
+
+        // 랙 높이 초과 검사
+        if (newEnd > rack.getTotalUnit()) {
+            throw new IllegalStateException("장비 설치 위치가 랙의 최대 높이(" + rack.getTotalUnit() + "U)를 벗어납니다.");
+        }
+
+        // 해당 랙의 모든 장비 조회
+        List<Device> existingDevices = deviceRepository.findByRackId(rackId);
+        for (Device existing : existingDevices) {
+            // 수정 시: 자기 자신과의 충돌은 무시
+            if (currentDeviceId != null && existing.getId().equals(currentDeviceId)) {
+                continue;
+            }
+
+            int exStart = existing.getStartUnit();
+            int exEnd = exStart + existing.getHeightUnit() - 1;
+
+            // 충돌 판정 공식
+            if (startUnit <= exEnd && newEnd >= exStart) {
+                throw new IllegalStateException("이미 해당 위치(" + exStart + "~" + exEnd + "U)에 다른 장비가 있습니다.");
+            }
+        }
     }
 }

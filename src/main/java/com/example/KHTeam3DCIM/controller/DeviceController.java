@@ -116,33 +116,74 @@ public class DeviceController {
     // 3. 실제 등록 처리하기 (저장 버튼 눌렀을 때)
     // ==========================================
     @PostMapping("/devices/new")
-    // @Transactional // Controller에서는 제거 (Service에서 처리)
     public String create(
-            @RequestParam("rackId") Long rackId,
-            @RequestParam("cateId") String cateId,
+            // ⭐ required = false를 붙여야 try 안의 if문이 작동합니다.
+            @RequestParam(value = "rackId", required = false) Long rackId,
+            @RequestParam(value = "cateId", required = false) String cateId,
             @RequestParam(value = "reqId", required = false) Long reqId,
-            Device device
+            Device device,
+            Model model
     ) {
-        // 1. 현재 로그인한 사용자 ID 가져오기
-        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        // 2. Member 엔티티 찾아오기
-        Member currentMember = memberRepository.findById(currentMemberId)
-                .orElseThrow(() -> new RuntimeException("회원 정보 없음"));
-        // 3. 장비에 주인 설정 (등록자 기록용)
-        device.setMember(currentMember);
-
-        // 장비 등록
-        deviceService.registerDevice(rackId, cateId, device);
-
-        // 만약 신청서 승인건이었다면, 신청서 상태를 '처리 완료'로 변경
-        if (reqId != null) {
-            Request req = requestRepository.findById(reqId).orElse(null);
-            if (req != null) {
-                req.setStatus("APPROVED");
-                requestRepository.save(req); // 명시적 저장 (Transactional 없으므로)
+        try {
+            // 0. 랙 및 카테고리 선택 여부 체크 (최상단)
+            if (rackId == null) {
+                throw new IllegalArgumentException("설치할 랙(Rack)을 선택해야 합니다.");
             }
+            if (cateId == null || cateId.trim().isEmpty()) {
+                throw new IllegalArgumentException("장비 종류(Category)를 선택해야 합니다.");
+            }
+
+            // 0-1. 필수 입력값 빈 값 체크
+            if (device.getSerialNum() == null || device.getSerialNum().trim().isEmpty()) {
+                throw new IllegalArgumentException("시리얼 번호는 필수 입력 항목입니다.");
+            }
+            if (device.getStartUnit() == null || device.getStartUnit() < 1) {
+                throw new IllegalArgumentException("올바른 시작 유닛 번호를 입력해주세요.");
+            }
+            if (device.getHeightUnit() == null || device.getHeightUnit() < 1) {
+                throw new IllegalArgumentException("장비 높이는 최소 1U 이상이어야 합니다.");
+            }
+
+            // 1. 시리얼 번호 중복 체크
+            if (deviceService.isSerialDuplicate(device.getSerialNum(), null)) {
+                throw new IllegalStateException("이미 등록된 시리얼 번호입니다.");
+            }
+
+            // 2. 랙 공간 점유 체크
+            deviceService.checkRackOverlap(rackId, device.getStartUnit(), device.getHeightUnit(), null);
+
+            // 3. 정상 로직 진행
+            String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+            Member currentMember = memberRepository.findById(currentMemberId)
+                    .orElseThrow(() -> new RuntimeException("회원 정보 없음"));
+            device.setMember(currentMember);
+
+            // 4. 서비스 호출 및 저장
+            deviceService.registerDevice(rackId, cateId, device);
+
+            // 5. 신청서 상태 업데이트
+            if (reqId != null) {
+                requestRepository.findById(reqId).ifPresent(req -> {
+                    req.setStatus("APPROVED");
+                    requestRepository.save(req);
+                });
+            }
+
+            return "redirect:/devices";
+
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+
+            // 폼 데이터 및 상태 유지
+            model.addAttribute("racks", rackRepository.findAll());
+            model.addAttribute("categories", categoryService.findAllCategories());
+            model.addAttribute("device", device);
+            model.addAttribute("selectedRackId", rackId);
+            model.addAttribute("selectedCateId", cateId);
+            model.addAttribute("reqId", reqId);
+
+            return "device/device_form";
         }
-        return "redirect:/devices";
     }
 
     // ==========================================
@@ -173,9 +214,58 @@ public class DeviceController {
     // 6. 실제 수정 처리
     // ==========================================
     @PostMapping("/devices/{id}/edit")
-    public String update(@PathVariable Long id, Device device) {
-        deviceService.updateDevice(id, device);
-        return "redirect:/devices";
+    public String update(@PathVariable Long id,
+                         @RequestParam(value = "rackId", required = false) Long rackId, // HTML의 name="rackId"와 매핑
+                         @RequestParam(value="cateId", required=false) String cateId,
+                         Device device,
+                         Model model) {
+        try {
+            // 0. 랙 선택 여부 체크를 최상단에 배치합니다.
+            if (rackId == null) {
+                throw new IllegalArgumentException("설치할 랙(Rack)을 선택해야 합니다.");
+            }
+            // 0-1. 필수 입력값 빈 값 체크 (서버 측 검증)
+            if (device.getSerialNum() == null || device.getSerialNum().trim().isEmpty()) {
+                throw new IllegalArgumentException("시리얼 번호는 필수 입력 항목입니다.");
+            }
+            if (device.getStartUnit() == null || device.getStartUnit() < 1) {
+                throw new IllegalArgumentException("올바른 시작 유닛 번호를 입력해주세요.");
+            }
+            if (device.getHeightUnit() == null || device.getHeightUnit() < 1) {
+                throw new IllegalArgumentException("장비 높이는 최소 1U 이상이어야 합니다.");
+            }
+
+            // 1. 시리얼 번호 중복 체크
+            if (deviceService.isSerialDuplicate(device.getSerialNum(), id)) {
+                throw new IllegalStateException("이미 다른 장비에서 사용 중인 시리얼 번호입니다.");
+            }
+
+            // 2. 랙 공간 점유 체크 (조건문 단순화: rackId는 필수값이므로 바로 체크)
+            deviceService.checkRackOverlap(rackId, device.getStartUnit(), device.getHeightUnit(), id);
+
+            // 3. 모든 검증 통과 시 실제 수정 로직 수행
+            deviceService.updateDevice(id, device, rackId, cateId);
+
+            return "redirect:/devices";
+
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+
+            model.addAttribute("racks", rackRepository.findAll());
+            model.addAttribute("categories", categoryService.findAllCategories());
+            model.addAttribute("device", device);
+            model.addAttribute("isEdit", true);
+
+            // 선택 값 유지 (rackId 사용)
+            model.addAttribute("selectedRackId", rackId);
+
+            // 카테고리는 select name="category.id"일 경우 아래와 같이 처리
+            if (device.getCategory() != null) {
+                model.addAttribute("selectedCateId", device.getCategory().getId());
+            }
+
+            return "device/device_form";
+        }
     }
 
     // ==========================================
