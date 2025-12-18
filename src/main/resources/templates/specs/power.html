@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="/css/index.css" rel="stylesheet">
     <style>
-        /* [수정] 스크롤 가능한 테이블 래퍼 */
+        /* 스크롤 가능한 테이블 래퍼 */
         .spec-scroll-wrapper {
             max-height: 600px; /* 이 높이를 넘어가면 스크롤 생김 */
             overflow-y: auto;
@@ -45,7 +45,7 @@
             vertical-align: middle;
         }
 
-        /*  헤더 고정 및 배경색 지정  */
+        /* 헤더 고정 및 배경색 지정  */
         .spec-table th {
             /* 배경색을 반투명이 아닌 완전한 색상으로 지정하여 글자 겹침 방지 */
             background-color: #1e293b; /* 짙은 남색 배경 */
@@ -62,7 +62,7 @@
             border-bottom: none;
         }
 
-        /* [수정] 이미지 슬라이더 스타일 개선 */
+        /* 이미지 슬라이더 스타일 개선 */
         .product-carousel {
             border-radius: 15px;
             overflow: hidden;
@@ -107,6 +107,52 @@
             margin-bottom: 1.5rem;
             border-left: 3px solid var(--accent-cyan);
         }
+
+        /* 이미지 슬라이더 하단 캡션 스타일 */
+        .custom-caption {
+            position: absolute;
+            bottom: 30px; /* 하단에서의 거리 */
+            left: 50%;
+            transform: translateX(-50%); /* 정확히 중앙 정렬 */
+            width: auto;
+            min-width: 50%; /* 최소 너비 */
+            max-width: 90%;
+            padding: 10px 25px;
+
+            /* 디자인: 반투명 검정 배경 + 블러 효과 (Glassmorphism) */
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px; /* 둥근 캡슐 모양 */
+
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* 캡션 텍스트 스타일 */
+        .custom-caption h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .custom-caption span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 2px;
+        }
+
+        /* 호버 시 살짝 떠오르는 효과 (선택사항) */
+        .carousel-item:hover .custom-caption {
+            background: rgba(15, 23, 42, 0.9);
+            bottom: 35px;
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -117,7 +163,7 @@
 <section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/specs_power/main.png');">
     <div class="container position-relative z-1">
         <h1 class="page-title">POWER INFRASTRUCTURE</h1>
-        <p class="page-subtitle">UPS(Uninterruptible Power Supply, 무정전 전원 장치) 와<br>지능형 PDU(Power Distribution Unit, 전력 분배 장치) 전력 관리</p>
+        <p class="page-subtitle">안정적인 IT 운영을 위한 스마트 전력 분배 및 에너지 관리 제원</p>
     </div>
 </section>
 
@@ -147,17 +193,28 @@
                     <button type="button" data-bs-target="#carouselPower1" data-bs-slide-to="10"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_power/Ri4Power_1.jpg" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_2.jpg" alt="Power 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_3.jpg" alt="Power 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_4.jpg" alt="Power 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_5.jpg" alt="Power 5"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_6.jpg" alt="Power 6"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_7.jpg" alt="Power 7"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_8.jpg" alt="Power 8"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_9.jpg" alt="Power 9"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_10.jpg" alt="Power 10"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_11.jpg" alt="Power 11"></div>
+                    <div class="carousel-item active"><img src="/images/specs_power/Ri4Power_1.jpg" alt="Power 1">
+                        <div class="custom-caption mb-3"><h5>인클로저 시스템</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_2.jpg" alt="Power 2">
+                        <div class="custom-caption mb-3"><h5>ISV 분배</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_3.jpg" alt="Power 3">
+                        <div class="custom-caption mb-3"><h5>모듈형 전면 설계</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_4.jpg" alt="Power 4">
+                        <div class="custom-caption mb-3"><h5>Maxi-PLS</h5><span>(최대 3200A)</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_5.jpg" alt="Power 5">
+                        <div class="custom-caption mb-3"><h5>Maxi-PLS</h5><span>(최대 3200A)</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_6.jpg" alt="Power 6">
+                        <div class="custom-caption mb-3"><h5>연결 시스템</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_7.jpg" alt="Power 7">
+                        <div class="custom-caption mb-3"><h5>연결 시스템</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_8.jpg" alt="Power 8">
+                        <div class="custom-caption mb-3"><h5>내부 설치</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_9.jpg" alt="Power 9">
+                        <div class="custom-caption mb-3"><h5>내부 설치</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_10.jpg" alt="Power 10">
+                        <div class="custom-caption mb-3"><h5>내부 설치</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/Ri4Power_11.jpg" alt="Power 11">
+                        <div class="custom-caption mb-3"><h5>내부 설치</h5><span></span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselPower1" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -227,9 +284,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>모듈형 설계:</strong> 다양한 배전 요구사항에 맞춘 유연한 구성 가능</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>검증된 안전성:</strong> IEC 표준을 준수하는 고성능 배전 시스템</span></li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>쉬운 유지보수:</strong> 직관적인 내부 구조로 점검 및 교체 용이</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>고용량 전력 처리:</strong> Maxi-PLS 시스템을 통해 최대 3,200A의 고전류 배전 시스템 구축 가능</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>안전한 구획 분리:</strong> 내부 기능 영역을 물리적으로 분리(Form 1-4b)하여 아크 사고 확산 방지</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>모듈형 유연성:</strong> 표준화된 모듈 조립 방식으로 설계 변경 및 시스템 확장에 유연하게 대응</span></li>
                 </ul>
             </div>
         </div>
@@ -254,11 +311,16 @@
                     <button type="button" data-bs-target="#carouselPower2" data-bs-slide-to="4"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_power/buzzbar_1.jpg" alt="Busbar 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_2.jpg" alt="Busbar 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_3.jpg" alt="Busbar 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_4.jpg" alt="Busbar 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_5.jpg" alt="Busbar 5"></div>
+                    <div class="carousel-item active"><img src="/images/specs_power/buzzbar_1.jpg" alt="Busbar 1">
+                        <div class="custom-caption mb-3"><h5>RiLineX</h5><span>최대 800A</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_2.jpg" alt="Busbar 2">
+                        <div class="custom-caption mb-3"><h5>RiLine</h5><span>최대 160A (3극)</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_3.jpg" alt="Busbar 3">
+                        <div class="custom-caption mb-3"><h5>Mini-PLS</h5><span>최대 250A (3핀)</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_4.jpg" alt="Busbar 4">
+                        <div class="custom-caption mb-3"><h5>RiLine60</h5><span>800A ~ 1600A</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/buzzbar_5.jpg" alt="Busbar 5">
+                        <div class="custom-caption mb-3"><h5>185mm 시스템</h5><span>RiLine Compact 전용 어댑터</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselPower2" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -317,8 +379,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Tool-less Assembly:</strong> 공구 없는 간편한 조립 시스템</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Safety First:</strong> 감전 방지를 위한 완벽한 접촉 보호 설계</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Tool-less Assembly:</strong> 공구 없이 끼우는 방식(Click-fit)으로 설치 시간을 획기적으로 단축</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>완벽한 접촉 보호:</strong> 전면 및 측면 커버를 통해 감전 사고를 예방하는 IP2X 등급 안전 설계</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>광범위 호환성:</strong> 소형 제어반(160A)부터 대형 배전반(1600A)까지 커버하는 폭넓은 라인업</span></li>
                 </ul>
             </div>
         </div>
@@ -341,9 +404,12 @@
                     <button type="button" data-bs-target="#carouselPower3" data-bs-slide-to="2"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_power/energy_1.jpg" alt="Energy 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/energy_2.jpg" alt="Energy 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/energy_3.jpg" alt="Energy 3"></div>
+                    <div class="carousel-item active"><img src="/images/specs_power/energy_1.jpg" alt="Energy 1">
+                        <div class="custom-caption mb-3"><h5>Energy Meter</h5><span>전기 에너지 데이터를 측정&분석</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/energy_2.jpg" alt="Energy 2">
+                        <div class="custom-caption mb-3"><h5>확장 모듈</h5><span>RiLine/Ri4Power용 변류기와 호환</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/energy_3.jpg" alt="Energy 3">
+                        <div class="custom-caption mb-3"><h5>전류 변환기</h5><span>다양한 전압 및 전류 대역을 커버</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselPower3" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -391,8 +457,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Real-time Analysis:</strong> 에너지 흐름의 실시간 시각화 및 분석</span></li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Efficiency Optimization:</strong> 에너지 효율 잠재력 파악을 통한 비용 절감</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>정밀한 실시간 계측:</strong> 전압, 전류, 주파수 및 역률 등 주요 전력 품질 요소를 실시간 모니터링</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>에너지 효율 최적화:</strong> 소비 패턴 분석을 통해 에너지 낭비 요소를 식별하고 운영 비용 절감</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>유연한 확장성:</strong> 플러그 앤 플레이 방식의 확장 모듈로 측정 포인트 손쉽게 추가 가능</span></li>
                 </ul>
             </div>
         </div>
@@ -416,10 +483,14 @@
                     <button type="button" data-bs-target="#carouselPower4" data-bs-slide-to="3"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_power/switch_1.jpg" alt="Switch 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/switch_2.jpg" alt="Switch 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/switch_3.jpg" alt="Switch 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/switch_4.jpg" alt="Switch 4"></div>
+                    <div class="carousel-item active"><img src="/images/specs_power/switch_1.jpg" alt="Switch 1">
+                        <div class="custom-caption mb-3"><h5>절연기 스위치</h5><span>NH-부하 시 작동</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/switch_2.jpg" alt="Switch 2">
+                        <div class="custom-caption mb-3"><h5>CB 장치 어댑터</h5><span>(4극)</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/switch_3.jpg" alt="Switch 3">
+                        <div class="custom-caption mb-3"><h5>NH 퓨즈-스위치 단로기</h5><span></span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/switch_4.jpg" alt="Switch 4">
+                        <div class="custom-caption mb-3"><h5>NH 퓨즈-스위치</h5><span>(MSÜ 모니터링)</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselPower4" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -499,8 +570,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>High Durability:</strong> 고부하 환경에서도 안정적인 작동 보장</span></li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Modular Compatible:</strong> 다양한 버스바 시스템과 완벽 호환</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>부하 개폐 능력:</strong> 전력이 흐르는 상태에서도 안전하게 회로를 차단하거나 연결 가능 (NH Disconnector)</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>지능형 상태 감시:</strong> 전자식 모니터링(MSÜ) 기능을 통해 퓨즈 단선 여부를 즉시 감지하여 알림</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>설치 공간 최소화:</strong> 버스바 시스템에 직결하는 어댑터 방식으로 배전반 내부 공간 활용 극대화</span></li>
                 </ul>
             </div>
         </div>
@@ -524,10 +596,14 @@
                     <button type="button" data-bs-target="#carouselPower5" data-bs-slide-to="3"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_power/storge_1.jpg" alt="Storage 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/storge_2.jpg" alt="Storage 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/storge_3.jpg" alt="Storage 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_power/storge_4.jpg" alt="Storage 4"></div>
+                    <div class="carousel-item active"><img src="/images/specs_power/storge_1.jpg" alt="Storage 1">
+                        <div class="custom-caption mb-3"><h5>VX ESS 인클로저</h5><span>스토리지 확장</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/storge_2.jpg" alt="Storage 2">
+                        <div class="custom-caption mb-3"><h5>VX ESS 구조물</h5><span>배터리 모듈의 안정적인 거치</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/storge_3.jpg" alt="Storage 3">
+                        <div class="custom-caption mb-3"><h5>중하중 장치 선반</h5><span>무거운 장비 장착 용이</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_power/storge_4.jpg" alt="Storage 4">
+                        <div class="custom-caption mb-3"><h5>슬라이딩 레일</h5><span>유지보수 용이</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselPower5" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -570,8 +646,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Scalability:</strong> 모듈형 설계로 용량 확장 용이</span></li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>Robust Design:</strong> 중량물 배터리를 견디는 견고한 프레임</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>검증된 견고함:</strong> 무거운 배터리 모듈(개당 100kg 이상)을 안정적으로 지지하는 고강도 프레임</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>편리한 유지보수:</strong> 슬라이딩 레일 및 인출식 선반 구조로 배터리 교체 및 점검 작업 용이</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>무한한 확장성:</strong> 표준 VX25 인클로저 기반으로 용량 증설 시 손쉽게 랙(Baying) 연결 가능</span></li>
                 </ul>
             </div>
         </div>

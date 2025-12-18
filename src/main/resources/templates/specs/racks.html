@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="/css/index.css" rel="stylesheet">
     <style>
-        /* [수정] 스크롤 가능한 테이블 래퍼 */
+        /* 스크롤 가능한 테이블 래퍼 */
         .spec-scroll-wrapper {
             max-height: 600px; /* 이 높이를 넘어가면 스크롤 생김 */
             overflow-y: auto;
@@ -45,7 +45,7 @@
             vertical-align: middle;
         }
 
-        /*  헤더 고정 및 배경색 지정  */
+        /* 헤더 고정 및 배경색 지정  */
         .spec-table th {
             /* 배경색을 반투명이 아닌 완전한 색상으로 지정하여 글자 겹침 방지 */
             background-color: #1e293b; /* 짙은 남색 배경 */
@@ -62,7 +62,7 @@
             border-bottom: none;
         }
 
-        /* [수정] 이미지 슬라이더 스타일 개선 */
+        /* 이미지 슬라이더 스타일 개선 */
         .product-carousel {
             border-radius: 15px;
             overflow: hidden;
@@ -107,6 +107,52 @@
             margin-bottom: 1.5rem;
             border-left: 3px solid var(--accent-cyan);
         }
+
+        /* 이미지 슬라이더 하단 캡션 스타일 */
+        .custom-caption {
+            position: absolute;
+            bottom: 30px; /* 하단에서의 거리 */
+            left: 50%;
+            transform: translateX(-50%); /* 정확히 중앙 정렬 */
+            width: auto;
+            min-width: 50%; /* 최소 너비 */
+            max-width: 90%;
+            padding: 10px 25px;
+
+            /* 디자인: 반투명 검정 배경 + 블러 효과 (Glassmorphism) */
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px; /* 둥근 캡슐 모양 */
+
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* 캡션 텍스트 스타일 */
+        .custom-caption h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .custom-caption span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 2px;
+        }
+
+        /* 호버 시 살짝 떠오르는 효과 (선택사항) */
+        .carousel-item:hover .custom-caption {
+            background: rgba(15, 23, 42, 0.9);
+            bottom: 35px;
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -117,7 +163,7 @@
 <section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/specs_rack/main.png');">
     <div class="container position-relative z-1">
         <h1 class="page-title">SERVER RACK SPECS</h1>
-        <p class="page-subtitle">프리미엄 19-인치 42U 서버 랙 장비 제원</p>
+        <p class="page-subtitle">데이터센터 공간 효율과 장비 보호를 극대화한 표준 랙 시스템 제원</p>
     </div>
 </section>
 
@@ -146,18 +192,23 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5309116_1.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5309116</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5309116_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5309116_3.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>장착 여유 공간</h5><span>87 mm / 193 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5309116_4.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>15,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5309116_5.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>95 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack1" data-bs-slide="prev">
@@ -215,9 +266,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>최적화된 공기 흐름:</strong> 85% 이상의 높은 타공율로 고발열 장비 냉각에 탁월</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>유연한 케이블링:</strong> 상단 및 하단, 측면의 다양한 케이블 인입구 제공</span></li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>강력한 보안:</strong> 전/후면 및 측면 패널에 잠금 장치 기본 내장</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>최적화된 공기 흐름:</strong> 전후면 85% 타공율 도어로 고발열 서버 냉각 효율 극대화</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>강력한 내구성:</strong> 15,000 N(약 1.5톤)의 정적 하중을 견디는 견고한 프레임 설계</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>유연한 확장성:</strong> 폭 800mm 설계로 대량의 케이블 번들링 및 측면 관리 용이</span></li>
                 </ul>
             </div>
         </div>
@@ -245,21 +296,27 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5307114_6.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5307114</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5307114_1.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5307114_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>150 mm / 130 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5307114_3.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>8,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5307114_4.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>순 중량</h5><span>76.72 kg</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5307114_5.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>89.8 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack2" data-bs-slide="prev">
@@ -311,8 +368,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>표준화된 설계:</strong> 다양한 네트워크 장비 호환성 보장</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>효율적인 공간 활용:</strong> 800x800mm 사이즈로 공간 효율 극대화</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>네트워크 최적화:</strong> 800x800mm 구조로 스위치 및 패치 패널 케이블링에 최적</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>공간 효율성:</strong> 깊이가 짧은 전산실이나 제한된 공간 배치에 유리한 콤팩트 설계</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>표준 호환성:</strong> 범용적인 19인치 장비 장착이 가능한 Standard 앵글 및 액세서리 지원</span></li>
                 </ul>
             </div>
         </div>
@@ -339,18 +397,23 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5330123_4.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5330123</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5330123_1.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5330123_5.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>장착 여유 공간</h5><span>87 mm / 193 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5330123_3.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>15,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5330123_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>87.4 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack3" data-bs-slide="prev">
@@ -402,8 +465,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>강화 유리 도어:</strong> 문을 열지 않고도 내부 장비 상태 확인 가능</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>슬림 디자인:</strong> 폭 600mm 설계로 좁은 공간에 최적화</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>네트워크 최적화:</strong> 800x800mm 구조로 스위치 및 패치 패널 케이블링에 최적</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>공간 효율성:</strong> 깊이가 짧은 전산실이나 제한된 공간 배치에 유리한 콤팩트 설계</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>표준 호환성:</strong> 범용적인 19인치 장비 장착이 가능한 Standard 앵글 및 액세서리 지원</span></li>
                 </ul>
             </div>
         </div>
@@ -430,18 +494,23 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5311126_4.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5311126</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311126_5.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311126_3.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>장착 여유 공간</h5><span>150 mm / 330 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311126_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>15,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311126_1.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>116.4 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack4" data-bs-slide="prev">
@@ -492,8 +561,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>깊은 깊이(1200mm):</strong> 대형 고성능 서버 장착 가능</span></li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>넓은 케이블 공간:</strong> 깊어진 만큼 후면 케이블 정리 공간 확보</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>초고성능 서버 대응:</strong> 1200mm의 깊은 깊이로 고성능 GPU 서버 및 E-ATX 규격 완벽 호환</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>여유로운 배선 공간:</strong> 폭 800mm와 깊은 후면 공간을 활용해 복잡한 케이블을 깔끔하게 정리</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>보안 및 방진:</strong> 전면 유리 및 후면 폐쇄형 도어로 먼지 유입을 최소화하며 보안성 강화</span></li>
                 </ul>
             </div>
         </div>
@@ -520,18 +590,23 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5310118_5.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5310118</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5310118_3.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5310118_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>장착 여유 공간</h5><span>150 mm / 330 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5310118_1.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>15,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5310118_4.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>87 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack5" data-bs-slide="prev">
@@ -581,7 +656,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>폭 600, 깊이 1200:</strong> 좁은 공간에 깊은 서버를 설치할 때 최적</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>딥(Deep) & 슬림:</strong> 좁은 공간(W600)에도 깊이가 긴(D1200) 고성능 서버를 설치할 수 있는 특수 설계</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>탁월한 열관리:</strong> 고밀도 서버 배치를 위해 전/후면 통풍 도어를 채택하여 열 배출 효율 우수</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>설치 유연성:</strong> 바닥 면적을 최소화하면서도 엔터프라이즈급 장비 수용 능력 보유</span></li>
                 </ul>
             </div>
         </div>
@@ -608,18 +685,23 @@
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img src="/images/specs_rack/VX 5311116_3.jpg" class="d-block w-100" alt="VX Series">
+                        <div class="custom-caption mb-3"><h5>모델 번호</h5><span>VX 5311116</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311116_2.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>높이 단위</h5><span>42 U</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311116_1.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>장착 여유 공간</h5><span>150 mm / 330 mm</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311116_5.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>부하량</h5><span>15,000 N</span></div>
                     </div>
                     <div class="carousel-item">
                         <img src="/images/specs_rack/VX 5311116_4.jpg" class="d-block w-100" alt="VX Interior">
+                        <div class="custom-caption mb-3"><h5>총 중량</h5><span>101 kg</span></div>
                     </div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack6" data-bs-slide="prev">
@@ -669,7 +751,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>폭 800mm:</strong> 좌우 측면 케이블 정리 공간이 넉넉함</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>이상적인 밸런스:</strong> 1000mm 깊이와 800mm 폭의 조합으로 대부분의 표준 서버 및 네트워크 장비 수용</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>측면 작업 편의성:</strong> 넓은 좌우 공간을 통해 PDU 장착 및 대용량 케이블 덕트 설치 용이</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>고효율 통풍 시스템:</strong> 전면 알루미늄 및 후면 강판 타공 도어를 통해 랙 내부 온도 일정 유지</span></li>
                 </ul>
             </div>
         </div>

@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="/css/index.css" rel="stylesheet">
     <style>
-        /* [수정] 스크롤 가능한 테이블 래퍼 */
+        /* 스크롤 가능한 테이블 래퍼 */
         .spec-scroll-wrapper {
             max-height: 600px; /* 이 높이를 넘어가면 스크롤 생김 */
             overflow-y: auto;
@@ -45,7 +45,7 @@
             vertical-align: middle;
         }
 
-        /*  헤더 고정 및 배경색 지정  */
+        /* 헤더 고정 및 배경색 지정  */
         .spec-table th {
             /* 배경색을 반투명이 아닌 완전한 색상으로 지정하여 글자 겹침 방지 */
             background-color: #1e293b; /* 짙은 남색 배경 */
@@ -62,7 +62,7 @@
             border-bottom: none;
         }
 
-        /* [수정] 이미지 슬라이더 스타일 개선 */
+        /* 이미지 슬라이더 스타일 개선 */
         .product-carousel {
             border-radius: 15px;
             overflow: hidden;
@@ -107,6 +107,52 @@
             margin-bottom: 1.5rem;
             border-left: 3px solid var(--accent-cyan);
         }
+
+        /* 이미지 슬라이더 하단 캡션 스타일 */
+        .custom-caption {
+            position: absolute;
+            bottom: 30px; /* 하단에서의 거리 */
+            left: 50%;
+            transform: translateX(-50%); /* 정확히 중앙 정렬 */
+            width: auto;
+            min-width: 50%; /* 최소 너비 */
+            max-width: 90%;
+            padding: 10px 25px;
+
+            /* 디자인: 반투명 검정 배경 + 블러 효과 (Glassmorphism) */
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px; /* 둥근 캡슐 모양 */
+
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* 캡션 텍스트 스타일 */
+        .custom-caption h5 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #ffffff;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .custom-caption span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 2px;
+        }
+
+        /* 호버 시 살짝 떠오르는 효과 (선택사항) */
+        .carousel-item:hover .custom-caption {
+            background: rgba(15, 23, 42, 0.9);
+            bottom: 35px;
+        }
     </style>
 </head>
 <body class="dashboard-body">
@@ -114,10 +160,10 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <!-- 페이지 히어로 섹션 -->
-<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1563770095-2889f5c507c5?q=80&w=2000&auto=format&fit=crop');">
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/specs_cooling/main.png');">
     <div class="container position-relative z-1">
         <h1 class="page-title">PRECISION COOLING</h1>
-        <p class="page-subtitle">CRAC / In-Row Cooling System</p>
+        <p class="page-subtitle">시스템 보호와 에너지 효율을 극대화한 혁신적인 공조 제원</p>
     </div>
 </section>
 
@@ -136,10 +182,18 @@
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="0" class="active"></button>
                     <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling1" data-bs-slide-to="3"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/roof_1.jpg" alt="Fan 1">
+                        <div class="custom-caption mb-3"><h5>루프 장착형 팬 (Roof Fan)</h5><span>SK 3138.000</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/roof_2.jpg" alt="Fan 2">
+                        <div class="custom-caption mb-3"><h5>원심 팬</h5><span>482.6mm(19˝)/320m³/h</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/roof_3.jpg" alt="Fan 3">
+                        <div class="custom-caption mb-3"><h5>팬 필터</h5><span>TopTherm</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/roof_4.jpg" alt="Fan 4">
+                        <div class="custom-caption mb-3"><h5>열교환기 루프</h5><span>마운트형</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling1" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -161,8 +215,10 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>루프 장착형 팬, 루프 배기구</th><td>차세대 루프 장착형 팬은 모든 크기에 대해 하나의 시스템임: 모든 출력 등급에 대해 단 하나의 장착용 컷아웃만 필요함, 압력 손실이 낮은 공기 유도를 통해 높은 효율성을 제공하며, 혁신적인 클램프 고정장치로 IP54의 높은 보호 등급을 달성함.</td></tr>
+                    <tr><th>원심 팬 공기 처리 능력</th><td>공기 처리량이 최대 320m3/h인 랙 마운트 팬 2U 52db의 작은 소음으로 사무실 내에서도 사용할 수 있습니다.</td></tr>
+                    <tr><th>팬 필터 장치(TopTherm)</th><td>공구를 사용하지 않고 조립할 수 있는 통합 팬 장치 공기 처리 능력 20 - 900 m³/h, 표준 보호 등급 IP 54.</td></tr>
+                    <tr><th>공기 대 공기 열교환기 루프 마운트형</th><td>조절기가 미장착된 연결 완료된 루프 마운트 열교환기 장치</td></tr>
                 </table>
             </div>
 
@@ -170,9 +226,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>경제적인 열 부하 분산: 상대적으로 깨끗한 주변 공기를 활용하여 효율적이고 경제적인 냉각 솔루션을 제공합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설치 및 유지보수 편의성: 공구 없이 조립 가능한 팬 장치와 혁신적인 클램프 고정 방식으로 설치가 간편합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>다양한 설치 옵션: 루프 장착 및 19인치 랙 마운트 등 다양한 환경에 맞는 옵션과 IP54 등급의 보호 성능을 갖추고 있습니다.</li>
                 </ul>
             </div>
         </div>
@@ -181,7 +237,7 @@
     <div class="product-divider"></div>
 
     <!-- =========================================
-     [제품 2] 냉각 장치, Thermoelectric Cooler ** 제품이 많아서 따로 진행하자!
+     [제품 2] 냉각 장치, Thermoelectric Cooler
      ========================================= -->
     <div class="row g-5">
         <!-- 왼쪽: 이미지 슬라이더 -->
@@ -193,10 +249,21 @@
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="0" class="active"></button>
                     <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling2" data-bs-slide-to="5"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/Blue_1.jpg" alt="Cooling 1">
+                        <div class="custom-caption mb-3"><h5>루프 장착형 냉각 장치</h5><span>Blue e+ 총 냉각 출력 1.30kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/Blue_2.jpg" alt="Cooling 2">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>Blue e+ S 0,3 kW – 1 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/Blue_3.jpg" alt="Cooling 3">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>TopTherm Blue e 0.3 ~ 4 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/Blue_4.jpg" alt="Cooling 4">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>Blue e+ 옥외용 1.5 ~ 5.0kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/Blue_5.jpg" alt="Cooling 5">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>TopTherm Blue e, NEMA 4X 0.5 ~ 2.5kW</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling2" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -218,8 +285,11 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>루프 장착형 냉각 장치 Blue e+ 총 냉각 출력 1.30kW</th><td>혁신적인 하이브리드 기술을 통한 혁명적인 에너지 효율. 속도 제어식 구성품과 히트 파이프 기술을 통한 평균 75% 에너지 절감. 전 세계에서 사용하기 위한 독보적인 멀티 전압 수용 능력. 터치 디스플레이를 통한 직관적인 조작.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 Blue e+ S 0,3 kW – 1 kW</th><td>검증된 Blue e+ 기술이 적용된 Blue e+ S 냉각 장치는 세계 최고의 에너지 효율성을 제공함. 여기에는 기계 및 시스템의 탄소 발자국을 줄이는 것도 포함됨. 새로운 디자인과 많은 스마트 기능.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 TopTherm Blue e 0.3 ~ 4 kW</th><td>300W ~ 4000W 출력 등급의 에너지 효율적인 벽면 장착형 냉각 장치 Blue e, 통합 전기식 응축물 증발 시스템이 포함된 경우 1000W. 이상 “가로” 및 “평면” 특수 형식으로 제공.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 Blue e+ 옥외용 1.5 ~ 5.0kW</th><td>1500W ~ 5000W 출력 등급의 에너지 효율이 높은 벽면 장착형 냉각 장치 Blue e+ 옥외용. IP 56 / UL 타입 12/3R/4 높은 보호 등급과 -30°C ~ 60°C의 온도 범위 덕분에 까다로운 환경에 대해 최적의 보호 기능을 제공함. 냉각 장치는 세 가지 장착 종류(외부 장착, 부분 내부 장착, 완전 내부 장착)로 예컨대 Toptec 프로젝트 솔루션에 장착할 수 있음.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 TopTherm Blue e, NEMA 4X 0.5 ~ 2.5kW</th><td>고효율 Blue e 벽면 장착 냉각 장치에는, 통합형 e-컴포트 컨트롤러가 기본적으로 장착되어 있습니다. 500 W ~ 2,500W의 출력 등급을 지니고 있고, 전기식 응축수 증발 기술이 적용되어 있습니다.</td></tr>
                 </table>
             </div>
 
@@ -227,9 +297,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>혁신적인 하이브리드 기술: 히트 파이프와 속도 제어식 구성품을 결합하여 평균 75%의 획기적인 에너지 절감을 실현했습니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>완벽한 내부 보호: 내부와 외부의 공기 순환이 분리되어 먼지 침투를 차단하며, IP56 및 NEMA 4X 등급으로 거친 환경에서도 안전합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>글로벌 호환성: 멀티 전압 수용 능력으로 전 세계 어디서나 사용 가능하며, 터치 디스플레이와 IoT 인터페이스로 직관적인 관리가 가능합니다.</li>
                 </ul>
             </div>
         </div>
@@ -250,10 +320,18 @@
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="0" class="active"></button>
                     <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling3" data-bs-slide-to="3"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/VX25_1.jpg" alt="VX25 1">
+                        <div class="custom-caption mb-3"><h5>냉각 모듈</h5><span>VX25</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/VX25_2.jpg" alt="VX25 2">
+                        <div class="custom-caption mb-3"><h5>냉각 모듈</h5><span>Blue e 총 냉각 출력 1.50 ~ 2.50 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/VX25_3.jpg" alt="VX25 3">
+                        <div class="custom-caption mb-3"><h5>냉각 모듈</h5><span>Blue e 총 냉각 출력 1.50 ~ 2.50 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/VX25_4.jpg" alt="VX25 4">
+                        <div class="custom-caption mb-3"><h5>냉각 모듈</h5><span>관계도</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling3" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -275,8 +353,8 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>VX25 공조 도어 모듈형 공조 컨셉트 냉각 모듈 설치용</th><td>유형 SK 3307.7XX ~ 3310.7XX의 공조 모듈 설치용 강판 섹션 공조 도어.</td></tr>
+                    <tr><th>모듈형 공조 컨셉트, 냉각 모듈 Blue e 총 냉각 출력 1.50 ~ 2.50 kW</th><td>공조 도어용 공조 모듈. 1500 ~ 2500W의 냉각 출력.</td></tr>
                 </table>
             </div>
 
@@ -284,9 +362,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>공간 절약형 디자인: 냉각 장치가 인클로저 도어와 일체형으로 통합되어 별도의 설치 공간 없이 깔끔하고 조화로운 외관을 제공합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>간편한 설치 및 교체: 기존 도어를 기계적 가공 없이 쉽게 교체하여 쿨링 모듈을 설치할 수 있어 현장 적용성이 매우 뛰어납니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>유연한 냉각 성능: 1.5kW에서 최대 2.5kW의 냉각 출력을 제공하며, 모듈형 설계를 통해 유지보수와 시스템 업그레이드가 용이합니다.</li>
                 </ul>
             </div>
         </div>
@@ -307,10 +385,24 @@
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="0" class="active"></button>
                     <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselCooling4" data-bs-slide-to="5"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/water_1.jpg" alt="Water 1">
+                        <div class="custom-caption mb-3"><h5>칠러 Blue e+</h5><span>1,5 - 7 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/water_2.jpg" alt="Water 2">
+                        <div class="custom-caption mb-3"><h5>TopTherm 칠러</h5><span>1 - 4 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/water_3.jpg" alt="Water 3">
+                        <div class="custom-caption mb-3"><h5>칠러 Blue e</h5><span>8 ~ 48 kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/water_4.jpg" alt="Water 4">
+                        <div class="custom-caption mb-3"><h5>열교환기</h5><span>루프 마운트형</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/water_5.jpg" alt="Water 5">
+                        <div class="custom-caption mb-3"><h5>열교환기</h5><span>벽면 장착형</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/water_6.jpg" alt="Water 6">
+                        <div class="custom-caption mb-3"><h5>액체 냉각 패키지</h5><span>LCP 랙 산업용</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling4" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -332,8 +424,12 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>칠러 Blue e+ 1,5 - 7 kW</th><td>Blue e+ 칠러는 효율적이고 유연하며 콤팩트함. 이 제품은 냉각수의 경제적인 중앙 냉각을 제공하며 이것을 특히 공기 대 물 열교환기에 공급함. 회전속도 제어식 구성요소와 인버터 기술을 통한 최대 70% 에너지 절감. 전 세계에서 사용하기 위한 국제 인증 및 다전압성. 터치 디스플레이를 통한 직관적인 조작 및 지능형 통신 인터페이스로 손쉽게 조작하고 분석할 수 있음.</td></tr>
+                    <tr><th>TopTherm 칠러 1 - 4 kW</th><td>루프 장착형 버전 및 독립형 버전의 TopTherm 칠러는 유연한 콤팩트형 제품임. 이 제품은 냉각수의 경제적인 중앙 냉각을 제공하며 이것을 특히 공기 대 물 열교환기에 공급함. 기본 사양으로 나노 코팅 콘덴서가 있음.</td></tr>
+                    <tr><th>칠러 Blue e 8 ~ 48 kW</th><td>스탠드형 인클로저에 있는 Blue e 칠러는 냉각수의 경제적인 중앙 냉각을 제공함. 마이크로 채널 기술로 냉각제 감소가 가능함. 터치 디스플레이를 통한 직관적인 조작 및 지능형 통신 인터페이스로 손쉽게 조작하고 분석할 수 있음. 기본 사양에 통합된 안전 기능으로 최대 안전성 달성. 또한, 사전 정의된 옵션 패키지로 납품 시간 단축.</td></tr>
+                    <tr><th>물 대 공기 열교환기 루프 마운트형</th><td>루프 면에 장착하기 위한 용도. 냉각 출력 1.87kW ~ 4kW. 기본 IP 55 보호 등급. 거친 환경에서 사용하기 위한 용도에 특히 적합. 유연한 급수 연결 가능.</td></tr>
+                    <tr><th>물 대 공기 열교환기 벽면 장착형</th><td>출력 등급 375 ~ 5,000W. 거친 환경에서 사용하기 위한 용도. 편리한 설치 및 유연한 급수 연결 가능. 외부 장착 또는 완전 내부 장착 가능.</td></tr>
+                    <tr><th>액체 냉각 패키지 LCP 랙 산업용</th><td>연반 인클로저 시스템 VX25 내 공기 대 물 열교환기. 600 또는 800mm 깊이 및 2000mm 높이 VX25 인클로저에 적합. 양쪽 측면에 각 5kW 또는 한 면에 10kW의 공기 배출 가능. 장치 상/하부에 유연한 급배수 연결 가능.</td></tr>
                 </table>
             </div>
 
@@ -341,9 +437,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>고효율 중앙 냉각 시스템: 인버터 기술과 마이크로 채널 기술을 적용하여 에너지 소비를 최대 70% 줄이고 냉매 사용량을 획기적으로 감소시켰습니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>강력한 고부하 냉각 솔루션: 높은 열 부하가 발생하는 산업 환경에서도 공기 대 물 열교환 방식을 통해 안정적이고 강력한 냉각 성능을 제공합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>유연한 설치 및 내구성: 루프형, 독립형, 랙 장착형 등 다양한 설치 옵션을 제공하며, 나노 코팅 콘덴서 등으로 거친 환경에서도 뛰어난 내구성을 발휘합니다.</li>
                 </ul>
             </div>
         </div>
@@ -376,16 +472,26 @@
 
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 8"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 9"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 10"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/itcooler_1.jpg" alt="IT Cooler 1">
+                        <div class="custom-caption mb-3"><h5>액체 냉각 패키지</h5><span>LCP CW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_2.jpg" alt="IT Cooler 2">
+                        <div class="custom-caption mb-3"><h5>액체 냉각 장치</h5><span>VX IT 랙</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_3.jpg" alt="IT Cooler 3">
+                        <div class="custom-caption mb-3"><h5>소형 냉각 장치</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_4.jpg" alt="IT Cooler 4">
+                        <div class="custom-caption mb-3"><h5>IT 실내 냉각</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_5.jpg" alt="IT Cooler 5">
+                        <div class="custom-caption mb-3"><h5>IT 냉각용 칠러</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_6.jpg" alt="IT Cooler 6">
+                        <div class="custom-caption mb-3"><h5>IT 냉각용 액세서리</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_7.jpg" alt="IT Cooler 7">
+                        <div class="custom-caption mb-3"><h5>통로 차폐</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_8.jpg" alt="IT Cooler 8">
+                        <div class="custom-caption mb-3"><h5>루프 장착형 냉각 장치</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_9.jpg" alt="IT Cooler 9">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>Blue e+ IT</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/itcooler_10.jpg" alt="IT Cooler 10">
+                        <div class="custom-caption mb-3"><h5>루프 마운트 냉각 장치</h5><span>IT 장치 냉각용</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling5" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -407,16 +513,16 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>액체 냉각 패키지</th><td>LCP CW: IT 랙에서 공기 대 물 열교환기를 통해 매우 높은 열부하가 운반됨. LCP DX: 중소형 IT 적용 영역의 냉각에 적합.</td></tr>
+                    <tr><th>액체 냉각 장치</th><td>VX IT 랙 및 마이크로 데이터 센터의 공간 낭비 없는 효율적인 냉각. IT에 맞는 "앞에서 뒤로" 이루어지는 공기 유도 최적 지원. 단순형 또는 리던던트형 버전의 가용성을 통해 고장 안전성이 높음.</td></tr>
+                    <tr><th>소형 냉각 장치</th><td>개별 IT 랙을 냉각하기 위한 액티브 및 패시브 구성 요소.</td></tr>
+                    <tr><th>IT 실내 냉각</th><td>최고의 정밀도와 고장 안정성으로 데이터 센터를 위한 안정적이고 에너지 효율적인 실내 냉각. Stulz 포트폴리오의 CyberAir 3PRO CW, CyberAir 3PRO DX 및 CyberAir Mini CW 실내 냉각 시스템.</td></tr>
+                    <tr><th>IT 냉각용 칠러</th><td>LCP 또는 공기/물 열교환기 등 IT 애플리케이션 및 프로젝트 별 요구를 위한 안정적인 냉각.</td></tr>
+                    <tr><th>IT 냉각용 액세서리</th><td>Blue e+ 냉각 장치, LCP CW 및 LCP DX 적용 영역에 적합한 액세서리.</td></tr>
+                    <tr><th>통로 차폐</th><td>도어 및 커버 구성품이 데이터 센터의 따뜻한 공기와 차가운 공기를 분리합니다. 이를 통해 온도 제어 효율성이 상승합니다. 온기 또는 냉기 통로 파티션으로도 사용할 수 있습니다.</td></tr>
+                    <tr><th>루프 장착형 냉각 장치 Blue e+ IT</th><td>Blue e+ 기술을 이용하여 IT 랙의 에너지 효율적인 냉각을 위한 요구사항에 맞게 패키지를 조정함. IoT 인터페이스와 결합하여 다양한 시스템 및 모니터링과 에너지 매니지먼트 시스템에 통신이 이루어짐.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 Blue e+ IT</th><td>Blue e+ 기술을 이용하여 IT 랙의 에너지 효율적인 냉각을 위한 요구사항에 맞게 패키지를 조정함. IoT 인터페이스와 결합하여 다양한 시스템 및 모니터링과 에너지 매니지먼트 시스템에 통신이 이루어짐.</td></tr>
+                    <tr><th>루프 마운트 냉각 장치 IT 장치 냉각용</th><td>최대 3kW 손실 출력용 액티브 개별 인클로저 냉각. 서버 인입구 온도의 설정값에 따른 제어.</td></tr>
                 </table>
             </div>
 
@@ -424,9 +530,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>데이터 센터 최적화: 단일 서버 랙부터 대규모 데이터 센터까지 IT 장비의 특성에 맞춘 정밀하고 효율적인 냉각 솔루션을 제공합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>에너지 효율 및 고가용성: Blue e+ 기술과 인버터 제어를 통해 에너지를 절감하고, 리던던트 구성으로 시스템의 안정성과 가동 시간을 보장합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>지능형 모니터링 및 제어: IoT 인터페이스와 통합되어 실시간 상태 모니터링 및 원격 제어가 가능하며, 데이터 센터 관리 시스템(DCIM)과 원활하게 연동됩니다.</li>
                 </ul>
             </div>
         </div>
@@ -435,7 +541,7 @@
     <div class="product-divider"></div>
 
     <!-- =========================================
-     [제품 6] 히터 ** 제품이 많아서 이건 따로 해보자
+     [제품 6] 히터
      ========================================= -->
     <div class="row g-5">
         <!-- 왼쪽: 이미지 슬라이더 -->
@@ -447,10 +553,15 @@
                 <div class="carousel-indicators">
                     <button type="button" data-bs-target="#carouselCooling6" data-bs-slide-to="0" class="active"></button>
                     <button type="button" data-bs-target="#carouselCooling6" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselCooling6" data-bs-slide-to="2"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/nanbang_1.jpg" alt="Heater 1">
+                        <div class="custom-caption mb-3"><h5>인클로저</h5><span>난방 장치 팬 없음</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/nanbang_2.jpg" alt="Heater 2">
+                        <div class="custom-caption mb-3"><h5>인클로저</h5><span>난방 장치 팬 있음</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/nanbang_3.jpg" alt="Heater 3">
+                        <div class="custom-caption mb-3"><h5>열전기 쿨러</h5><span>총 냉각/난방 출력 80/80W</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling6" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -472,8 +583,9 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>인클로저 난방 장치 팬 없음</th><td>상대 습도를 조절하기 위한 인클로저 히터는 이슬점 이하로 떨어지는 것을 방지하여 인클로저 내부에서 응결을 방지함. 부식이나 전기 단락으로 인한 이차 피해를 방지함. 팬 없는 버전. 연속 열 출력 10 ~ 150W.</td></tr>
+                    <tr><th>인클로저 난방 장치 팬 있음</th><td>상대 습도를 조절하기 위한 인클로저 히터는 이슬점 이하로 떨어지는 것을 방지하여 인클로저 내부에서 응결을 방지함. 부식이나 전기 단락으로 인한 이차 피해를 방지함. 팬 있는 버전. 연속 열 출력 235 ~ 800W.</td></tr>
+                    <tr><th>열전기 쿨러 총 냉각/난방 출력 80/80W</th><td>펠티에 기술에 기반한 경량 구조의 고성능 공조 장치는 커맨드 패널과 소형 인클로저의 에너지 효율적인 에어 컨디셔닝을 책임짐. 냉각/난방 출력 80/80W</td></tr>
                 </table>
             </div>
 
@@ -481,9 +593,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>결로 및 부식 방지: 인클로저 내부 온도를 이슬점 이상으로 유지하여 습기 발생을 막고, 전기 부품의 부식과 단락 사고를 예방합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>다양한 출력 및 팬 옵션: 10W 소형 히터부터 800W 팬 히터까지 다양한 라인업을 갖추어 설치 환경과 필요 열량에 맞춰 최적의 제품을 선택할 수 있습니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>지능형 온도 제어: 자동 온도 조절 장치와 연동하여 불필요한 에너지 소모를 줄이면서도 최적의 내부 환경을 지속적으로 유지합니다.</li>
                 </ul>
             </div>
         </div>
@@ -512,14 +624,22 @@
                     <button type="button" data-bs-target="#carouselCooling7" data-bs-slide-to="8"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 8"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/fanfilter_1.jpg" alt="Outdoor 1">
+                        <div class="custom-caption mb-3"><h5>팬/필터 유닛</h5><span>Blue e+</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_2.jpg" alt="Outdoor 2">
+                        <div class="custom-caption mb-3"><h5>팬/필터 유닛</h5><span>Blue e+ EC 기술 포함</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_3.jpg" alt="Outdoor 3">
+                        <div class="custom-caption mb-3"><h5>살수 안전 후드</h5><span>보호등급 상승</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_4.jpg" alt="Outdoor 4">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>Blue e+ 옥외용 1.5 ~ 5.0kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_5.jpg" alt="Outdoor 5">
+                        <div class="custom-caption mb-3"><h5>벽면 장착형 냉각 장치</h5><span>TopTherm Blue e, UL Type 3R/4 0.5 ~ 2.5kW</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_6.jpg" alt="Outdoor 6">
+                        <div class="custom-caption mb-3"><h5>인클로저 </h5><span>난방 장치 팬 없음</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_7.jpg" alt="Outdoor 7">
+                        <div class="custom-caption mb-3"><h5>인클로저 </h5><span>난방 장치 팬 있음</span></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/fanfilter_8.jpg" alt="Outdoor 8">
+                        <div class="custom-caption mb-3"><h5>직접 공기 냉각(DAC)</h5><span>시스템 다기능 인클로저용</span></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling7" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -541,14 +661,14 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>Blue e+ 팬/필터 유닛</th><td>공구를 사용하지 않고 조립할 수 있는 통합 팬 장치 공기 처리 능력 20 - 1160 m³/h, 표준 보호 등급 IP 54.</td></tr>
+                    <tr><th>Blue e+ 팬/필터 유닛 EC 기술 포함</th><td>EC 기술이 적용된 에너지 효율 버전은 처음으로 IoT 기능이 탑재된 것 이외에도 여러 특징이 있음. Blue e+ 팬 필터 장치는 에너지 효율성부터 모니터링, 지속 가능성, 공기 처리 능력 향상(175 ~ 1,160m³/h)에 이르기까지 다양한 이점을 제공함.</td></tr>
+                    <tr><th>살수 안전 후드 보호 등급을 높이기 위한 용도</th><td>특히 식품 산업 부문에서 살수 안전 후드가 물기 유입을 차단함. 보호 등급 IP 56은 기본 필터와 함께 도달 가능.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 Blue e+ 옥외용 1.5 ~ 5.0kW</th><td>1500W ~ 5000W 출력 등급의 에너지 효율이 높은 벽면 장착형 냉각 장치 Blue e+ 옥외용. IP 56 / UL 타입 12/3R/4 높은 보호 등급과 -30°C ~ 60°C의 온도 범위 덕분에 까다로운 환경에 대해 최적의 보호 기능을 제공함. 냉각 장치는 세 가지 장착 종류(외부 장착, 부분 내부 장착, 완전 내부 장착)로 예컨대 Toptec 프로젝트 솔루션에 장착할 수 있음.</td></tr>
+                    <tr><th>벽면 장착형 냉각 장치 TopTherm Blue e, UL Type 3R/4 0.5 ~ 2.5kW</th><td>에너지 효율적 Blue e 벽면 장착형 냉각 장치로서 출력 등급이 500W ~ 2500W이며 표준 통합형 e-컴포트 컨트롤러 그리고 전기식 응축물 증발 시스템. 보호 등급 UL Type 3R/4, 12.</td></tr>
+                    <tr><th>인클로저 난방 장치 팬 없음</th><td>상대 습도를 조절하기 위한 인클로저 히터는 이슬점 이하로 떨어지는 것을 방지하여 인클로저 내부에서 응결을 방지함. 부식이나 전기 단락으로 인한 이차 피해를 방지함. 팬 없는 버전. 연속 열 출력 10 ~ 150W.</td></tr>
+                    <tr><th>인클로저 난방 장치 팬을 통한</th><td>상대 습도를 조절하기 위한 인클로저 히터는 이슬점 이하로 떨어지는 것을 방지하여 인클로저 내부에서 응결을 방지함. 부식이나 전기 단락으로 인한 이차 피해를 방지함. 팬 있는 버전. 연속 열 출력 235 ~ 800W.</td></tr>
+                    <tr><th>직접 공기 냉각(DAC) 시스템 다기능 인클로저용</th><td>다기능 인클로저(MFG)에 설치하기 위한 루프 장착형 Direct Air Cooler. 이 제품은 낮은 온도차(Delta T)인 경우 MFG에서 높은 손실 전력을 매우 효과적으로 보상하기에 특히 적합합니다. 매우 효과적인 주름형 필터를 사용함으로써 주변 공기가 필터링되어 MFG로 유입되고, 따뜻한 내부 공기가 플랩 밸브를 통해 빠져나갈 수 있습니다. DAC(Direct Air Cooler)는 MFG 하우징의 루프에 완전히 통합되어 파손으로부터 보호됩니다.</td></tr>
                 </table>
             </div>
 
@@ -556,9 +676,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>극한 환경 대응 설계: -30°C에서 60°C의 넓은 온도 범위와 IP56, UL Type 4 등의 높은 보호 등급으로 옥외의 가혹한 날씨와 환경을 견딜 수 있습니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>강화된 방수 및 방진: 살수 안전 후드와 이중 구조 설계를 적용하여 비, 눈, 먼지 등 외부 오염 물질의 침투를 원천적으로 차단합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>에너지 효율적인 하이브리드 냉각: Blue e+ 기술과 직접 공기 냉각(DAC) 방식을 활용하여 옥외 환경에서도 최고의 에너지 효율을 달성합니다.</li>
                 </ul>
             </div>
         </div>
@@ -587,13 +707,20 @@
                     <button type="button" data-bs-target="#carouselCooling8" data-bs-slide-to="7"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 7"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/gongjo_1.jpg" alt="Accessory 1">
+                        <div class="custom-caption mb-3"><h5>필터 기술</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_2.jpg" alt="Accessory 2">
+                        <div class="custom-caption mb-3"><h5>공기 유도</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_3.jpg" alt="Accessory 3">
+                        <div class="custom-caption mb-3"><h5>공통</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_4.jpg" alt="Accessory 4">
+                        <div class="custom-caption mb-3"><h5>공통</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_5.jpg" alt="Accessory 5">
+                        <div class="custom-caption mb-3"><h5>조립 구성품</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_6.jpg" alt="Accessory 6">
+                        <div class="custom-caption mb-3"><h5>프로젝트 플래닝/모니터링</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/gongjo_7.jpg" alt="Accessory 7">
+                        <div class="custom-caption mb-3"><h5>IIoT 솔루션</h5></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling8" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -615,13 +742,13 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>필터 기술</th><td>분진 부하가 증가한 경우 필터 매트를 사용하여 필터 팬의 수명을 늘리고 보호 등급을 유지하는 것이 좋음. 특히 주변 공기에 오일이 함유된 경우 금속 필터를 사용해야 함.</td></tr>
+                    <tr><th>공기 유도</th><td>인클로저의 모든 영역으로 효율적인 공기 유도 및 공기 방향 전환을 위한 시스템. 공기 덕트 시스템을 통해 인클로저의 어느 영역으로든 차가운 공기를 정확하게 유도할 수 있음. 자가 통풍식 설치 장치들로 인해 발생할 수 있는 공기 순환회로의 통기단락 현상을 효과적으로 방지할 수 있음.</td></tr>
+                    <tr><th>공통</th><td>인클로저의 모든 영역으로 효율적인 공기 유도 및 공기 방향 전환을 위한 시스템. 공기 덕트 시스템을 통해 인클로저의 어느 영역으로든 차가운 공기를 정확하게 유도할 수 있음. 자가 통풍식 설치 장치들로 인해 발생할 수 있는 공기 순환회로의 통기단락 현상을 효과적으로 방지할 수 있음.</td></tr>
+                    <tr><th>공통</th><td>공조 솔루션의 효율성과 최적의 제어(예: 소음 감소 및 에너지 절감)를 향상시키기 위한 용도.</td></tr>
+                    <tr><th>조립 구성품</th><td>공조기 제품의 간단한 설치와 더 뛰어난 사용 편의성, 보호 등급 달성을 위한 액세서리.</td></tr>
+                    <tr><th>프로젝트 플래닝/모니터링</th><td>효율적인 공조를 위한 중요한 기준은 시스템의 최적 설계, 제어, 모니터링임. 당사의 사용자 친화적인 툴과 소프트웨어 솔루션은 공조 수요 계산 및 제품 진단과 분석 시 지원.</td></tr>
+                    <tr><th>IIoT 솔루션</th><td>디지털화와 네트워킹은 모든 회사에 큰 기회를 제공. IoT 인터페이스로 물리적 환경조건을 모니터링하기 위한 센서나 리탈 냉각 솔루션을 인더스트리 4.0 환경에 쉽게 연결할 수 있음.</td></tr>
                 </table>
             </div>
 
@@ -629,9 +756,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>공기 흐름 최적화: 정밀한 에어 덕트 시스템과 가이드 솔루션을 통해 냉각 공기를 핫스팟에 정확히 전달하여 냉각 효율을 극대화합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>스마트 모니터링 및 연결성: IoT 인터페이스와 센서를 통해 필터 상태, 온도, 누수 등을 실시간 감시하고 인더스트리 4.0 환경에 통합합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>유지보수 편의성 및 수명 연장: 고성능 필터와 보호 커버를 통해 장비 수명을 늘리고, 공구 없는 유지보수 부품으로 관리 비용을 절감합니다.</li>
                 </ul>
             </div>
         </div>
@@ -658,12 +785,18 @@
                     <button type="button" data-bs-target="#carouselCooling9" data-bs-slide-to="5"></button>
                 </div>
                 <div class="carousel-inner">
-                    <div class="carousel-item active"><img src="/images/specs_cooling/" alt="Power 1"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 2"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 3"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 4"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 5"></div>
-                    <div class="carousel-item"><img src="/images/specs_cooling/" alt="Power 6"></div>
+                    <div class="carousel-item active"><img src="/images/specs_cooling/yebibupum_1.jpg" alt="Spare 1">
+                        <div class="custom-caption mb-3"><h5>활성 구성요소</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/yebibupum_2.jpg" alt="Spare 2">
+                        <div class="custom-caption mb-3"><h5>전자 부품</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/yebibupum_3.jpg" alt="Spare 3">
+                        <div class="custom-caption mb-3"><h5>팬</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/yebibupum_4.jpg" alt="Spare 4">
+                        <div class="custom-caption mb-3"><h5>센서</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/yebibupum_5.jpg" alt="Spare 5">
+                        <div class="custom-caption mb-3"><h5>인클로저 구성요소</h5></div></div>
+                    <div class="carousel-item"><img src="/images/specs_cooling/yebibupum_6.jpg" alt="Spare 6">
+                        <div class="custom-caption mb-3"><h5>액세서리</h5></div></div>
                 </div>
                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselCooling9" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
@@ -685,12 +818,12 @@
             <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
             <div class="spec-scroll-wrapper">
                 <table class="spec-table">
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
-                    <tr><th></th><td></td></tr>
+                    <tr><th>활성 구성요소</th><td>컴프레서, 건조기, 팽창 밸브, 팽창 밸브용 코일, 응축물 증발기, 제어 볼 밸브, 밸브, 체크 밸브, 바이패스 밸브, 솔레노이드 밸브용 코일, 펌프, 탱크, 응축수 펌프, 액적 분리기, 증발기, 콘덴서, 열교환기, 플레이트 열교환기, 오일섬프 히터, 서보 모터</td></tr>
+                    <tr><th>전자 부품</th><td>디스플레이, 제어기, I/O보드, 인버터, 파워팩, 변압기, 응축물 증발기 퓨즈 키트, 전자 모듈, 제어 모듈 LCP용, 제어 모듈 물 LCP용, 제어 모듈 팬 LCP용, 돌입 전류 제한기 LCP용. 회전수 제어기, 장애 메시지 모듈, SNMP카드, 위상 릴레이, 디스플레이 케이블, 파워 입력 AC케이블, 연결 커넥터, 콘덴서, 스타터, 유지보수 스위치</td></tr>
+                    <tr><th>팬</th><td>축방향 팬, 반사형 팬, 사류팬, 통풍기 장치, </td></tr>
+                    <tr><th>센서</th><td>온도 센서, 온도 센서 물 유입부, 온도 센서 물 회수관, 응축수 센서, 매체 센서, 누출 센서, 레벨 모니터, 유량계, 유량계용 센서, 압력 전송기, 플로트 스위치, 수위 표시기, 압력계, 온도 제어기</td></tr>
+                    <tr><th>인클로저 구성요소</th><td>그릴, 장착 클립, 고정 홀더, 그릴 커버용 오프닝 리미터, 커버, 인클로저, 송풍기 패널, 금속 필터, 루프 장착형 팬 어댑터 프레임, 팬 잠금장치, 장착 프레임 SK, 베이스, 필터 하우징 팬 필터 장치용</td></tr>
+                    <tr><th>액세서리</th><td>루프 씰, 실링 프레임HD, 액세서리 백, 응축물 수집병, 컴프레서 장착 재료</td></tr>
                 </table>
             </div>
 
@@ -698,9 +831,9 @@
             <div class="feature-summary mt-4">
                 <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
                 <ul class="list-unstyled text-white-50 small mb-0">
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
-                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>설명추가예정</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>순정 부품의 신뢰성: 제조사가 보증하는 고품질 순정 부품을 사용하여 수리 후에도 장비의 원래 성능과 안전성을 그대로 유지합니다.</li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>포괄적인 부품 라인업: 컴프레서, 팬, 전자 기판부터 각종 센서와 기구물까지 유지보수에 필요한 모든 예비 부품을 완벽하게 지원합니다.</li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i>신속한 장애 복구 지원: 주요 핵심 부품의 빠른 수급과 교체 용이성을 고려한 설계를 통해 장비 다운타임을 최소화하고 가용성을 확보합니다.</li>
                 </ul>
             </div>
         </div>
