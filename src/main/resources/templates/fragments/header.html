@@ -67,7 +67,7 @@
                 </li>
 
                 <!-- 2. 장비 -->
-                <li class="nav-item dropdown" sec:authorize="!hasRole('ADMIN')">
+                <li class="nav-item dropdown" sec:authorize="hasRole('USER')">
                     <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-hdd-stack me-2"></i> 장비
                     </a>
