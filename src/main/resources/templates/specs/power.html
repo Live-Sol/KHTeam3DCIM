@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Power Specs</title>
+    <!-- 공통 라이브러리 생략 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+    <style>
+        .spec-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(10px);
+        }
+        .spec-table th, .spec-table td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+        .spec-table th { background: rgba(250, 204, 21, 0.1); color: #fff; width: 30%; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.05); } /* Yellow Tint */
+        .spec-table tr:last-child td, .spec-table tr:last-child th { border-bottom: none; }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2000&auto=format&fit=crop');">
+    <div class="container position-relative z-1">
+        <h1 class="page-title">POWER INFRASTRUCTURE</h1>
+        <p class="page-subtitle">Uninterruptible Power Supply (UPS) & Intelligent PDU</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <h3 class="section-header text-warning mb-4">RELIABILITY & EFFICIENCY</h3>
+            <p class="text-white-50 mb-4" style="line-height: 1.8;">
+                StarRoot의 전력 시스템은 99.999%의 가용성을 목표로 설계되었습니다.
+                모듈형 UPS 시스템은 N+1 또는 2N 구성을 지원하며, 지능형 PDU(iPDU)를 통해
+                장비별 전력 사용량을 실시간으로 모니터링하고 원격 제어할 수 있습니다.
+            </p>
+            <ul class="list-unstyled text-white-50">
+                <li class="mb-2"><i class="bi bi-battery-charging text-warning me-2"></i> 리튬이온 배터리 기반 UPS</li>
+                <li class="mb-2"><i class="bi bi-outlet text-warning me-2"></i> 콘센트별 전력 계측 지원 (1% 오차)</li>
+                <li class="mb-2"><i class="bi bi-arrow-repeat text-warning me-2"></i> 자동 절체 스위치 (ATS/STS) 내장</li>
+            </ul>
+        </div>
+
+        <div class="col-lg-7">
+            <h4 class="text-white fw-bold mb-3"><i class="bi bi-plug-fill me-2"></i>UPS & PDU Specification</h4>
+            <table class="spec-table">
+                <tr>
+                    <th colspan="2" class="text-center text-warning bg-opacity-25 bg-warning">UPS System (무정전 전원 장치)</th>
+                </tr>
+                <tr>
+                    <th>Capacity</th>
+                    <td>500 kVA Modular (Scalable up to 2 MVA)</td>
+                </tr>
+                <tr>
+                    <th>Topology</th>
+                    <td>Online Double Conversion</td>
+                </tr>
+                <tr>
+                    <th>Efficiency</th>
+                    <td>Up to 97% (Double Conversion Mode)</td>
+                </tr>
+                <tr>
+                    <th>Battery Type</th>
+                    <td>Lithium-Ion (LiFePO4) Cabinet</td>
+                </tr>
+                <tr>
+                    <th>Back-up Time</th>
+                    <td>15 Minutes @ Full Load</td>
+                </tr>
+
+                <tr>
+                    <th colspan="2" class="text-center text-warning bg-opacity-25 bg-warning">Intelligent PDU (전원 분배 장치)</th>
+                </tr>
+                <tr>
+                    <th>Input Voltage</th>
+                    <td>3-Phase 380V / 400V / 415V</td>
+                </tr>
+                <tr>
+                    <th>Current Rating</th>
+                    <td>32A / 63A per Phase</td>
+                </tr>
+                <tr>
+                    <th>Outlets</th>
+                    <td>36x C13 (10A) + 6x C19 (16A) Lockable</td>
+                </tr>
+                <tr>
+                    <th>Metering</th>
+                    <td>Input Phase, Circuit Breaker, Outlet Level</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

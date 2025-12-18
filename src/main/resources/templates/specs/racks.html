@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Rack Specs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+    <style>
+        /* [수정] 스크롤 가능한 테이블 래퍼 */
+        .spec-scroll-wrapper {
+            max-height: 500px; /* 이 높이를 넘어가면 스크롤 생김 */
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(30, 41, 59, 0.4);
+            /* 커스텀 스크롤바 디자인 */
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-cyan) rgba(15, 23, 42, 0.5);
+        }
+        /* 웹킷(크롬 등) 스크롤바 커스텀 */
+        .spec-scroll-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .spec-scroll-wrapper::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .spec-scroll-wrapper::-webkit-scrollbar-thumb {
+            background-color: var(--accent-cyan);
+            border-radius: 10px;
+        }
+
+        /* 스펙 테이블 스타일 (수정됨: 헤더 배경색 불투명 처리) */
+        .spec-table {
+            width: 100%;
+            border-collapse: separate; /* collapse 대신 separate 사용 */
+            border-spacing: 0;
+        }
+        .spec-table th, .spec-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        /*  헤더 고정 및 배경색 지정  */
+        .spec-table th {
+            /* 배경색을 반투명이 아닌 완전한 색상으로 지정하여 글자 겹침 방지 */
+            background-color: #1e293b; /* 짙은 남색 배경 */
+            color: #fff; /* 글자색 흰색 */
+            width: 30%;
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.05);
+
+            /* 하단 테두리 추가 (헤더 구분선) */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .spec-table tr:last-child td, .spec-table tr:last-child th {
+            border-bottom: none;
+        }
+
+        /* [수정] 이미지 슬라이더 스타일 개선 */
+        .product-carousel {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #1e293b; /* 이미지가 비어있는 공간을 채울 배경색 */
+        }
+        .product-carousel .carousel-item {
+            height: 500px; /* 높이를 늘려서 랙 장비 전체가 잘 보이게 함 */
+        }
+        .product-carousel .carousel-item img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain; /* 이미지가 잘리지 않고 전체가 다 보이게 설정 */
+            padding: 20px; /* 테두리와 이미지 사이 여백 */
+        }
+
+        /* 제품 섹션 구분선 */
+        .product-divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 100px 0;
+            position: relative;
+        }
+        .product-divider::after {
+            content: 'PRODUCT LINEUP';
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--primary-bg);
+            padding: 0 15px;
+            letter-spacing: 2px;
+        }
+
+        /* 특징 박스 */
+        .feature-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid var(--accent-cyan);
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- 페이지 히어로 -->
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/specs_rack/main.png');">
+    <div class="container position-relative z-1">
+        <h1 class="page-title">SERVER RACK SPECS</h1>
+        <p class="page-subtitle">스텐다드 19-인치 42U 서버 랙 장비 제원</p>
+    </div>
+</section>
+
+<div class="container py-5">
+
+    <!-- =========================================
+         [제품 1] VX 5309116
+         ========================================= -->
+    <div class="row g-5">
+        <!-- 왼쪽: 이미지 슬라이더 (깔끔하게 contain 적용) -->
+        <div class="col-lg-6">
+
+            <!-- 제품명 -->
+            <h3 class="text-white fw-bold mb-2">VX 5309116 (Premium)</h3>
+            <p class="text-cyan mb-4">Enterprise Standard Network Rack</p>
+
+            <!-- 이미지 슬라이더 -->
+            <div id="carouselRack1" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack1" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack1" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack1" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack1" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack1" data-bs-slide-to="4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5309116_1.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5309116_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5309116_3.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5309116_4.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5309116_5.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack1" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack1" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <!-- 일단 PDF로 다운로드 할 수 있게 해놨는데 기능은 구현 안됨 -->
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 설명 및 제원표 -->
+        <div class="col-lg-6">
+            <!-- 상세 제원표 (스크롤 박스 안에 넣음) -->
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5309116</td></tr>
+                    <tr><th>버전</th><td>통풍 가능, 표준, 19" 장착 앵글 포함</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄<br><small class="text-muted">Front: Al 1.25mm / Rear: Steel 1.5mm</small></td></tr>
+                    <tr><th>표면 처리</th><td>프레임: 전착도장 / 내부: 도장 처리<br>도어: 분체 코팅 / 전면: 산화방지코팅</td></tr>
+                    <tr><th>색상</th><td>Frame: RAL 7035 (Light Grey)<br>Interior: RAL 9005 (Jet Black)</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임 (도어/루프 포함)<br>
+                            - 전면 알루미늄 도어 (타공율 85%)<br>
+                            - 후면 강판 도어 (양문형, 타공율 85%)<br>
+                            - 안전 잠금장치 3524 E<br>
+                            - 19인치 장착 앵글 (482.6mm)<br>
+                            - 루프 플레이트 (케이블 인입구 포함)<br>
+                            - IPPC 인증 팔레트 포장
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>800 x 2000 x 1000 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>87 mm / 193 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>720 mm</td></tr>
+                    <tr><th>부하량</th><td>15,000 N</td></tr>
+                    <tr><th>정적 하중 (UL 2416)</th><td>12,000 N (약 1,200 kg)</td></tr>
+                    <tr><th>순 중량</th><td>81.15 kg</td></tr>
+                    <tr><th>총 중량</th><td>95 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>234.1 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <!-- 주요 특징 요약 -->
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>최적화된 공기 흐름:</strong> 85% 이상의 높은 타공율로 고발열 장비 냉각에 탁월</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>유연한 케이블링:</strong> 상단 및 하단, 측면의 다양한 케이블 인입구 제공</span></li>
+                    <li class="d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>강력한 보안:</strong> 전/후면 및 측면 패널에 잠금 장치 기본 내장</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+         [제품 2] VX 5307114
+         ========================================= -->
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">VX 5307114 (Standard)</h3>
+            <p class="text-cyan mb-4">Optimized for Network Equipment</p>
+
+            <div id="carouselRack2" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="4"></button>
+                    <button type="button" data-bs-target="#carouselRack2" data-bs-slide-to="5"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5307114_6.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5307114_1.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5307114_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5307114_3.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5307114_4.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5307114_5.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack2" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack2" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5307114</td></tr>
+                    <tr><th>버전</th><td>통풍 가능, 표준, 19" 장착 앵글</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄</td></tr>
+                    <tr><th>표면 처리</th><td>전착도장, 분체 코팅</td></tr>
+                    <tr><th>색상</th><td>RAL 7035 / RAL 9005</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임<br>
+                            - 전면/후면 통풍 도어 (타공율 85%)<br>
+                            - 안전 잠금장치 3524 E<br>
+                            - 19인치 장착 앵글<br>
+                            - 루프 플레이트 (케이블 인입구 포함)<br>
+                            - IPPC 팔레트
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>800 x 2000 x 800 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>150 mm / 130 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>520 mm</td></tr>
+                    <tr><th>부하량</th><td>8,000 N</td></tr>
+                    <tr><th>순 중량</th><td>76.72 kg</td></tr>
+                    <tr><th>총 중량</th><td>89.8 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>221.2 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>표준화된 설계:</strong> 다양한 네트워크 장비 호환성 보장</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>효율적인 공간 활용:</strong> 800x800mm 사이즈로 공간 효율 극대화</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+         [제품 3] VX 5330123
+         ========================================= -->
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">VX 5330123 (Slim)</h3>
+            <p class="text-cyan mb-4">Glass Door for Visual Monitoring</p>
+
+            <div id="carouselRack3" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack3" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack3" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack3" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack3" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack3" data-bs-slide-to="4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5330123_4.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5330123_1.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5330123_5.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5330123_3.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5330123_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack3" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack3" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5330123</td></tr>
+                    <tr><th>버전</th><td>표준 버전, 글라스 도어</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄, 단판 안전 유리(3mm)</td></tr>
+                    <tr><th>표면 처리</th><td>전착도장, 분체 코팅, 산화방지코팅</td></tr>
+                    <tr><th>색상</th><td>RAL 7035 / RAL 9005</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임<br>
+                            - 전면 알루미늄 모니터링 도어 (유리)<br>
+                            - 후면 강판 도어 (폐쇄형)<br>
+                            - 안전 잠금장치 3524 E<br>
+                            - 19인치 장착 앵글<br>
+                            - IPPC 팔레트
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>600 x 2000 x 800 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>87 mm / 193 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>520 mm</td></tr>
+                    <tr><th>부하량</th><td>15,000 N</td></tr>
+                    <tr><th>순 중량</th><td>76.4 kg</td></tr>
+                    <tr><th>총 중량</th><td>87.4 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>215.3 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>강화 유리 도어:</strong> 문을 열지 않고도 내부 장비 상태 확인 가능</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>슬림 디자인:</strong> 폭 600mm 설계로 좁은 공간에 최적화</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+         [제품 4] VX 5311126
+         ========================================= -->
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">VX 5311126 (Deep)</h3>
+            <p class="text-cyan mb-4">Deep Depth for Large Servers</p>
+
+            <div id="carouselRack4" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack4" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack4" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack4" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack4" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack4" data-bs-slide-to="4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5311126_4.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311126_5.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311126_3.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311126_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311126_1.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack4" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack4" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5311126</td></tr>
+                    <tr><th>버전</th><td>통풍 가능, 표준</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄, 유리(3mm)</td></tr>
+                    <tr><th>표면 처리</th><td>전착도장, 분체 코팅</td></tr>
+                    <tr><th>색상</th><td>RAL 7035 / RAL 9005</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임<br>
+                            - 전면 모니터링 도어 (유리)<br>
+                            - 후면 강판 도어 (폐쇄형)<br>
+                            - 19인치 장착 앵글<br>
+                            - IPPC 팔레트
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>800 x 2000 x 1200 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>150 mm / 330 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>720 mm</td></tr>
+                    <tr><th>부하량</th><td>15,000 N</td></tr>
+                    <tr><th>순 중량</th><td>94.4 kg</td></tr>
+                    <tr><th>총 중량</th><td>116.4 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>285.8 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <div class="feature-summary mt-4">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>깊은 깊이(1200mm):</strong> 대형 고성능 서버 장착 가능</span></li>
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>넓은 케이블 공간:</strong> 깊어진 만큼 후면 케이블 정리 공간 확보</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+         [제품 5] VX 5310118
+         ========================================= -->
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">VX 5310118</h3>
+            <p class="text-cyan mb-4">Narrow & Deep Configuration</p>
+
+            <div id="carouselRack5" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack5" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack5" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack5" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack5" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack5" data-bs-slide-to="4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5310118_5.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5310118_3.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5310118_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5310118_1.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5310118_4.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack5" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack5" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5310118</td></tr>
+                    <tr><th>버전</th><td>통풍 가능, 표준</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄</td></tr>
+                    <tr><th>색상</th><td>RAL 7035 / RAL 9005</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임<br>
+                            - 전면 알루미늄 도어 (타공율 85%)<br>
+                            - 후면 강판 도어 (통풍형)<br>
+                            - 19인치 장착 앵글<br>
+                            - IPPC 팔레트
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>600 x 2000 x 1200 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>150 mm / 330 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>720 mm</td></tr>
+                    <tr><th>부하량</th><td>15,000 N</td></tr>
+                    <tr><th>순 중량</th><td>68 kg</td></tr>
+                    <tr><th>총 중량</th><td>87 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>214.4 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <div class="feature-summary">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>폭 600, 깊이 1200:</strong> 좁은 공간에 깊은 서버를 설치할 때 최적</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- =========================================
+         [제품 6] VX 5311116
+         ========================================= -->
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h3 class="text-white fw-bold mb-2">VX 5311116</h3>
+            <p class="text-cyan mb-4">Wide & Standard Depth</p>
+
+            <div id="carouselRack6" class="carousel slide product-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carouselRack6" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#carouselRack6" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#carouselRack6" data-bs-slide-to="2"></button>
+                    <button type="button" data-bs-target="#carouselRack6" data-bs-slide-to="3"></button>
+                    <button type="button" data-bs-target="#carouselRack6" data-bs-slide-to="4"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/images/specs_rack/VX 5311116_3.jpg" class="d-block w-100" alt="VX Series">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311116_2.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311116_1.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311116_5.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/images/specs_rack/VX 5311116_4.jpg" class="d-block w-100" alt="VX Interior">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRack6" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselRack6" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+
+            <div class="mt-3 text-center">
+                <button class="btn btn-outline-light w-100 py-2" style="border-radius: 10px; opacity: 0.7;">
+                    <i class="bi bi-download me-2"></i>Download Datasheet (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <h5 class="text-white fw-bold mb-3 small opacity-75"><i class="bi bi-table me-2"></i>Technical Specifications</h5>
+            <div class="spec-scroll-wrapper">
+                <table class="spec-table">
+                    <tr><th>모델 번호</th><td>VX 5311116</td></tr>
+                    <tr><th>버전</th><td>통풍 가능, 표준</td></tr>
+                    <tr><th>재료</th><td>강판, 알루미늄</td></tr>
+                    <tr><th>색상</th><td>RAL 7035 / RAL 9005</td></tr>
+                    <tr>
+                        <th>제공 범위</th>
+                        <td style="line-height: 1.6;">
+                            - VX 인클로저 프레임<br>
+                            - 전면 알루미늄 도어 (타공율 85%)<br>
+                            - 후면 강판 도어 (통풍형)<br>
+                            - 19인치 장착 앵글<br>
+                            - IPPC 팔레트
+                        </td>
+                    </tr>
+                    <tr><th>치수 (W x H x D)</th><td>800 x 2000 x 1000 mm</td></tr>
+                    <tr><th>높이 단위</th><td>42 U</td></tr>
+                    <tr><th>장착 여유 공간</th><td>150 mm / 330 mm</td></tr>
+                    <tr><th>레벨 간격</th><td>720 mm</td></tr>
+                    <tr><th>부하량</th><td>15,000 N</td></tr>
+                    <tr><th>순 중량</th><td>79 kg</td></tr>
+                    <tr><th>총 중량</th><td>101 kg</td></tr>
+                    <tr><th>탄소 발자국 (PCF)</th><td>248.8 kg CO2 eq</td></tr>
+                </table>
+            </div>
+
+            <div class="feature-summary">
+                <h6 class="text-white fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Key Features</h6>
+                <ul class="list-unstyled text-white-50 small mb-0">
+                    <li class="mb-2 d-flex"><i class="bi bi-check2-circle text-cyan me-2 flex-shrink-0"></i> <span><strong>폭 800mm:</strong> 좌우 측면 케이블 정리 공간이 넉넉함</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

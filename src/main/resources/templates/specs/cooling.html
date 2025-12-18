@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Cooling Specs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+    <style>
+        .spec-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(10px);
+        }
+        .spec-table th, .spec-table td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+        .spec-table th { background: rgba(59, 130, 246, 0.1); color: #fff; width: 30%; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.05); } /* Blue Tint */
+        .spec-table tr:last-child td, .spec-table tr:last-child th { border-bottom: none; }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1563770095-2889f5c507c5?q=80&w=2000&auto=format&fit=crop');">
+    <div class="container position-relative z-1">
+        <h1 class="page-title">PRECISION COOLING</h1>
+        <p class="page-subtitle">CRAC / In-Row Cooling System</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <h3 class="section-header text-primary mb-4">THERMAL MANAGEMENT</h3>
+            <p class="text-white-50 mb-4" style="line-height: 1.8;">
+                서버실의 온습도를 일정하게 유지하는 정밀 공조 시스템입니다.
+                바닥 공조(Downflow) 방식과 열복도/냉복도(Hot/Cold Aisle) 컨테인먼트 구성을 통해
+                냉방 효율을 극대화하고 PUE를 낮춥니다.
+            </p>
+            <div class="glass-box text-center p-4 border border-primary border-opacity-25">
+                <i class="bi bi-thermometer-snow text-primary" style="font-size: 3rem;"></i>
+                <h5 class="text-white mt-3">Target Temperature</h5>
+                <h2 class="text-white fw-bold">22℃ ± 2℃</h2>
+                <small class="text-white-50">Humidity: 45% ± 5%</small>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h4 class="text-white fw-bold mb-3"><i class="bi bi-fan me-2"></i>Cooling Unit Specs</h4>
+            <table class="spec-table">
+                <tr>
+                    <th>Equipment Type</th>
+                    <td>CRAC (Computer Room Air Conditioner)</td>
+                </tr>
+                <tr>
+                    <th>Cooling Capacity</th>
+                    <td>100 kW (Sensible Cooling)</td>
+                </tr>
+                <tr>
+                    <th>Airflow Direction</th>
+                    <td>Downflow (Raised Floor)</td>
+                </tr>
+                <tr>
+                    <th>Fan Type</th>
+                    <td>EC Fan (Variable Speed Control)</td>
+                </tr>
+                <tr>
+                    <th>Refrigerant</th>
+                    <td>R-410A / R-407C (Eco-friendly)</td>
+                </tr>
+                <tr>
+                    <th>Humidifier</th>
+                    <td>Electrode Steam Humidifier (3-10 kg/h)</td>
+                </tr>
+                <tr>
+                    <th>Filter Grade</th>
+                    <td>G4 / F7 Efficiency Filters</td>
+                </tr>
+                <tr>
+                    <th>Control Interface</th>
+                    <td>7" Touchscreen Display & Modbus/SNMP</td>
+                </tr>
+                <tr>
+                    <th>Redundancy</th>
+                    <td>N+1 Configuration</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

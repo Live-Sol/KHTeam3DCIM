@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Server Specs</title>
+    <!-- 공통 CSS 생략 (위와 동일) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+    <style>
+        .spec-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(10px);
+        }
+        .spec-table th, .spec-table td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
+        .spec-table th { background: rgba(248, 113, 113, 0.1); color: #fff; width: 30%; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.05); } /* Red Tint */
+        .spec-table tr:last-child td, .spec-table tr:last-child th { border-bottom: none; }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('https://images.unsplash.com/photo-1597852074816-d933c7d2b988?q=80&w=2000&auto=format&fit=crop');">
+    <div class="container position-relative z-1">
+        <h1 class="page-title">HIGH-PERFORMANCE SERVERS</h1>
+        <p class="page-subtitle">Enterprise Grade 2U Rackmount Server</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <h3 class="section-header text-danger mb-4">SYSTEM ARCHITECTURE</h3>
+            <p class="text-white-50 mb-4" style="line-height: 1.8;">
+                AI 연산, 빅데이터 분석, 고성능 웹 호스팅을 위한 엔터프라이즈급 서버입니다.
+                듀얼 소켓 아키텍처를 기반으로 최대 코어 확장이 가능하며,
+                핫스왑 가능한 드라이브 베이와 이중화 전원 공급 장치로 무중단 서비스를 보장합니다.
+            </p>
+            <div class="row g-3 text-center">
+                <div class="col-6">
+                    <div class="glass-box p-3">
+                        <i class="bi bi-cpu-fill text-danger fs-2 mb-2"></i>
+                        <h6 class="text-white">Dual CPU</h6>
+                        <small class="text-white-50">Scalable Support</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="glass-box p-3">
+                        <i class="bi bi-memory text-danger fs-2 mb-2"></i>
+                        <h6 class="text-white">DDR5 RAM</h6>
+                        <small class="text-white-50">High Bandwidth</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h4 class="text-white fw-bold mb-3"><i class="bi bi-clipboard-data me-2"></i>Hardware Specifications</h4>
+            <table class="spec-table">
+                <tr>
+                    <th>Form Factor</th>
+                    <td>2U Rackmount</td>
+                </tr>
+                <tr>
+                    <th>Processor (CPU)</th>
+                    <td>2x Intel® Xeon® Scalable Processors (Gold/Platinum)</td>
+                </tr>
+                <tr>
+                    <th>Memory (RAM)</th>
+                    <td>Up to 4TB DDR5 4800MHz (32 DIMM Slots)</td>
+                </tr>
+                <tr>
+                    <th>Storage Bays</th>
+                    <td>12x 3.5" Hot-swap SAS/SATA/NVMe</td>
+                </tr>
+                <tr>
+                    <th>RAID Controller</th>
+                    <td>PERC H750 Adapter (RAID 0, 1, 5, 6, 10, 50, 60)</td>
+                </tr>
+                <tr>
+                    <th>Network (NIC)</th>
+                    <td>4x 10GbE SFP+ / 2x 25GbE OCP 3.0</td>
+                </tr>
+                <tr>
+                    <th>Power Supply</th>
+                    <td>Dual Redundant 1600W Titanium Level (96%)</td>
+                </tr>
+                <tr>
+                    <th>Cooling</th>
+                    <td>6x High Performance Fans (N+1 Redundancy)</td>
+                </tr>
+                <tr>
+                    <th>Management</th>
+                    <td>iDRAC9 Enterprise with OpenManage</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
