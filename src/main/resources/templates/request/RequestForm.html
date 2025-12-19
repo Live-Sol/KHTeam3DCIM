@@ -15,73 +15,78 @@
     <div class="container-form">
         <div class="card request-card shadow-lg">
             <div class="card-header request-header text-center text-white">
-                <h4 class="mb-0 fw-bold">
-<!--                    <i class="bi bi-pencil-square me-2"></i> -->
-                    장비 입고 신청서</h4>
+                <h4 class="mb-0 fw-bold">장비 입고 신청서</h4>
             </div>
 
             <div class="card-body p-4 p-md-5">
                 <form th:action="@{/requests/new}" th:object="${requestDTO}" method="post">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
                     <h5 class="section-title border-bottom pb-2 mb-4">신청자 정보</h5>
-
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">회사명</label>
                             <input type="text" th:field="*{companyName}" class="form-control custom-input"
-                                   placeholder="예: (주)KH정보통신">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
+                                   th:classappend="${#fields.hasErrors('companyName')} ? 'is-invalid'" placeholder="예: (주)KH정보통신">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">회사 대표 번호</label>
-                            <input type="text" th:field="*{companyPhone}" class="form-control custom-input" placeholder="예: 02-1234-5678">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
+                            <input type="text" th:field="*{companyPhone}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('companyPhone')} ? 'is-invalid'" placeholder="예: 02-1234-5678">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
                         </div>
                     </div>
 
                     <div class="row mb-5">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">담당자 성함</label>
-                            <input type="text" th:field="*{userName}" class="form-control custom-input">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
+                            <input type="text" th:field="*{userName}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('userName')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-sub">담당자 직통 번호</label>
-                            <input type="text" th:field="*{contact}" class="form-control custom-input" placeholder="예: 010-0000-0000">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
+                            <label class="form-label text-sub">담당자 연락처</label>
+                            <input type="text" th:field="*{contact}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('contact')} ? 'is-invalid'" placeholder="예: 010-0000-0000">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
                         </div>
                     </div>
 
                     <h5 class="section-title border-bottom pb-2 mb-4">장비 정보</h5>
-
                     <div class="mb-3">
                         <label class="form-label text-sub">장비 종류</label>
-                        <select th:field="*{cateId}" class="form-select custom-input">
-                            <option value="" selected>--- 선택해 주세요 ---</option>
-                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                        <select th:field="*{cateId}" class="form-select custom-input"
+                                th:classappend="${#fields.hasErrors('cateId')} ? 'is-invalid'">
+                            <option value="">--- 선택해 주세요 ---</option>
+                            <th:block th:if="${categories != null}">
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}"></option>
+                            </th:block>
                         </select>
-                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('cateId')}" th:errors="*{cateId}"></div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('cateId')}" th:errors="*{cateId}"></div>
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">제조사</label>
-                            <input type="text" th:field="*{vendor}" class="form-control custom-input" placeholder="예: Dell">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('vendor')}" th:errors="*{vendor}"></div>
+                            <input type="text" th:field="*{vendor}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('vendor')} ? 'is-invalid'" placeholder="예: Dell">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('vendor')}" th:errors="*{vendor}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">모델명</label>
-                            <input type="text" th:field="*{modelName}" class="form-control custom-input" placeholder="예: R740">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('modelName')}" th:errors="*{modelName}"></div>
+                            <input type="text" th:field="*{modelName}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('modelName')} ? 'is-invalid'" placeholder="예: R740">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('modelName')}" th:errors="*{modelName}"></div>
                         </div>
                     </div>
 
                     <div class="row mb-4 ems-box p-3 mx-0 rounded">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 예상 소비 전력 (W)</label>
-                            <input type="number" th:field="*{powerWatt}" class="form-control custom-input-dark" placeholder="예: 500">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('powerWatt')}" th:errors="*{powerWatt}"></div>
+                            <input type="number" th:field="*{powerWatt}" class="form-control custom-input-dark"
+                                   th:classappend="${#fields.hasErrors('powerWatt')} ? 'is-invalid'" placeholder="예: 500">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('powerWatt')}" th:errors="*{powerWatt}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 서비스</label>
@@ -97,20 +102,14 @@
                         <input type="hidden" id="realHeightUnit" th:field="*{heightUnit}">
 
                         <div class="btn-group w-100 mb-3" role="group">
-                            <input type="radio" class="btn-check" name="u_option" id="u1" value="1"
-                                   onclick="selectUnit(1)" th:checked="*{heightUnit == 1}">
+                            <input type="radio" class="btn-check" name="u_option" id="u1" value="1" onclick="selectUnit(1)" th:checked="*{heightUnit == 1}">
                             <label class="btn btn-outline-unit" for="u1">1 U</label>
-
-                            <input type="radio" class="btn-check" name="u_option" id="u2" value="2"
-                                   onclick="selectUnit(2)" th:checked="*{heightUnit == 2 || heightUnit == null}">
+                            <input type="radio" class="btn-check" name="u_option" id="u2" value="2" onclick="selectUnit(2)" th:checked="*{heightUnit == 2 or heightUnit == null}">
                             <label class="btn btn-outline-unit" for="u2">2 U</label>
-
-                            <input type="radio" class="btn-check" name="u_option" id="u4" value="4"
-                                   onclick="selectUnit(4)" th:checked="*{heightUnit == 4}">
+                            <input type="radio" class="btn-check" name="u_option" id="u4" value="4" onclick="selectUnit(4)" th:checked="*{heightUnit == 4}">
                             <label class="btn btn-outline-unit" for="u4">4 U</label>
-
-                            <input type="radio" class="btn-check" name="u_option" id="u_etc" value="etc"
-                                   onclick="enableEtc()" th:checked="*{heightUnit != null && heightUnit != 1 && heightUnit != 2 && heightUnit != 4}">
+                            <input type="radio" class="btn-check" name="u_option" id="u_etc" value="etc" onclick="enableEtc()"
+                                   th:checked="*{heightUnit != null and heightUnit != 1 and heightUnit != 2 and heightUnit != 4}">
                             <label class="btn btn-outline-unit" for="u_etc">기타</label>
                         </div>
 
@@ -119,25 +118,26 @@
                             <input type="number" id="etcInput" class="form-control custom-input"
                                    th:classappend="${#fields.hasErrors('heightUnit')} ? 'is-invalid'"
                                    min="1" disabled oninput="updateEtcValue()"
-                                   th:value="*{heightUnit != 1 && heightUnit != 2 && heightUnit != 4} ? *{heightUnit} : ''">
+                                   th:value="*{heightUnit != null and heightUnit != 1 and heightUnit != 2 and heightUnit != 4} ? *{heightUnit} : ''">
                             <span class="input-group-text custom-addon">U</span>
                         </div>
-                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('heightUnit')}" th:errors="*{heightUnit}"></div>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('heightUnit')}" th:errors="*{heightUnit}"></div>
                     </div>
 
                     <h5 class="section-title border-bottom pb-2 mb-4">입고 계약 정보</h5>
-
                     <div class="mb-4">
                         <label class="form-label text-sub">입고 목적</label>
-                        <textarea th:field="*{purpose}" class="form-control custom-input" rows="3" placeholder="예: 사내 그룹웨어 운영용"></textarea>
-                        <div class="text-danger small mt-1" th:if="${#fields.hasErrors('purpose')}" th:errors="*{purpose}"></div>
+                        <textarea th:field="*{purpose}" class="form-control custom-input" rows="3"
+                                  th:classappend="${#fields.hasErrors('purpose')} ? 'is-invalid'" placeholder="예: 사내 그룹웨어 운영용"></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('purpose')}" th:errors="*{purpose}"></div>
                     </div>
 
                     <div class="row mb-5">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">입고 희망일</label>
-                            <input type="date" th:field="*{startDate}" class="form-control custom-input">
-                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+                            <input type="date" th:field="*{startDate}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('startDate')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-sub">계약 기간</label>
@@ -148,6 +148,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="row g-3">
                         <div class="col-6">
                             <button type="submit" class="btn btn-primary-admin w-100 py-3 fw-bold">신청서 제출</button>
@@ -161,6 +162,39 @@
         </div>
     </div>
 </div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3"
+     th:if="${hasErrors}">
+
+    <div id="errorToast"
+         class="toast fade show align-items-center text-white bg-danger border-0"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
+
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                입력 항목에 오류가 있습니다. 빨간색 표시된 부분을 확인해주세요.
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/request_form.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const firstInvalid = document.querySelector(".is-invalid");
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+            firstInvalid.focus();
+        }
+    });
+</script>
+
 </body>
 </html>

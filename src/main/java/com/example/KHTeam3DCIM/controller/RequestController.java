@@ -64,6 +64,7 @@ public class RequestController {
 
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllCategories());
+            model.addAttribute("hasErrors", true);
             return "request/RequestForm";
         }
 

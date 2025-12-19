@@ -20,22 +20,31 @@ function updateEtcValue() {
 
 // 4. 페이지 로드 시 복원 로직
 window.onload = function() {
-    // [A] 입고 희망일 최소 날짜 설정
+    // [A] 기존 입고 희망일 최소 날짜 설정 로직...
     const today = new Date().toISOString().split('T')[0];
     const startDateInput = document.getElementById("startDate");
     if(startDateInput) startDateInput.setAttribute('min', today);
 
-    // [B] 서버에서 넘어온 데이터에 따라 '기타'창 활성화 여부 결정
+    // [B] 기존 '기타'창 활성화 여부 결정 로직...
     const realUnitField = document.getElementById('realHeightUnit');
     const etcInput = document.getElementById('etcInput');
     const uEtcRadio = document.getElementById('u_etc');
-
     if (realUnitField && realUnitField.value) {
         const val = realUnitField.value;
-        // 1, 2, 4가 아닌 값이 들어있다면 '기타'인 상황임
         if (!['1', '2', '4'].includes(val)) {
             if(etcInput) etcInput.disabled = false;
             if(uEtcRadio) uEtcRadio.checked = true;
+        }
+    }
+
+    // [C] 추가: 토스트 알림 실행 로직
+    // hasErrors가 true일 때 Bootstrap 토스트를 띄웁니다.
+    if (typeof hasErrors !== 'undefined' && hasErrors) {
+        const toastElement = document.getElementById('errorToast');
+        if (toastElement) {
+            // Bootstrap 5의 Toast 인스턴스 생성 및 출력
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
         }
     }
 }
