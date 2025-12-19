@@ -23,4 +23,5 @@ public class Category {
 
     @Column(name = "CATE_NAME", length = 50, nullable = false)
     private String name; // 예: "서버(Server)"
+
 }

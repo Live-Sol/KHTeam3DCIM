@@ -101,17 +101,28 @@
                     <label class="form-label">설치 위치 (Rack)</label>
                     <div class="input-group">
                         <span class="input-group-text custom-bg-light"><i class="bi bi-hdd-rack"></i></span>
-                        <select name="rackId" class="form-select custom-select" onchange="updateMaxUnit(this)"
+                        <select name="rackId"
+                                class="form-select custom-select"
                                 th:disabled="${reqId != null}"
                                 th:classappend="${(errorMessage != null and #strings.contains(errorMessage, '랙')) ? 'is-invalid' : ''}">
-                            <option value="" disabled th:selected="${device == null or (device.rack == null and selectedRackId == null)}">--- 설치할 랙 선택 ---</option>
+
+                            <option value="" disabled
+                                    th:selected="${selectedRackId == null}">
+                                --- 설치할 랙 선택 ---
+                            </option>
+
                             <option th:each="rack : ${racks}"
                                     th:value="${rack.id}"
-                                    th:data-total-unit="${rack.totalUnit}"
                                     th:text="|${rack.rackName} (${rack.locationDesc}) - ${rack.totalUnit}U|"
-                                    th:selected="${rack.id == selectedRackId or (device != null and device.rack != null and device.rack.id == rack.id)}">
+                                    th:selected="${rack.id == selectedRackId}">
                             </option>
                         </select>
+
+                        <!-- ⭐ disabled 대응용 hidden -->
+                        <input type="hidden"
+                               name="rackId"
+                               th:if="${reqId != null}"
+                               th:value="${selectedRackId}" />
                     </div>
                 </div>
 
@@ -135,13 +146,28 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">장비 종류</label>
-                        <select name="cateId" class="form-select custom-select" th:disabled="${reqId != null}">
+                        <select name="cateId"
+                                class="form-select custom-select"
+                                th:disabled="${reqId != null}"
+                                th:classappend="${(errorMessage != null and #strings.contains(errorMessage, 'Category')) ? 'is-invalid' : ''}">
+
+                            <option value="" disabled
+                                    th:selected="${selectedCateId == null}">
+                                --- 장비 종류 선택 ---
+                            </option>
+
                             <option th:each="cate : ${categories}"
                                     th:value="${cate.id}"
                                     th:text="${cate.name}"
-                                    th:selected="${(selectedCateId != null and cate.id == selectedCateId) or (device != null and device.category != null and cate.id == device.category.id)}">
+                                    th:selected="${cate.id == selectedCateId}">
                             </option>
                         </select>
+
+                        <!-- ⭐ disabled 대응용 hidden input -->
+                        <input type="hidden"
+                               name="cateId"
+                               th:if="${reqId != null}"
+                               th:value="${selectedCateId}" />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">시리얼 번호</label>
@@ -201,9 +227,17 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <label class="form-label">입고일</label>
-                        <input type="date" name="contractDate" class="form-control custom-form-control"
-                               th:value="${device != null ? device.contractDate : ''}"
-                               th:readonly="${reqId != null}" required>
+                        <input type="date"
+                               name="contractDate"
+                               class="form-control custom-form-control"
+                               th:value="${device != null ? #temporals.format(device.contractDate, 'yyyy-MM-dd') : ''}"
+                               th:disabled="${reqId != null}"
+                               required>
+                        <input type="hidden"
+                               name="contractDate"
+                               th:if="${reqId != null}"
+                               th:value="${#temporals.format(device.contractDate, 'yyyy-MM-dd')}" />
+
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">계약 기간</label>
@@ -213,6 +247,10 @@
                             <option value="24" th:selected="${device == null or (device != null and (device.contractMonth == 24 or device.contractMonth == null))}">2년 (24개월) - 표준</option>
                             <option value="36" th:selected="${device != null and device.contractMonth == 36}">3년 (36개월)</option>
                         </select>
+                        <input type="hidden"
+                               name="contractMonth"
+                               th:if="${reqId != null}"
+                               th:value="${device.contractMonth}" />
                     </div>
                 </div>
 

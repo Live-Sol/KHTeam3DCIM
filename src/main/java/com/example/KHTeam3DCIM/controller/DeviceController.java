@@ -14,11 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -61,10 +57,9 @@ public class DeviceController {
                              @RequestParam(required = false) Long reqId,
                              @RequestParam(required = false) Long rackId,
                              @RequestParam(required = false) Integer startUnit,
-                             @RequestParam(required = false) String cateId // cateId 추가로 받기
+                             @RequestParam(required = false) String cateId
     ) {
-        // [수정 포인트] 리다이렉트 시 FlashAttribute에 담긴 "device"가 모델에 있는지 확인
-        // 만약 에러가 발생해서 돌아온 경우라면, 모델에 이미 "device"가 들어있습니다.
+        // 1️⃣ 에러 리다이렉트가 아닌 경우만 새 Device 생성
         if (!model.containsAttribute("device")) {
             Device device = new Device();
 
@@ -73,7 +68,7 @@ public class DeviceController {
                 device.setStartUnit(startUnit);
             }
 
-            // (2) 신청서 승인 건 처리 (데이터 복사)
+            // (2) 신청서 승인 건 → 값 복사
             if (reqId != null) {
                 Request req = requestRepository.findById(reqId).orElse(null);
                 if (req != null) {
@@ -89,26 +84,38 @@ public class DeviceController {
                     device.setDescription(req.getPurpose());
                     device.setPowerWatt(req.getPowerWatt());
                     device.setEmsStatus(req.getEmsStatus());
-
-                    // 신청서 승인 건일 경우, 카테고리 ID도 기본 세팅
-                    model.addAttribute("selectedCateId", req.getCateId());
                 }
             }
-            // 에러 상황이 아닐 때만 새 객체(또는 신청서 기반 객체)를 모델에 추가
+
             model.addAttribute("device", device);
         }
 
-        // "대기 중인 신청서 목록" 등 공통 데이터는 항상 필요
+        // 2️⃣ 카테고리 선택값 결정 (⭐ 핵심)
+        String resolvedCateId = null;
+
+        if (reqId != null) {
+            Request req = requestRepository.findById(reqId).orElse(null);
+            if (req != null) {
+                resolvedCateId = req.getCateId(); // 신청서 값 우선
+            }
+        }
+
+        if (resolvedCateId == null) {
+            resolvedCateId = cateId; // 에러 리다이렉트 시 유지
+        }
+
+        // 3️⃣ 공통 모델 데이터
+        model.addAttribute("selectedCateId", resolvedCateId);
         model.addAttribute("selectedRackId", rackId);
-        model.addAttribute("selectedCateId", cateId);
-        model.addAttribute("waitingRequests", requestRepository.findByStatusOrderByReqDateDesc("WAITING"));
+        model.addAttribute("waitingRequests",
+                requestRepository.findByStatusOrderByReqDateDesc("WAITING"));
         model.addAttribute("racks", rackRepository.findAll());
         model.addAttribute("categories", categoryService.findAllCategories());
         model.addAttribute("reqId", reqId);
 
-
         return "device/device_form";
     }
+
 
     // ==========================================
     // 3. 실제 등록 처리하기 (저장 버튼 눌렀을 때)
@@ -118,7 +125,7 @@ public class DeviceController {
             @RequestParam(value = "rackId", required = false) Long rackId,
             @RequestParam(value = "cateId", required = false) String cateId,
             @RequestParam(value = "reqId", required = false) Long reqId,
-            Device device,
+            @ModelAttribute Device device,
             RedirectAttributes rttr  // 1. Model 대신 RedirectAttributes 추가
     ) {
         try {
@@ -164,9 +171,6 @@ public class DeviceController {
             if (!device.getIpAddr().matches(ipRegex)) {
                 throw new IllegalArgumentException("관리 IP 형식이 올바르지 않습니다. (예: 192.168.0.1)");
             }
-
-            // 공통 검증 및 날짜 동기화
-            validateAndSync(device);
 
             // [순서 4] 비즈니스 로직 검증
             if (deviceService.isSerialDuplicate(device.getSerialNum(), null)) throw new IllegalStateException("이미 등록된 시리얼 번호입니다.");
@@ -225,15 +229,37 @@ public class DeviceController {
     // ==========================================
     @GetMapping("/devices/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        Device device = deviceService.findById(id);
 
+        // 🔹 1. device 우선순위 처리 (에러 리다이렉트 대응)
+        Device device;
+        if (model.containsAttribute("device")) {
+            device = (Device) model.getAttribute("device");
+        } else {
+            device = deviceService.findById(id);
+            model.addAttribute("device", device);
+        }
+
+        // 🔹 2. select 유지용 값 세팅 (⭐ 중요)
+        model.addAttribute("selectedRackId",
+                model.containsAttribute("rackId")
+                        ? model.getAttribute("rackId")
+                        : (device.getRack() != null ? device.getRack().getId() : null)
+        );
+
+        model.addAttribute("selectedCateId",
+                model.containsAttribute("cateId")
+                        ? model.getAttribute("cateId")
+                        : (device.getCategory() != null ? device.getCategory().getId() : null)
+        );
+
+        // 🔹 3. 공통 데이터
         model.addAttribute("racks", rackRepository.findAll());
         model.addAttribute("categories", categoryService.findAllCategories());
-        model.addAttribute("device", device);
         model.addAttribute("isEdit", true);
 
         return "device/device_form";
     }
+
 
     // ==========================================
     // 6. 실제 수정 처리
@@ -241,60 +267,71 @@ public class DeviceController {
     @PostMapping("/devices/{id}/edit")
     public String update(@PathVariable Long id,
                          @RequestParam(value = "rackId", required = false) Long rackId,
-                         @RequestParam(value="cateId", required=false) String cateId,
+                         @RequestParam(value = "cateId", required = false) String cateId,
                          Device device,
-                         RedirectAttributes rttr) { // 1. Model 대신 RedirectAttributes 추가
+                         RedirectAttributes rttr) {
         try {
-            // [검증 로직] - 기존과 동일
-            if (device.getCompanyName() == null || device.getCompanyName().trim().isEmpty()) throw new IllegalArgumentException("회사명은 필수 입력 항목입니다.");
-            if (device.getCompanyPhone() == null || device.getCompanyPhone().trim().isEmpty()) throw new IllegalArgumentException("회사 대표 번호는 필수 입력 항목입니다.");
+            // ===========================
+            // 1. 검증 로직
+            // ===========================
+            if (device.getCompanyName() == null || device.getCompanyName().trim().isEmpty())
+                throw new IllegalArgumentException("회사명은 필수 입력 항목입니다.");
+            if (device.getCompanyPhone() == null || device.getCompanyPhone().trim().isEmpty())
+                throw new IllegalArgumentException("회사 대표 번호는 필수 입력 항목입니다.");
             String phoneRegex = "^\\d{2,3}-\\d{3,4}-\\d{4}$";
-
-            if (device.getCompanyPhone() != null && !device.getCompanyPhone().matches(phoneRegex)) {
+            if (!device.getCompanyPhone().matches(phoneRegex))
                 throw new IllegalArgumentException("회사 대표 번호 형식이 올바르지 않습니다. (예: 02-123-4567)");
-            }
-            if (device.getUserName() == null || device.getUserName().trim().isEmpty()) throw new IllegalArgumentException("담당자 이름은 필수 입력 항목입니다.");
-            if (device.getContact() == null || device.getContact().trim().isEmpty()) throw new IllegalArgumentException("담당자 연락처는 필수 입력 항목입니다.");
-            if (device.getContact() != null && !device.getContact().matches(phoneRegex)) {
+            if (device.getUserName() == null || device.getUserName().trim().isEmpty())
+                throw new IllegalArgumentException("담당자 이름은 필수 입력 항목입니다.");
+            if (device.getContact() == null || device.getContact().trim().isEmpty())
+                throw new IllegalArgumentException("담당자 연락처는 필수 입력 항목입니다.");
+            if (!device.getContact().matches(phoneRegex))
                 throw new IllegalArgumentException("담당자 연락처 형식이 올바르지 않습니다. (예: 010-1234-5678)");
-            }
-
             if (rackId == null) throw new IllegalArgumentException("설치할 랙(Rack)을 선택해야 합니다.");
-            if (cateId == null || cateId.trim().isEmpty()) throw new IllegalArgumentException("장비 종류(Category)를 선택해야 합니다.");
-            if (device.getSerialNum() == null || device.getSerialNum().trim().isEmpty()) throw new IllegalArgumentException("시리얼 번호는 필수 입력 항목입니다.");
-            if (device.getStartUnit() == null || device.getStartUnit() < 1) throw new IllegalArgumentException("올바른 시작 유닛 번호를 입력해주세요.");
-            if (device.getHeightUnit() == null || device.getHeightUnit() < 1) throw new IllegalArgumentException("장비 높이는 최소 1U 이상이어야 합니다.");
+            if (cateId == null || cateId.trim().isEmpty())
+                throw new IllegalArgumentException("장비 종류(Category)를 선택해야 합니다.");
+            if (device.getSerialNum() == null || device.getSerialNum().trim().isEmpty())
+                throw new IllegalArgumentException("시리얼 번호는 필수 입력 항목입니다.");
+            if (device.getStartUnit() == null || device.getStartUnit() < 1)
+                throw new IllegalArgumentException("올바른 시작 유닛 번호를 입력해주세요.");
+            if (device.getHeightUnit() == null || device.getHeightUnit() < 1)
+                throw new IllegalArgumentException("장비 높이는 최소 1U 이상이어야 합니다.");
 
-            // 공통 검증 및 날짜 동기화 호출
-            validateAndSync(device);
-
-            if (deviceService.isSerialDuplicate(device.getSerialNum(), id)) {
+            if (deviceService.isSerialDuplicate(device.getSerialNum(), id))
                 throw new IllegalStateException("이미 다른 장비에서 사용 중인 시리얼 번호입니다.");
-            }
             deviceService.checkRackOverlap(rackId, device.getStartUnit(), device.getHeightUnit(), id);
 
-            // 모든 검증 통과 시 저장
+            // ===========================
+            // 2. 저장
+            // ===========================
             deviceService.updateDevice(id, device, rackId, cateId);
-
-            // 성공 메시지 (선택 사항)
             rttr.addFlashAttribute("successMessage", "장비 정보가 수정되었습니다.");
             return "redirect:/devices";
 
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // 2. 에러 메시지를 FlashAttribute에 담기 (토스트용)
+            // ===========================
+            // 3. 에러 메시지 및 입력값 유지
+            // ===========================
             rttr.addFlashAttribute("errorMessage", e.getMessage());
-
-            // 3. 입력했던 데이터 가방에 담기 (기존 입력값 유지용)
-            // 화면의 th:value="${device.companyName}" 등이 이 가방에서 데이터를 꺼내 쓰게 됩니다.
             rttr.addFlashAttribute("device", device);
-
-            // 4. 리다이렉트 시 필요한 정보들을 가방에 담기
             rttr.addFlashAttribute("isEdit", true);
 
-            // 5. 다시 '수정 화면'으로 리다이렉트 (경로에 id 포함)
+            // ===========================
+            // 4. select 유지용 값
+            // ===========================
+            if (rackId != null) rttr.addFlashAttribute("rackId", rackId);
+            else if (device.getRack() != null) rttr.addFlashAttribute("rackId", device.getRack().getId());
+
+            if (cateId != null) rttr.addFlashAttribute("cateId", cateId);
+            else if (device.getCategory() != null) rttr.addFlashAttribute("cateId", device.getCategory().getId());
+
+            // ===========================
+            // 5. 다시 수정 화면으로 리다이렉트
+            // ===========================
             return "redirect:/devices/" + id + "/edit";
         }
     }
+
 
     // ==========================================
     // 7. 모달 팝업용 JSON 데이터 반환 API
@@ -318,10 +355,7 @@ public class DeviceController {
     // ⭐ [여기 아래에 추가] 공통 검증 및 데이터 동기화 로직
     // -----------------------------------------------------------
     private void validateAndSync(Device device) {
-        // 날짜 데이터 동기화 (ContractDate -> RegDate)
-        if (device.getContractDate() != null) {
-            device.setRegDate(device.getContractDate().atStartOfDay());
-        }
+
     }
 
 }
