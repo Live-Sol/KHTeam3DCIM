@@ -5,41 +5,22 @@
     <title th:text="${isEdit == true} ? '장비 정보 수정' : '신규 장비 등록'"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <link rel="stylesheet" th:href="@{/css/requests.css}">
     <link rel="stylesheet" th:href="@{/css/device_form.css}">
-
     <style>
-        /* requests.css의 --dark-bg 변수 사용 */
-        body {
-            background-color: var(--dark-bg, #0f172a);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* 상단에서 시작 */
-            padding-top: 3rem; /* 상단 여백 */
-        }
-        /* 폼 컨테이너의 최대 너비와 마진을 설정 */
-        .device-form-container {
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 3rem;
-        }
+        body { background-color: var(--dark-bg, #0f172a); display: flex; justify-content: center; align-items: flex-start; padding-top: 3rem; }
+        .device-form-container { width: 100%; max-width: 800px; margin-bottom: 3rem; }
     </style>
-
 </head>
 <body>
 
 <div class="device-form-container">
-
     <div class="card custom-card-dark shadow-lg border-0 mb-5">
-
         <div class="card-header bg-primary custom-card-header text-white p-3">
             <h4 class="mb-0 fw-bold" th:text="${isEdit == true} ? '장비 정보 수정' : '신규 장비 등록'"></h4>
-<!--            <h4 class="mb-0 fw-bold" th:text="${isEdit == true} ? '🛠️ 장비 정보 수정' : '➕ 신규 장비 등록'"></h4>-->
         </div>
 
         <div class="card-body p-4">
-
             <div class="alert custom-alert-info d-flex align-items-center" th:if="${reqId != null}">
                 <span class="fs-4 me-2">🔔</span>
                 <div>
@@ -56,10 +37,8 @@
                      th:if="${isEdit != true and waitingRequests != null and !waitingRequests.isEmpty()}">
                     <div class="card-body p-3">
                         <label class="form-label fw-bold text-primary">입주 대기 신청서 불러오기</label>
-<!--                        <label class="form-label fw-bold text-primary">📥 입주 대기 신청서 불러오기</label>-->
                         <select id="requestSelect" class="form-select custom-select border-primary" onchange="loadRequestData(this)">
                             <option value="">--- 선택 안 함 (직접 입력) ---</option>
-
                             <th:block th:each="req : ${waitingRequests}">
                                 <option th:value="${req.id}"
                                         th:data-company="${req.companyName}"
@@ -83,112 +62,88 @@
                     </div>
                 </div>
 
-
                 <h5 class="mb-3 text-primary border-bottom pb-2">1. 소유자 정보</h5>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">회사명</label>
-                        <input type="text" name="companyName"
-                               class="form-control custom-form-control"
-                               th:value="${device.companyName != null ? device.companyName : (member != null ? member.companyName : '')}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'"
-                               placeholder="예: (주)KH정보통신">
+                        <input type="text" name="companyName" class="form-control custom-form-control"
+                               th:value="${device != null and device.companyName != null ? device.companyName : (member != null ? member.companyName : '')}"
+                               th:readonly="${reqId != null}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">회사 대표 번호</label>
-                        <input type="text" name="companyPhone"
-                               class="form-control custom-form-control"
-                               th:value="${device.companyPhone != null ? device.companyPhone : (member != null ? member.contact : '')}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'"
-                               placeholder="예: 02-1234-5678">
+                        <input type="text" name="companyPhone" class="form-control custom-form-control"
+                               th:value="${device != null ? device.companyPhone : ''}"
+                               th:readonly="${reqId != null}">
                     </div>
                 </div>
-
-                <div class="row mb-4">
+                <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">담당자 성함</label>
-                        <input type="text" name="userName"
-                               class="form-control custom-form-control"
-                               th:value="${device.userName != null ? device.userName : (member != null ? member.name : '')}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'">
+                        <input type="text" name="userName" class="form-control custom-form-control"
+                               th:value="${device != null ? device.userName : ''}"
+                               th:readonly="${reqId != null}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">담당자 연락처</label>
-                        <input type="text" name="contact"
-                               class="form-control custom-form-control"
-                               th:value="${device.contact != null ? device.contact : (member != null ? member.contact : '')}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'"
-                               placeholder="예: 010-0000-0000">
+                        <label class="form-label fw-bold">담당자 번호</label>
+                        <input type="text" name="contact" class="form-control custom-form-control"
+                               th:value="${device != null ? device.contact : ''}"
+                               th:readonly="${reqId != null}">
                     </div>
                 </div>
 
-
                 <h5 class="mb-3 text-primary border-bottom pb-2">2. 장비 상세 정보</h5>
-
                 <div class="mb-3">
                     <label class="form-label">설치 위치 (Rack)</label>
                     <div class="input-group">
                         <span class="input-group-text custom-bg-light"><i class="bi bi-hdd-rack"></i></span>
-                        <select name="rackId" class="form-select custom-select"
-                                onchange="updateMaxUnit(this)"
-                                th:disabled="${selectedRackId != null}"
-                                th:autofocus="${selectedRackId == null and (device.rack == null or device.rack.id == null)}"
-                                th:classappend="${(errorMessage != null and device.rack == null) ? 'is-invalid ' : ''} + (${selectedRackId != null} ? 'bg-secondary bg-opacity-25' : '')">
-                            <option value="" disabled selected>--- 설치할 랙 선택 ---</option>
+                        <select name="rackId" class="form-select custom-select" onchange="updateMaxUnit(this)"
+                                th:disabled="${reqId != null}"
+                                th:classappend="${(errorMessage != null and #strings.contains(errorMessage, '랙')) ? 'is-invalid' : ''}">
+                            <option value="" disabled th:selected="${device == null or (device.rack == null and selectedRackId == null)}">--- 설치할 랙 선택 ---</option>
                             <option th:each="rack : ${racks}"
                                     th:value="${rack.id}"
                                     th:data-total-unit="${rack.totalUnit}"
                                     th:text="|${rack.rackName} (${rack.locationDesc}) - ${rack.totalUnit}U|"
-                                    th:selected="${rack.id == selectedRackId or (device.rack != null and device.rack.id == rack.id)}">
+                                    th:selected="${rack.id == selectedRackId or (device != null and device.rack != null and device.rack.id == rack.id)}">
                             </option>
                         </select>
                     </div>
-                    <input th:if="${selectedRackId != null}" type="hidden" name="rackId" th:value="${selectedRackId}">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">제조사 (Vendor)</label>
+                        <input type="text" name="vendor"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '제조사')} ? 'is-invalid' : ''"
+                               class="form-control custom-form-control"
+                               th:value="${device != null ? device.vendor : ''}" placeholder="예: HP, Dell">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">모델명 (Model Name)</label>
+                        <input type="text" name="modelName"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '모델명')} ? 'is-invalid' : ''"
+                               class="form-control custom-form-control"
+                               th:value="${device != null ? device.modelName : ''}" placeholder="예: ProLiant DL380">
+                    </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">장비 종류</label>
-                        <select name="cateId" class="form-select custom-select"
-                                th:disabled="${reqId != null}"
-                                th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'">
+                        <select name="cateId" class="form-select custom-select" th:disabled="${reqId != null}">
                             <option th:each="cate : ${categories}"
                                     th:value="${cate.id}"
                                     th:text="${cate.name}"
-                                    th:selected="${device.category != null and cate.id == device.category.id}">Server</option>
+                                    th:selected="${(selectedCateId != null and cate.id == selectedCateId) or (device != null and device.category != null and cate.id == device.category.id)}">
+                            </option>
                         </select>
-                        <input th:if="${reqId != null}" type="hidden" name="cateId"
-                               th:value="${device.category != null ? device.category.id : selectedCateId}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">시리얼 번호<small class="text-danger"> (관리자)</small></label>
-<!--                        에러 메시지에 '시리얼'이라는 단어가 포함된 경우에만 is-invalid 추가-->
-                        <input type="text" name="serialNum"
-                               class="form-control custom-form-control"
-                        th:classappend="${errorMessage != null and #strings.contains(errorMessage, '시리얼')} ? 'is-invalid'"
-                        th:value="${device.serialNum}"
-                        placeholder="SN-XXXX-XXXX">
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label">제조사</label>
-                        <input type="text" name="vendor" class="form-control custom-form-control"
-                               th:value="${device.vendor}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">모델명</label>
-                        <input type="text" name="modelName" class="form-control custom-form-control"
-                               th:value="${device.modelName}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'" required>
+                        <label class="form-label">시리얼 번호</label>
+                        <input type="text" name="serialNum" class="form-control custom-form-control"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '시리얼')} ? 'is-invalid'"
+                               th:value="${device != null ? device.serialNum : ''}" placeholder="SN-XXXX-XXXX">
                     </div>
                 </div>
 
@@ -196,83 +151,68 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-danger"><i class="bi bi-lightning-charge-fill"></i> 소비 전력 (W)</label>
                         <input type="number" name="powerWatt" class="form-control custom-form-control"
-                               th:value="${device.powerWatt != null ? device.powerWatt : 0}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'"
-                               placeholder="예: 500" min="0">
+                               th:value="${device != null ? device.powerWatt : 0}"
+                               th:readonly="${reqId != null}" min="0">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-success"><i class="bi bi-activity"></i> EMS 관제 연동</label>
-                        <select name="emsStatus" class="form-select custom-select"
-                                th:disabled="${reqId != null}"
-                                th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'">
-                            <option value="OFF" th:selected="${device.emsStatus == 'OFF'}">연동 안 함 (OFF)</option>
-                            <option value="ON" th:selected="${device.emsStatus == 'ON'}">연동 함 (ON)</option>
+                        <select name="emsStatus" class="form-select custom-select" th:disabled="${reqId != null}">
+                            <option value="OFF" th:selected="${device != null and device.emsStatus == 'OFF'}">연동 안 함 (OFF)</option>
+                            <option value="ON" th:selected="${device != null and device.emsStatus == 'ON'}">연동 함 (ON)</option>
                         </select>
-                        <input th:if="${reqId != null}" type="hidden" name="emsStatus" th:value="${device.emsStatus}">
                     </div>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-4">
-                        <label class="form-label">시작 유닛 (U)</label>
-                        <input type="number" name="startUnit" class="form-control custom-form-control"
-                               th:value="${device.startUnit}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'" min="1" max="100" value="1">
+                        <label class="form-label fw-bold">시작 유닛 (U)</label>
+                        <input type="number" name="startUnit"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '시작 유닛')} ? 'is-invalid' : ''"
+                               class="form-control custom-form-control"
+                               th:value="${device != null ? device.startUnit : 1}">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">장비 높이 (U)</label>
-                        <input type="number" name="heightUnit" class="form-control custom-form-control"
-                               th:value="${device.heightUnit != null ? device.heightUnit : 1}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'" min="1" max="100">
+                        <label class="form-label fw-bold">장비 높이 (U)</label>
+                        <input type="number" name="heightUnit"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '장비 높이')} ? 'is-invalid' : ''"
+                               class="form-control custom-form-control"
+                               th:value="${device != null ? device.heightUnit : 1}">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">관리 IP<small class="text-danger"> (관리자)</small></label>
+                        <label class="form-label fw-bold">관리 IP</label>
                         <input type="text" name="ipAddr" class="form-control custom-form-control"
-                               th:value="${device.ipAddr}" placeholder="192.168.x.x" required>
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '관리 IP')} ? 'is-invalid' : ''"
+                               th:value="${device != null ? device.ipAddr : ''}" placeholder="192.168.x.x">
                     </div>
                 </div>
 
-
                 <h5 class="mb-3 text-primary border-bottom pb-2">3. 계약 및 기타 정보</h5>
-
                 <div class="mb-3">
-                    <label class="form-label">용도 / 설명 (Description)</label>
+                    <label class="form-label">용도 / 설명</label>
                     <textarea name="description" class="form-control custom-form-control" rows="2"
-                              th:text="${device.description}"
-                              th:readonly="${reqId != null}"
-                              th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'"
-                              placeholder="장비의 용도나 특이사항을 기록하세요."></textarea>
+                              th:text="${device != null ? device.description : ''}"
+                              th:readonly="${reqId != null}" placeholder="용도 기록"></textarea>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <label class="form-label">입고일 (계약 시작일)</label>
+                        <label class="form-label">입고일</label>
                         <input type="date" name="contractDate" class="form-control custom-form-control"
-                               th:value="${device.contractDate}"
-                               th:readonly="${reqId != null}"
-                               th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'" required>
+                               th:value="${device != null ? device.contractDate : ''}"
+                               th:readonly="${reqId != null}" required>
                     </div>
-
                     <div class="col-md-6">
                         <label class="form-label">계약 기간</label>
                         <select name="contractMonth" class="form-select custom-select"
-                                th:disabled="${reqId != null}"
-                                th:classappend="${reqId != null} ? 'bg-secondary bg-opacity-25'">
-                            <option value="12" th:selected="${device.contractMonth == 12}">1년 (12개월)</option>
-                            <option value="24" th:selected="${device.contractMonth == 24 or device.contractMonth == null}">2년 (24개월) - 표준</option>
-                            <option value="36" th:selected="${device.contractMonth == 36}">3년 (36개월)</option>
-                            <option value="0" th:selected="${device.contractMonth == 0}">기타</option>
+                                th:disabled="${isEdit == true or (reqId != null)}">
+                            <option value="12" th:selected="${device != null and device.contractMonth == 12}">1년 (12개월)</option>
+                            <option value="24" th:selected="${device == null or (device != null and (device.contractMonth == 24 or device.contractMonth == null))}">2년 (24개월) - 표준</option>
+                            <option value="36" th:selected="${device != null and device.contractMonth == 36}">3년 (36개월)</option>
                         </select>
-                        <input th:if="${reqId != null}" type="hidden" name="contractMonth" th:value="${device.contractMonth}">
                     </div>
                 </div>
 
-                <hr class="custom-hr">
-
-                <div class="d-grid gap-2">
+                <div class="d-grid gap-2 mt-4">
                     <button type="submit" class="btn custom-btn-primary btn-lg fw-bold"
                             th:text="${isEdit == true} ? '수정 내용 저장' : '장비 등록 완료'"></button>
                     <a th:href="${isEdit == true} ? @{/racks} : @{/requests}"
@@ -285,50 +225,29 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="/js/device_form.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        const errorMessage = [[${errorMessage}]];
         const successMessage = [[${successMessage}]];
+        const errorMessage = [[${errorMessage}]]; // 혹시 모를 에러 대비
 
-        // 공통 토스트 설정
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
+            timerProgressBar: true
         });
 
-        // 에러 메시지가 있으면 토스트 띄우기
-        if (errorMessage) {
-            Toast.fire({
-                icon: 'error',
-                title: errorMessage
-            });
-        }
-
-        // 성공 메시지가 있으면 토스트 띄우기
         if (successMessage) {
-            Toast.fire({
-                icon: 'success',
-                title: successMessage
-            });
+            Toast.fire({ icon: 'success', title: successMessage });
         }
-
-        // 기존에 쓰시던 폼 초기화 함수 호출 (에러 메시지 전달)
-        if (typeof initializeForm === "function") {
-            initializeForm(errorMessage);
+        if (errorMessage) {
+            Toast.fire({ icon: 'error', title: errorMessage });
         }
     });
 </script>
-
 </body>
 </html>

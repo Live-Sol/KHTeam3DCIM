@@ -139,5 +139,37 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // 컨트롤러의 RedirectAttributes에서 보낸 메시지 읽기
+        const successMessage = [[${successMessage}]];
+        const errorMessage = [[${errorMessage}]];
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+
+        // 성공 메시지가 있으면 토스트 띄우기
+        if (successMessage) {
+            Toast.fire({
+                icon: 'success',
+                title: successMessage
+            });
+        }
+
+        // 에러 메시지가 있으면 토스트 띄우기 (삭제 실패 등 대비)
+        if (errorMessage) {
+            Toast.fire({
+                icon: 'error',
+                title: errorMessage
+            });
+        }
+    });
+</script>
 </body>
 </html>
