@@ -67,12 +67,14 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">회사명</label>
                         <input type="text" name="companyName" class="form-control custom-form-control"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '회사명')} ? 'is-invalid' : ''"
                                th:value="${device != null and device.companyName != null ? device.companyName : (member != null ? member.companyName : '')}"
                                th:readonly="${reqId != null}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">회사 대표 번호</label>
                         <input type="text" name="companyPhone" class="form-control custom-form-control"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '회사 대표 번호')} ? 'is-invalid' : ''"
                                th:value="${device != null ? device.companyPhone : ''}"
                                th:readonly="${reqId != null}">
                     </div>
@@ -81,12 +83,14 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">담당자 성함</label>
                         <input type="text" name="userName" class="form-control custom-form-control"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '담당자 이름')} ? 'is-invalid' : ''"
                                th:value="${device != null ? device.userName : ''}"
                                th:readonly="${reqId != null}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">담당자 번호</label>
+                        <label class="form-label fw-bold">담당자 연락처</label>
                         <input type="text" name="contact" class="form-control custom-form-control"
+                               th:classappend="${errorMessage != null and #strings.contains(errorMessage, '담당자 연락처')} ? 'is-invalid' : ''"
                                th:value="${device != null ? device.contact : ''}"
                                th:readonly="${reqId != null}">
                     </div>
@@ -204,7 +208,7 @@
                     <div class="col-md-6">
                         <label class="form-label">계약 기간</label>
                         <select name="contractMonth" class="form-select custom-select"
-                                th:disabled="${isEdit == true or (reqId != null)}">
+                                th:disabled="${reqId != null}">
                             <option value="12" th:selected="${device != null and device.contractMonth == 12}">1년 (12개월)</option>
                             <option value="24" th:selected="${device == null or (device != null and (device.contractMonth == 24 or device.contractMonth == null))}">2년 (24개월) - 표준</option>
                             <option value="36" th:selected="${device != null and device.contractMonth == 36}">3년 (36개월)</option>
@@ -224,8 +228,7 @@
         </div>
     </div>
 </div>
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/device_form.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
@@ -241,12 +244,23 @@
             timerProgressBar: true
         });
 
-        if (successMessage) {
-            Toast.fire({ icon: 'success', title: successMessage });
-        }
+        // 1. 토스트 알림 띄우기
+        if (successMessage) Toast.fire({ icon: 'success', title: successMessage });
+        if (errorMessage) Toast.fire({ icon: 'error', title: errorMessage });
+
+        // 2. 에러가 있을 경우 해당 칸으로 포커스 이동
         if (errorMessage) {
-            Toast.fire({ icon: 'error', title: errorMessage });
+            const firstInvalidField = document.querySelector('.is-invalid');
+            if (firstInvalidField) {
+                // 화면 중앙으로 부드럽게 스크롤
+                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 입력창에 커서 찍기
+                firstInvalidField.focus();
+            }
         }
+
+        // 기존 폼 초기화 함수가 있다면 실행
+        if (typeof initializeForm === "function") { initializeForm(errorMessage); }
     });
 </script>
 </body>

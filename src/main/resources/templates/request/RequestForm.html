@@ -24,7 +24,7 @@
                 <form th:action="@{/requests/new}" th:object="${requestDTO}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">1. 신청자 정보</h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">신청자 정보</h5>
 
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
@@ -53,7 +53,7 @@
                         </div>
                     </div>
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">2. 장비 정보</h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">장비 정보</h5>
 
                     <div class="mb-3">
                         <label class="form-label text-sub">장비 종류</label>
@@ -125,7 +125,7 @@
                         <div class="text-danger small mt-1" th:if="${#fields.hasErrors('heightUnit')}" th:errors="*{heightUnit}"></div>
                     </div>
 
-                    <h5 class="section-title border-bottom pb-2 mb-4">3. 입고 계약 정보</h5>
+                    <h5 class="section-title border-bottom pb-2 mb-4">입고 계약 정보</h5>
 
                     <div class="mb-4">
                         <label class="form-label text-sub">입고 목적</label>

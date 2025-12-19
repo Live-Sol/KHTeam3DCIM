@@ -96,19 +96,25 @@
                     </td>
 
                     <td class="text-white">
-                        <span th:text="${device.startUnit}">10</span>U~<span th:text="${device.startUnit + device.heightUnit - 1}">11</span>U
+                        <span th:text="${device.startUnit + device.heightUnit - 1}"></span>
+
+                        <span th:text="${(device.startUnit ?: 0) + (device.heightUnit ?: 0) - 1}"></span>
                     </td>
 
                     <td class="text-start">
-                        <div th:if="${device.contractDate != null}">
-                            <span class="text-white small" th:text="${device.contractDate}">2025-01-01</span><br>
+                        <div th:if="${device.contractDate != null and device.contractMonth != null}">
+                            <span class="text-white small" th:text="${device.contractDate}">2025-01-01</span><br/>
+
                             <small class="fw-bold"
                                    th:with="expireDate=${device.contractDate.plusMonths(device.contractMonth)}"
                                    th:classappend="${expireDate.isBefore(#temporals.createToday())} ? 'text-danger' : 'text-success'">
                                 ~ [[${expireDate}]]
                             </small>
                         </div>
-                        <div th:unless="${device.contractDate != null}" class="text-sub-muted">-</div>
+
+                        <div th:unless="${device.contractDate != null and device.contractMonth != null}" class="text-sub-muted">
+                            -
+                        </div>
                     </td>
 
                     <td>
