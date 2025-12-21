@@ -37,6 +37,8 @@ public class SecurityConfig {
                                 "/members/check-id",    // 아이디 중복 확인
                                 "/members/login",       // 로그인
                                 "/members/forgot-password", // 비밀번호 찾기
+                                "/members/send-verification-code", // 인증 코드 발송
+                                "/members/verify-code", // 인증 코드 검증
                                 "/solutions/**",        // 솔루션 페이지 전체 공개
                                 "/info/**",             // 정보 페이지 전체 공개
                                 "/specs/**"             // 제원 페이지 전체 공개

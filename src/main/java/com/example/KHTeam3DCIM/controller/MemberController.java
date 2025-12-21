@@ -3,13 +3,14 @@ package com.example.KHTeam3DCIM.controller;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.dto.Member.*;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
-import com.example.KHTeam3DCIM.security.CustomUserDetails; // Import 추가
+import com.example.KHTeam3DCIM.security.CustomUserDetails;
+import com.example.KHTeam3DCIM.service.MailService;
 import com.example.KHTeam3DCIM.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Import 추가
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Controller
 @RequestMapping("/members")
@@ -30,6 +32,7 @@ import java.util.Map;
 public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final MailService mailService;
 
     // 전체 회원 조회 (회원용)
     @GetMapping
@@ -99,8 +102,6 @@ public class MemberController {
         model.addAttribute("memberUpdateByUserRequest", currentInfo);
         model.addAttribute("memberName", member.getName());
         model.addAttribute("memberRole", member.getRole());
-
-        // 프로필 이미지 경로 추가 (없으면 null)
         model.addAttribute("profileImage", member.getProfileImage());
 
         return "member/editMember";
@@ -114,24 +115,18 @@ public class MemberController {
             BindingResult bindingResult,
             Model model, RedirectAttributes redirectAttributes) {
 
-        // 1. 유효성 검사 실패 시
         if (bindingResult.hasErrors()) {
             model.addAttribute("memberId", userDetails.getUsername());
             Member member = memberService.findMember(userDetails.getUsername());
             model.addAttribute("memberName", member.getName());
             model.addAttribute("memberRole", member.getRole());
-            model.addAttribute("profileImage", member.getProfileImage()); // 에러 시에도 기존 이미지 유지
+            model.addAttribute("profileImage", member.getProfileImage());
             return "member/editMember";
         }
 
         try {
-            // 2. 서비스 호출 (DB 업데이트 & 파일 저장)
             String memberId = userDetails.getUsername();
             memberService.updateMember(memberId, request);
-
-            // ⭐️ [중요] 세션 정보(SecurityContext) 강제 갱신 ⭐️
-            // DB 내용은 바뀌었지만, 현재 로그인된 정보(Authentication)는 옛날 상태입니다.
-            // 헤더의 이미지가 바로 바뀌려면 여기서 최신 정보를 다시 불러와 세션에 덮어씌워야 합니다.
             updateSecurityContext(memberId);
 
             redirectAttributes.addFlashAttribute("updateSuccess", true);
@@ -144,7 +139,6 @@ public class MemberController {
             model.addAttribute("error", "수정 실패: " + e.getMessage());
         }
 
-        // 오류 발생 시 데이터 복구하여 폼 다시 보여주기
         Member member = memberService.findMember(userDetails.getUsername());
         model.addAttribute("memberName", member.getName());
         model.addAttribute("memberRole", member.getRole());
@@ -153,26 +147,15 @@ public class MemberController {
         return "member/editMember";
     }
 
-    // ⭐️ 세션 갱신을 위한 헬퍼 메서드 ⭐️
     private void updateSecurityContext(String memberId) {
-        // 1. 최신 회원 정보 DB에서 가져오기
         Member updatedMember = memberService.findMember(memberId);
-
-        // 2. 현재 인증 정보 가져오기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        // 3. 새 UserDetails 객체 생성 (여기서 갱신된 profileImage가 들어감)
         CustomUserDetails newPrincipal = new CustomUserDetails(updatedMember, auth.getAuthorities());
-
-        // 4. 새로운 인증 토큰 생성 (기존 자격증명과 권한 유지)
         UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
                 newPrincipal, auth.getCredentials(), newPrincipal.getAuthorities());
-
-        // 5. 시큐리티 컨텍스트에 새 토큰 설정 (즉시 반영)
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
-    // 회원 탈퇴 페이지
     @GetMapping("/delete")
     public String deleteUserForm(Model model) {
         String loginId = getLoggedInUserId();
@@ -184,7 +167,6 @@ public class MemberController {
         return "member/deleteMember";
     }
 
-    // 회원 정보 삭제
     @DeleteMapping("/{memberId}")
     public ResponseEntity<?> deleteMember(@PathVariable String memberId, @RequestBody Map<String, String> body) {
         String loggedInId = getLoggedInUserId();
@@ -219,13 +201,75 @@ public class MemberController {
         return "member/forgot_password";
     }
 
-    @PostMapping("/forgot-password")
-    public String resetPassword(@ModelAttribute MemberPasswordResetRequest request, Model model) {
+    // ⭐️ 1. 인증번호 발송 API (안전한 예외 처리)
+    @PostMapping("/send-verification-code")
+    @ResponseBody
+    public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> request, HttpSession session) {
+        String memberId = request.get("memberId");
+        String email = request.get("email");
+
         try {
-            if (request.getNewPassword() == null || !request.getNewPassword().matches("^(?=.*[a-zA-Z])(?=.*\\d).{5,20}$")) {
-                throw new IllegalArgumentException("비밀번호는 영문자와 숫자를 포함하여 5~20자여야 합니다.");
+            // 회원 조회 시 회원이 없으면 RuntimeException 발생
+            Member member = memberService.findMember(memberId);
+
+            if (!member.getEmail().equals(email)) {
+                return ResponseEntity.badRequest().body(Map.of("message", "입력하신 아이디의 이메일 정보와 일치하지 않습니다."));
             }
+
+            // 인증번호 생성 및 발송
+            String code = String.valueOf(new Random().nextInt(900000) + 100000);
+            mailService.sendEmail(email, code);
+
+            session.setAttribute("verificationCode", code);
+            session.setAttribute("verifiedMemberId", memberId);
+
+            return ResponseEntity.ok(Map.of("message", "인증번호가 발송되었습니다. 이메일을 확인해주세요."));
+
+        } catch (RuntimeException e) {
+            // 회원 없음 에러 처리
+            return ResponseEntity.badRequest().body(Map.of("message", "존재하지 않는 회원 아이디입니다."));
+        } catch (Exception e) {
+            // 메일 서버 오류 등
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(Map.of("message", "메일 발송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."));
+        }
+    }
+
+    // 2. 인증번호 확인 API
+    @PostMapping("/verify-code")
+    @ResponseBody
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> request, HttpSession session) {
+        String inputCode = request.get("code");
+        String sessionCode = (String) session.getAttribute("verificationCode");
+
+        if (sessionCode != null && sessionCode.equals(inputCode)) {
+            session.setAttribute("isVerified", true);
+            return ResponseEntity.ok(Map.of("message", "인증되었습니다. 비밀번호를 변경하세요."));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "인증번호가 일치하지 않습니다."));
+        }
+    }
+
+    // 3. 비밀번호 재설정
+    @PostMapping("/forgot-password")
+    public String resetPassword(@ModelAttribute MemberPasswordResetRequest request,
+                                HttpSession session, Model model) {
+
+        Boolean isVerified = (Boolean) session.getAttribute("isVerified");
+        String verifiedMemberId = (String) session.getAttribute("verifiedMemberId");
+
+        if (isVerified == null || !isVerified || !request.getMemberId().equals(verifiedMemberId)) {
+            model.addAttribute("error", "이메일 인증을 먼저 진행해주세요.");
+            return "member/forgot_password";
+        }
+
+        try {
             memberService.resetPassword(request);
+
+            session.removeAttribute("verificationCode");
+            session.removeAttribute("isVerified");
+            session.removeAttribute("verifiedMemberId");
+
             model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다. 로그인해주세요.");
             return "member/login";
         } catch (IllegalArgumentException e) {
