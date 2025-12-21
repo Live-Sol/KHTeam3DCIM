@@ -173,12 +173,16 @@
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyName" th:field="*{companyName}" placeholder="Company" required>
                                         <label for="companyName"><i class="bi bi-building me-2"></i>회사명</label>
+                                        <!-- 회사명 에러 메시지 -->
+                                        <div class="validation-msg text-error" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyPhone" th:field="*{companyPhone}" placeholder="Tel" required>
                                         <label for="companyPhone"><i class="bi bi-telephone me-2"></i>회사 대표번호</label>
+                                        <!-- 회사번호 에러 메시지 -->
+                                        <div class="validation-msg text-error" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
                                     </div>
                                 </div>
                             </div>
