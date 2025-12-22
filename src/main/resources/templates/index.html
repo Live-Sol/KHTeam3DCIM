@@ -49,25 +49,32 @@
                 </h2>
             </div>
 
-            <!-- (3) PUE 지수 -->
+            <!-- (3) Power Usage Effectiveness (PUE) -->
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Power Usage (PUE)</h6>
                 <h2 class="summary-value text-cyan">
-                    <i class="bi bi-lightning-charge me-2"></i>[[${stats.pue}]]
-                    <span class="trend-badge trend-down" title="효율 개선됨">
-                        (<i class="bi bi-arrow-down-short"></i> 0.02)
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    <span id="pueValue">[[${env.currentPue}]]</span>
+
+                    <span class="trend-badge trend-down" th:if="${env.currentPue <= 1.5}" title="효율 좋음">
+                        (<i class="bi bi-check-lg"></i> Good)
+                    </span>
+                    <span class="trend-badge trend-up" th:unless="${env.currentPue <= 1.5}" title="주의 필요">
+                        (<i class="bi bi-exclamation"></i> High)
                     </span>
                 </h2>
             </div>
 
-            <!-- (4) Environment (Ulsan) -->
+            <!-- (4) Indoor Temperature & Fan Speed -->
             <div class="col-md-3 summary-item border-0">
-                <h6 class="summary-label">Environment (Ulsan)</h6>
-                <h2 class="summary-value text-warning">
-                    <i class="bi bi-cloud-sun me-2"></i> 8℃
-                    <span class="fs-6 text-white-50 ms-2" title="Humidity">
-                        <i class="bi bi-droplet-fill text-primary"></i> 25%
-                    </span>
+                <h6 class="summary-label">Indoor Temperature</h6> <h2 class="summary-value text-warning">
+                <i class="bi bi-thermometer-half me-2"></i>
+                <span id="tempValue">[[${env.currentTemp}]]</span>℃
+
+                <span class="fs-6 text-white-50 ms-2" title="Fan Speed">
+                    <i class="bi bi-fan text-primary"></i>
+                    <span id="fanSpeedValue">[[${env.fanSpeed}]]</span>%
+                </span>
                 </h2>
             </div>
         </div>
@@ -203,6 +210,32 @@
         initDashboardCharts(chartData);
     });
     /*]]>*/
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // 2초마다 데이터를 가져와서 화면만 갱신
+        setInterval(() => {
+            fetch('/admin/api/env/now')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // 1. PUE 업데이트
+                    const pueElem = document.getElementById('pueValue');
+                    if(pueElem) pueElem.innerText = data.currentPue.toFixed(2); // 소수점 2자리
+
+                    // 2. 온도 업데이트
+                    const tempElem = document.getElementById('tempValue');
+                    if(tempElem) tempElem.innerText = data.currentTemp.toFixed(1); // 소수점 1자리
+
+                    // 3. 팬 속도 업데이트
+                    const fanElem = document.getElementById('fanSpeedValue');
+                    if(fanElem) fanElem.innerText = data.fanSpeed;
+                })
+                .catch(error => console.error('Error fetching environment data:', error));
+        }, 2000); // 2000ms = 2초 주기
+    });
 </script>
 
 </body>

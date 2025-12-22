@@ -4,13 +4,12 @@
 <nav class="sidebar" th:fragment="sidebar">
     <div class="position-sticky">
         <h5 class="text-white text-center mt-3 mb-4">
-<!--            <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard-->
         </h5>
         <ul class="nav flex-column">
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${request.requestURI == '/admin' or request.requestURI == '/' ? 'active' : ''}"
+                   th:classappend="${requestURI == '/admin' or requestURI == '/' ? 'active' : ''}"
                    aria-current="page" href="/admin">
                     <i class="bi bi-house-door me-2"></i> 관리자 페이지
                 </a>
@@ -18,7 +17,7 @@
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${request.requestURI.startsWith('/requests') ? 'active' : ''}"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/requests') ? 'active' : ''}"
                    href="/requests">
                     <i class="bi bi-bell-fill me-2"></i> 입고 승인 관리
                 </a>
@@ -26,7 +25,7 @@
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${request.requestURI.startsWith('/devices') ? 'active' : ''}"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/devices') ? 'active' : ''}"
                    href="/devices">
                     <i class="bi bi-hdd-stack me-2"></i> 장비 관리
                 </a>
@@ -34,7 +33,7 @@
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${request.requestURI.startsWith('/racks') ? 'active' : ''}"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/racks') ? 'active' : ''}"
                    href="/racks">
                     <i class="bi bi-grid-1x2 me-2"></i> Rack 관리
                 </a>
@@ -42,7 +41,23 @@
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${request.requestURI.startsWith('/admin/members') ? 'active' : ''}"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/cooling') ? 'active' : ''}"
+                   href="/admin/cooling">
+                    <i class="bi bi-snow2 me-2"></i> Cooling 관리
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/pue') ? 'active' : ''}"
+                   href="/admin/pue">
+                    <i class="bi bi-lightning-charge me-2"></i> PUE 관리
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/members') ? 'active' : ''}"
                    href="/admin/members">
                     <i class="bi bi-people me-2"></i> 회원 관리
                 </a>

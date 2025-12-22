@@ -25,6 +25,7 @@ public class DeviceService {
     private final RackRepository rackRepository;
     private final CategoryRepository categoryRepository;
     private final AuditLogService auditLogService;
+    private final EnvironmentService envService; // 장비가 변경될 때 환경 정보도 업데이트되도록 장비 저장/삭제 후 호출
 
     // ==========================================
     // 1. 장비 등록하기
@@ -335,5 +336,16 @@ public class DeviceService {
                 throw new IllegalStateException("이미 해당 위치(" + exStart + "~" + exEnd + "U)에 다른 장비가 있습니다.");
             }
         }
+    }
+
+    // ==========================================
+    // 9. 장비 추가 시 환경 정보 업데이트
+    // ==========================================
+    @Transactional
+    public void addDevice(Device device) {
+        deviceRepository.save(device);
+
+        // ⭐ [추가] 장비가 늘었으니 전력량 및 PUE 다시 계산
+        envService.calculateSimulation(null);
     }
 }

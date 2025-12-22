@@ -41,12 +41,12 @@ public class SecurityConfig {
                                 "/members/verify-code", // 인증 코드 검증
                                 "/solutions/**",        // 솔루션 페이지 전체 공개
                                 "/info/**",             // 정보 페이지 전체 공개
-                                "/specs/**"             // 제원 페이지 전체 공개
+                                "/specs/**",            // 제원 페이지 전체 공개
+                                "/admin/api/env/now" // ⭐️ [추가] API는 JS에서 호출하므로 허용 (필요시 authenticated로 변경 가능)
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/members").permitAll()
-                        // 관리자 페이지(/members/admin/**)는 'ADMIN' 역할을 가진 사용자만 접근 허용
-                        // Spring Security가 인증된 사용자의 권한을 확인합니다.
-                        .requestMatchers("/members/admin/**").hasRole("ADMIN")
+                        // 관리자 페이지는 'ADMIN' 역할을 가진 사용자만 접근 허용
+                        .requestMatchers("/members/admin/**", "/admin/**").hasRole("ADMIN")
                         // 그 외 모든 요청은 인증된 사용자(로그인한 사용자)에게만 허용
                         .anyRequest().authenticated()
                 )
