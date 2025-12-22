@@ -1,11 +1,16 @@
 /* ===============================
    Sidebar
 ================================ */
+
 .sidebar {
-    width: 260px;
-    min-height: 100vh;
-    background-color: var(--panel-bg);
+    width: 280px;        /* 원하는 너비 (예: 280px) */
+    min-width: 280px;    /* ⭐ 핵심: 창이 줄어도 이 크기 이하로 절대 줄어들지 않음 */
+    max-width: 280px;    /* 너비 고정 */
+    height: 100vh;       /* 높이는 화면 전체 */
     border-right: 1px solid var(--border-color);
+
+    /* 기존 스타일 유지 */
+    background-color: #YOUR_COLOR;
 }
 
 .sidebar h5 {

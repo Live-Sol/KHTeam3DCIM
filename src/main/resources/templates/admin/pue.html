@@ -3,30 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>PUE 모니터링</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}"> <style>
-    .pue-value-box {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 5rem;
-        font-weight: 800;
-        background: -webkit-linear-gradient(#22d3ee, #3b82f6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .energy-card {
-        background-color: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(255,255,255,0.05);
-        transition: transform 0.2s;
-    }
-    .energy-card:hover {
-        transform: translateY(-5px);
-        border-color: var(--accent-cyan);
-    }
-</style>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+
+    <style>
+        /* 1. 네온 게이지 스타일 */
+        .gauge-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* 돌아가는 원형 그라데이션 (PUE 수치 시각화) */
+        .gauge-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--gauge-color) var(--gauge-percent),
+                rgba(255,255,255,0.05) 0%
+            );
+            /* 가운데 구멍 뚫기 (도넛 모양) */
+            mask: radial-gradient(transparent 65%, black 66%);
+            -webkit-mask: radial-gradient(transparent 65%, black 66%);
+
+            transition: all 1s ease-out;
+            box-shadow: 0 0 20px var(--gauge-color-dim);
+        }
+
+        /* 가운데 숫자 */
+        .pue-value-box {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            z-index: 2;
+            color: #fff;
+            text-shadow: 0 0 15px var(--gauge-color);
+        }
+
+        /* 맥박 뛰는 효과 (살아있는 느낌) */
+        @keyframes pulse-text {
+            0% { transform: scale(1); text-shadow: 0 0 10px var(--gauge-color); }
+            50% { transform: scale(1.02); text-shadow: 0 0 20px var(--gauge-color), 0 0 30px var(--gauge-color); }
+            100% { transform: scale(1); text-shadow: 0 0 10px var(--gauge-color); }
+        }
+        .pue-pulse {
+            animation: pulse-text 2s infinite ease-in-out;
+        }
+
+        /* 2. 카드 호버 효과 */
+        .energy-card {
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .energy-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* 3. 전기가 흐르는 프로그레스 바 */
+        .progress-bar-animated-stripe {
+            background-image: linear-gradient(
+                45deg,
+                rgba(255,255,255,.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255,255,255,.15) 50%,
+                rgba(255,255,255,.15) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+    </style>
 </head>
 <body>
 
@@ -42,24 +105,36 @@
         </h2>
 
         <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="card custom-card-dark h-100 shadow border-0 position-relative overflow-hidden">
-                    <div class="card-body text-center d-flex flex-column justify-content-center align-items-center p-5">
-                        <h5 class="text-secondary text-uppercase letter-spacing-2">Current PUE</h5>
-                        <div class="pue-value-box" th:text="${env.currentPue}">1.52</div>
 
-                        <div class="mt-3">
-                            <span th:if="${env.currentPue <= 1.2}" class="badge bg-success fs-5 px-4 py-2 rounded-pill">Excellent (최우수)</span>
-                            <span th:if="${env.currentPue > 1.2 && env.currentPue <= 1.5}" class="badge bg-info fs-5 px-4 py-2 rounded-pill">Good (우수)</span>
-                            <span th:if="${env.currentPue > 1.5 && env.currentPue <= 2.0}" class="badge bg-warning text-dark fs-5 px-4 py-2 rounded-pill">Average (보통)</span>
-                            <span th:if="${env.currentPue > 2.0}" class="badge bg-danger fs-5 px-4 py-2 rounded-pill">Poor (비효율)</span>
+            <div class="col-lg-6">
+                <div class="card custom-card-dark shadow border-0 position-relative overflow-hidden mb-4">
+                    <div class="card-body text-center d-flex flex-column justify-content-center align-items-center p-4">
+                        <h5 class="text-secondary text-uppercase letter-spacing-2 mb-4">Real-time PUE Efficiency</h5>
+
+                        <div class="gauge-container"
+                             th:with="percent=${(env.currentPue - 1.0) / 2.0 * 100}"
+                             th:style="'--gauge-percent: ' + ${percent > 100 ? 100 : (percent < 0 ? 0 : percent)} + '%; --gauge-color: ' + ${env.currentPue <= 1.5 ? '#4ade80' : (env.currentPue <= 2.0 ? '#facc15' : '#f87171')} + '; --gauge-color-dim: ' + ${env.currentPue <= 1.5 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}">
+
+                            <div class="gauge-ring"></div>
+
+                            <div class="pue-value-box pue-pulse" th:text="${env.currentPue}">1.52</div>
                         </div>
 
-                        <p class="mt-4 text-muted small">
-                            * PUE(Power Usage Effectiveness)는 1.0에 가까울수록 친환경적입니다.<br>
-                            냉방 에너지를 줄이면 PUE가 낮아지지만, 온도가 상승할 수 있습니다.
-                        </p>
-                        <a href="/admin/cooling" class="btn btn-outline-secondary mt-2 btn-sm">냉방 조절하러 가기 <i class="bi bi-arrow-right"></i></a>
+                        <div>
+                            <span th:if="${env.currentPue <= 1.2}" class="badge bg-success fs-5 px-4 py-2 rounded-pill shadow-lg">Excellent (최우수)</span>
+                            <span th:if="${env.currentPue > 1.2 && env.currentPue <= 1.5}" class="badge bg-info fs-5 px-4 py-2 rounded-pill shadow-lg">Good (우수)</span>
+                            <span th:if="${env.currentPue > 1.5 && env.currentPue <= 2.0}" class="badge bg-warning text-dark fs-5 px-4 py-2 rounded-pill shadow-lg">Average (보통)</span>
+                            <span th:if="${env.currentPue > 2.0}" class="badge bg-danger fs-5 px-4 py-2 rounded-pill shadow-lg">Poor (비효율)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card custom-card-dark shadow border-0">
+                    <div class="card-header bg-transparent border-0 text-white">
+                        <i class="bi bi-graph-up"></i> PUE Trend (Last 1 Hour)
+                    </div>
+                    <div class="card-body">
+                        <canvas id="pueChart" style="max-height: 200px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -75,7 +150,7 @@
                                         <span th:text="${env.totalFacilityLoad}">3500</span> <small class="fs-6 text-muted">W</small>
                                     </h2>
                                 </div>
-                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                                <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning border border-warning">
                                     <i class="bi bi-building-fill-gear fs-2"></i>
                                 </div>
                             </div>
@@ -91,7 +166,7 @@
                                         <span th:text="${env.totalItLoad}">2500</span> <small class="fs-6 text-muted">W</small>
                                     </h2>
                                 </div>
-                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary border border-primary">
                                     <i class="bi bi-server fs-2"></i>
                                 </div>
                             </div>
@@ -100,20 +175,30 @@
 
                     <div class="col-12">
                         <div class="card custom-card-dark p-4 h-100">
-                            <h6 class="text-white mb-3">에너지 소비 비율</h6>
-                            <div class="progress" style="height: 30px; background-color: #334155;">
-                                <div class="progress-bar bg-primary" role="progressbar"
+                            <h6 class="text-white mb-3">에너지 소비 비율 (Energy Breakdown)</h6>
+
+                            <div class="progress" style="height: 35px; background-color: #1e293b; border-radius: 8px; overflow: hidden;">
+                                <div class="progress-bar bg-primary progress-bar-animated-stripe" role="progressbar"
                                      th:style="'width: ' + (${env.totalItLoad} * 100 / ${env.totalFacilityLoad}) + '%'"
                                      th:text="'IT Load (' + ${#numbers.formatInteger(env.totalItLoad * 100 / env.totalFacilityLoad, 0)} + '%)'">
                                 </div>
-                                <div class="progress-bar bg-warning" role="progressbar"
+                                <div class="progress-bar bg-warning progress-bar-animated-stripe" role="progressbar"
                                      th:style="'width: ' + (100 - (${env.totalItLoad} * 100 / ${env.totalFacilityLoad})) + '%'"
                                      th:text="'Cooling/Etc'">
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-between mt-2 text-muted small">
-                                <span><i class="bi bi-circle-fill text-primary"></i> 실제 장비 사용량</span>
-                                <span><i class="bi bi-circle-fill text-warning"></i> 냉방 및 기타 전력</span>
+
+                            <div class="d-flex justify-content-between mt-3 text-muted small">
+                                <span><i class="bi bi-circle-fill text-primary"></i> 실제 서버/네트워크 장비</span>
+                                <span><i class="bi bi-circle-fill text-warning"></i> 냉방기, 조명, 보안 시스템</span>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-top border-secondary">
+                                <p class="text-white-50 small mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    현재 PUE <strong class="text-white">[[${env.currentPue}]]</strong> 기준,
+                                    IT 장비 1W 사용 시 <strong class="text-warning">[[${#numbers.formatDecimal(env.currentPue - 1, 1, 2)}]]W</strong>의 추가 전력이 시설 유지에 소모되고 있습니다.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -124,5 +209,65 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('pueChart').getContext('2d');
+        const currentPue = [[${env.currentPue}]];
+
+        // 더미 데이터 생성 (최근 1시간 변화량 시뮬레이션)
+        // 실제로는 DB에서 List<Double> 형태로 받아와야 하지만, 지금은 시각적 효과를 위해 난수 생성
+        const labels = ['50m', '40m', '30m', '20m', '10m', 'Now'];
+        const dataPoints = [
+            currentPue + 0.05,
+            currentPue - 0.02,
+            currentPue + 0.01,
+            currentPue - 0.04,
+            currentPue + 0.02,
+            currentPue
+        ];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'PUE Trend',
+                    data: dataPoints,
+                    borderColor: '#22d3ee', // Cyan
+                    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4, // 곡선 부드럽게
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#22d3ee'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        suggestedMin: 1.0,
+                        suggestedMax: 2.0,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    });
+    /*]]>*/
+</script>
+
 </body>
 </html>

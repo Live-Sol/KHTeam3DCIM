@@ -3,29 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>냉방 관리</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/admin.css}"> <style>
-    /* 쿨링 페이지 전용 스타일 */
-    .temp-display {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 4rem;
-        font-weight: 800;
-        color: #fff;
-        text-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
-    }
-    .fan-icon {
-        font-size: 5rem;
-        color: var(--text-sub);
-        transition: transform 0.1s linear;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .fan-spinning { animation: spin 1s linear infinite; }
-    .fan-fast { animation: spin 0.3s linear infinite; }
-</style>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        /* 쿨링 페이지 전용 스타일 */
+        .temp-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+        }
+        .fan-container {
+            width: 150px;
+            height: 150px;
+        }
+
+        .fan-icon {
+            font-size: 5rem;
+            color: #22d3ee; /* Cyan 색상 */
+            z-index: 2;
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8)); /* 네온 효과 */
+        }
+
+        /* 팬 주위를 감싸는 링 */
+        .fan-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(34, 211, 238, 0.1); /* 흐릿한 배경 링 */
+            border-top: 4px solid #22d3ee; /* 진한 링 (돌아가는 느낌) */
+            border-radius: 50%;
+            animation: spin-ring 2s linear infinite; /* 링도 천천히 돔 */
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), inset 0 0 15px rgba(34, 211, 238, 0.2);
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-ring { 100% { transform: rotate(-360deg); } } /* 팬과 반대 방향으로 회전 */
+
+        .fan-spinning { animation: spin 1s linear infinite; }
+    </style>
 </head>
 <body>
 
@@ -66,92 +89,212 @@
                         <h5 class="text-info"><i class="bi bi-fan"></i> 냉각 팬 가동 현황</h5>
                     </div>
                     <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
-                        <i id="fanIcon" class="bi bi-fan fan-icon mb-3 d-block"></i>
+                        <div class="fan-container position-relative d-flex justify-content-center align-items-center mb-3">
+                            <i id="fanIcon" class="bi bi-fan fan-icon"></i>
+                            <div class="fan-ring"></div>
+                        </div>
+
                         <h3 class="text-white mb-1"><span id="fanSpeedDisplay" th:text="${env.fanSpeed}">50</span>%</h3>
-                        <p class="text-muted">현재 출력 강도</p>
+                        <p class="text-muted">Cooling Power</p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12">
-                <div class="card custom-card-dark shadow border-info">
-                    <div class="card-header bg-info bg-opacity-10 border-info text-white">
-                        <i class="bi bi-sliders"></i> 환경 설정 제어판
+            <div class="col-lg-6">
+                <div class="card custom-card-dark shadow h-100">
+                    <div class="card-header bg-transparent border-0 text-white">
+                        <i class="bi bi-graph-up-arrow text-danger"></i> 실시간 온도 변화 (Temp History)
                     </div>
-                    <div class="card-body p-4">
+                    <div class="card-body">
+                        <div class="w-100 h-100" style="min-height: 250px;">
+                            <canvas id="tempChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card custom-card-dark shadow border-info h-100">
+                    <div class="card-header bg-info bg-opacity-10 border-info text-white">
+                        <i class="bi bi-sliders"></i> 환경 설정 (Settings)
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column justify-content-center">
                         <form action="/admin/cooling/update" method="post">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                            <div class="row g-4 align-items-center">
-                                <div class="col-md-4">
-                                    <label class="form-label text-white">목표 실내 온도 (°C)</label>
-                                    <input type="number" step="0.5" name="targetTemp" class="form-control custom-form-control"
-                                           th:value="${env.targetTemp}">
-                                    <div class="form-text text-white-50">설정 범위: 18.0 ~ 30.0</div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label text-white">팬 속도 (Fan Speed %)</label>
-                                    <input type="range" class="form-range" name="fanSpeed" min="0" max="100"
-                                           th:value="${env.fanSpeed}" oninput="document.getElementById('rangeVal').innerText=this.value">
-                                    <div class="text-end text-info fw-bold">
-                                        Setting: <span id="rangeVal" th:text="${env.fanSpeed}">50</span>%
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-white small">목표 온도 (°C)</label>
+                                    <div class="input-group">
+                                        <input type="number" step="0.5" name="targetTemp" class="form-control custom-form-control"
+                                               th:value="${env.targetTemp}">
+                                        <span class="input-group-text bg-dark text-white border-secondary">°C</span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label text-white d-block">운전 모드</label>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="form-label text-white small">팬 속도 설정</label>
+                                        <span class="text-info fw-bold small"><span id="rangeVal" th:text="${env.fanSpeed}">50</span>%</span>
+                                    </div>
+                                    <input type="range" class="form-range" name="fanSpeed" min="0" max="100"
+                                           th:value="${env.fanSpeed}" oninput="document.getElementById('rangeVal').innerText=this.value">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label text-white small d-block">운전 모드</label>
                                     <div class="btn-group w-100" role="group">
                                         <input type="radio" class="btn-check" name="coolingMode" id="mode1" value="AUTO" th:checked="${env.coolingMode == 'AUTO'}">
-                                        <label class="btn btn-outline-info" for="mode1">AUTO</label>
+                                        <label class="btn btn-outline-info btn-sm" for="mode1">AUTO</label>
 
                                         <input type="radio" class="btn-check" name="coolingMode" id="mode2" value="MANUAL" th:checked="${env.coolingMode == 'MANUAL'}">
-                                        <label class="btn btn-outline-light" for="mode2">MANUAL</label>
+                                        <label class="btn btn-outline-light btn-sm" for="mode2">MANUAL</label>
 
                                         <input type="radio" class="btn-check" name="coolingMode" id="mode3" value="ECO" th:checked="${env.coolingMode == 'ECO'}">
-                                        <label class="btn btn-outline-success" for="mode3">ECO</label>
+                                        <label class="btn btn-outline-success btn-sm" for="mode3">ECO</label>
                                     </div>
                                 </div>
                             </div>
 
                             <hr class="border-secondary my-4">
                             <button type="submit" class="btn btn-info w-100 fw-bold py-2">
-                                <i class="bi bi-check-lg"></i> 설정 적용 및 시뮬레이션 반영
+                                <i class="bi bi-check-lg"></i> 설정 적용
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
+
+<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        // 기존 JS 로직 유지
-        const speed = parseInt(document.getElementById('fanSpeedDisplay').innerText);
+        // --------------------------------------------------------
+        // 1. 기존 UI 로직 (팬 애니메이션 등)
+        // --------------------------------------------------------
+        const fanSpeedElem = document.getElementById('fanSpeedDisplay');
         const fanIcon = document.getElementById('fanIcon');
-        const temp = parseFloat(document.getElementById('currentTempDisplay').innerText);
+        const tempElem = document.getElementById('currentTempDisplay');
         const alertBox = document.getElementById('tempAlertBox');
 
-        if(speed > 0) {
-            fanIcon.classList.add('fan-spinning');
-            if(speed > 70) fanIcon.style.animationDuration = '0.2s';
-            else if(speed > 30) fanIcon.style.animationDuration = '1s';
-            else fanIcon.style.animationDuration = '3s';
+        function updateFanAnimation(speed) {
+            if(speed > 0) {
+                fanIcon.classList.add('fan-spinning');
+                if(speed > 70) fanIcon.style.animationDuration = '0.2s';
+                else if(speed > 30) fanIcon.style.animationDuration = '1s';
+                else fanIcon.style.animationDuration = '3s';
+            } else {
+                fanIcon.classList.remove('fan-spinning');
+            }
         }
 
-        if(temp > 30) {
-            alertBox.className = 'alert alert-danger mt-3 w-75';
-            alertBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> 경고: 온도가 너무 높습니다!';
-        } else if(temp > 27) {
-            alertBox.className = 'alert alert-warning mt-3 w-75';
-            alertBox.innerHTML = '<i class="bi bi-exclamation-circle"></i> 주의: 온도가 다소 높습니다.';
-        } else {
-            alertBox.className = 'alert alert-success mt-3 w-75';
-            alertBox.innerHTML = '<i class="bi bi-check-circle-fill"></i> 상태 쾌적함';
+        function updateTempAlert(temp) {
+            if(temp > 30) {
+                alertBox.className = 'alert alert-danger mt-3 w-75';
+                alertBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> 경고: 고온!';
+            } else if(temp > 27) {
+                alertBox.className = 'alert alert-warning mt-3 w-75';
+                alertBox.innerHTML = '<i class="bi bi-exclamation-circle"></i> 주의: 온도 상승';
+            } else {
+                alertBox.className = 'alert alert-success mt-3 w-75';
+                alertBox.innerHTML = '<i class="bi bi-check-circle-fill"></i> 상태 쾌적함';
+            }
         }
+
+        // 초기 실행
+        let currentSpeed = parseInt(fanSpeedElem.innerText);
+        let currentTemp = parseFloat(tempElem.innerText);
+        updateFanAnimation(currentSpeed);
+        updateTempAlert(currentTemp);
+
+
+        // --------------------------------------------------------
+        // 2. [신규] 온도 그래프 초기화 (Chart.js)
+        // --------------------------------------------------------
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        const initialTemp = currentTemp;
+
+        // 더미 데이터 생성 (최근 30분)
+        const labels = ['12s', '10s', '8s', '6s', '4s', '2s', 'Now'];
+        // 현재 온도 기준으로 약간씩 변동을 준 더미 데이터
+        const dataPoints = [
+            initialTemp - 0.5,
+            initialTemp - 0.2,
+            initialTemp + 0.1,
+            initialTemp - 0.3,
+            initialTemp + 0.2,
+            initialTemp - 0.1,
+            initialTemp
+        ];
+
+        const tempChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Indoor Temp (°C)',
+                    data: dataPoints,
+                    borderColor: '#f87171', // 붉은색 (온도 느낌)
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4, // 곡선
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#f87171'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        // 온도 변화가 잘 보이게 범위 설정 (현재온도 +- 5도)
+                        suggestedMin: initialTemp - 3,
+                        suggestedMax: initialTemp + 3,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+
+
+        // --------------------------------------------------------
+        // 3. 실시간 데이터 갱신 (API 호출)
+        // --------------------------------------------------------
+        setInterval(() => {
+            fetch('/admin/api/env/now')
+                .then(response => response.json())
+                .then(data => {
+                    // 텍스트 업데이트
+                    tempElem.innerText = data.currentTemp.toFixed(1);
+                    fanSpeedElem.innerText = data.fanSpeed;
+
+                    // 상태 업데이트
+                    updateFanAnimation(data.fanSpeed);
+                    updateTempAlert(data.currentTemp);
+
+                    // 차트 업데이트 (오른쪽으로 흐르는 효과)
+                    const newTemp = data.currentTemp;
+
+                    // 데이터 배열 뒤에 추가하고, 맨 앞 제거
+                    tempChart.data.datasets[0].data.push(newTemp);
+                    tempChart.data.datasets[0].data.shift();
+
+                    // 차트 다시 그리기
+                    tempChart.update();
+                });
+        }, 2000);
     });
 </script>
 </body>
