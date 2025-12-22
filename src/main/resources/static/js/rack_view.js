@@ -133,3 +133,44 @@ function updateStatusUI(status) {
         powerBtn.innerHTML = '<i class="bi bi-power"></i> 전원 켜기';
     }
 }
+
+// =======================================
+// [추가] 빈 칸 클릭 시 입고 승인 처리
+// =======================================
+function assignRack(unitNum, rackId) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reqId = urlParams.get('reqId');
+
+    // [케이스 1] 입고 신청 승인 모드인 경우 (reqId가 있을 때)
+    if (reqId) {
+        if (confirm(unitNum + "U 위치에 장비를 최종 승인 및 등록하시겠습니까?")) {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/requests/${reqId}/approve`;
+
+            // 데이터 추가 (CSRF, rackId, startUnit)
+            const params = {
+                '_csrf': token,
+                'rackId': rackId,
+                'startUnit': unitNum
+            };
+
+            for (const key in params) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = params[key];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    // [케이스 2] 그냥 관리자가 수동으로 새 장비를 등록하는 경우 (reqId가 없을 때)
+    else {
+        location.href = `/devices/new?rackId=${rackId}&startUnit=${unitNum}`;
+    }
+}

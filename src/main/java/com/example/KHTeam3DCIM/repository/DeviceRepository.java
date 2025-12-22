@@ -22,6 +22,23 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 3. 통합 검색 (제조사, 모델, 시리얼)
     List<Device> findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(
             String vendor, String modelName, String serialNum, Sort sort);
+    // [추가] 전체 조회 시 연관 객체(Member, Category, Rack)를 한 번에 가져오기
+    @Query("SELECT d FROM Device d " +
+            "JOIN FETCH d.member " +
+            "JOIN FETCH d.category " +
+            "LEFT JOIN FETCH d.rack")
+    List<Device> findAllWithMember(Sort sort);
+
+    // [추가] 검색 시 연관 객체를 포함하고, 신청자 아이디(memberId)로도 검색 가능하게 설정
+    @Query("SELECT d FROM Device d " +
+            "JOIN FETCH d.member " +
+            "JOIN FETCH d.category " +
+            "LEFT JOIN FETCH d.rack " +
+            "WHERE LOWER(d.vendor) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(d.modelName) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(d.serialNum) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(d.member.memberId) LIKE LOWER(CONCAT('%', :kw, '%'))")
+    List<Device> findAllWithMemberByKeyword(@Param("kw") String kw, Sort sort);
 
     // 4. 랙별 사용 유닛 합계
     @Query("SELECT COALESCE(SUM(d.heightUnit), 0) FROM Device d WHERE d.rack.id = :rackId")
@@ -45,4 +62,8 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 7. 중복 검사
     boolean existsBySerialNum(String serialNum);
     boolean existsBySerialNumAndIdNot(String serialNum, Long id);
+
+    // 8. 아이디 조회
+    @Query("SELECT d FROM Device d JOIN FETCH d.member JOIN FETCH d.category LEFT JOIN FETCH d.rack")
+    List<Device> findAllWithMember();
 }

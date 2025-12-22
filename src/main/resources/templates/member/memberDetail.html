@@ -22,7 +22,7 @@
         <div th:if="${memberNotFound}" class="glass-box text-center py-5">
             <i class="bi bi-x-circle-fill fs-1 mb-3 text-danger"></i>
             <h4 class="text-white">회원이 존재하지 않습니다.</h4>
-            <a th:href="@{/admin/members}" class="btn btn-outline-light mt-3">목록으로</a>
+            <a th:href="${returnUrl}" class="btn btn-outline-light mt-3">목록으로</a>
         </div>
 
         <!-- 회원 정보 -->

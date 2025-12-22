@@ -79,6 +79,7 @@ public class DeviceService {
         Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
         String property = switch (sortOption) {
             case "id_asc" -> "id";
+            case "member" -> "member.memberId"; // [추가] 신청자 아이디 기준 정렬
             case "rack" -> "rack.rackName";
             case "category" -> "category.name";
             case "serial" -> "serialNum";
@@ -159,19 +160,39 @@ public class DeviceService {
         return stats;
     }
 
+    // [1] 전체 조회 메서드 수정
     public List<Device> findAllDevices(String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
-        return deviceRepository.findAll(sort);
+        // 기본 findAll 대신 Member 정보까지 한 번에 가져오는 새 메서드 호출
+        return deviceRepository.findAllWithMember(sort);
     }
 
+    // [2] 검색 메서드 수정
     public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
         Sort sort = createSort(sortOption, sortDir);
+
         if (keyword == null || keyword.trim().isEmpty()) {
             return findAllDevices(sortOption, sortDir);
         }
-        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(
-                keyword, keyword, keyword, sort);
+
+        // 기존 자동 생성 메서드 대신, @Query로 만든 최적화 메서드 호출
+        // 이 메서드는 신청자 아이디로도 검색이 가능하도록 설계되었습니다.
+        return deviceRepository.findAllWithMemberByKeyword(keyword, sort);
     }
+
+//    public List<Device> findAllDevices(String sortOption, String sortDir) {
+//        Sort sort = createSort(sortOption, sortDir);
+//        return deviceRepository.findAll(sort);
+//    }
+//
+//    public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
+//        Sort sort = createSort(sortOption, sortDir);
+//        if (keyword == null || keyword.trim().isEmpty()) {
+//            return findAllDevices(sortOption, sortDir);
+//        }
+//        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(
+//                keyword, keyword, keyword, sort);
+//    }
 
     // ⭐ [NEW] 총 장비 개수 조회 메서드 추가
     public long countAllDevices() {

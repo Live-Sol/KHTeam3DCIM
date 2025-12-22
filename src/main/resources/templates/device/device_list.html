@@ -20,7 +20,7 @@
     <main class="main-content flex-grow-1">
 
         <h2 class="mb-4 text-white border-bottom pb-2">
-            <i class="bi bi-hdd-stack me-2"></i> 자산(Device) 관리 리스트
+            <i class="bi bi-hdd-stack me-2"></i> 총 장비 리스트
         </h2>
 
         <div class="d-flex justify-content-between mb-4 align-items-center">
@@ -29,6 +29,7 @@
 
                 <select name="sort" class="form-select custom-select" style="width: 160px;" onchange="this.form.submit()">
                     <option value="latest" th:selected="${sort == 'latest'}">ID</option>
+                    <option value="member" th:selected="${sort == 'member'}">신청자 아이디</option>
                     <option value="rack" th:selected="${sort == 'rack'}">위치(Rack)</option>
                     <option value="category" th:selected="${sort == 'category'}">장비 종류</option>
                     <option value="serial" th:selected="${sort == 'serial'}">제조사/모델</option>
@@ -61,21 +62,33 @@
             <table class="table table-hover admin-table">
                 <thead>
                 <tr class="text-center">
-                    <th style="width: 5%">ID</th>
+                    <th style="width: 15%">신청자</th>
                     <th style="width: 10%">위치(Rack)</th>
                     <th style="width: 10%">장비 종류</th>
-                    <th style="width: 20%">제조사/모델</th>
-                    <th style="width: 8%">소비전력</th>
+                    <th style="width: 15%">제조사/모델</th>
+                    <th style="width: 7%">소비전력</th>
                     <th style="width: 7%">EMS</th>
-                    <th style="width: 10%">설치위치</th>
-                    <th style="width: 12%" class="text-start">계약 (만료일)</th>
+                    <th style="width: 8%">설치위치</th>
+                    <th style="width: 10%" class="text-start">계약 (만료일)</th>
                     <th style="width: 8%">상태</th>
                     <th style="width: 10%">관리</th>
                 </tr>
                 </thead>
                 <tbody class="text-center">
                 <tr th:each="device : ${devices}">
-                    <td th:text="${device.id}" class="fw-bold text-info">1</td>
+                    <td>
+                        <span th:if="${device.member != null}">
+                            <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
+                               class="text-info text-decoration-none"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               th:title="'시스템 장비 ID: ' + ${device.id}">
+                                <i class="bi bi-person-fill small"></i>
+                                [[${device.member.memberId}]]
+                            </a>
+                        </span>
+                        <span th:unless="${device.member != null}" class="text-sub-muted">-</span>
+                    </td>
 
                     <td class="text-white fw-bold" th:text="${device.rack != null ? device.rack.rackName : '미배정'}">A-01</td>
 
@@ -148,6 +161,12 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        // --- 툴팁 활성화 코드 추가 ---
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
         // 컨트롤러의 RedirectAttributes에서 보낸 메시지 읽기
         const successMessage = [[${successMessage}]];
         const errorMessage = [[${errorMessage}]];

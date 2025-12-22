@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -149,5 +150,30 @@ public class RequestController {
         return "redirect:/requests";
     }
 
+    // =======================================
+    // 5. [관리자] 입고 승인 및 장비 등록 처리 (추가)
+    // =======================================
+    @PostMapping("/{id}/approve")
+    public String approveRequest(@PathVariable Long id,
+                                 @RequestParam Long rackId,
+                                 @RequestParam Integer startUnit,
+                                 RedirectAttributes redirectAttributes) { // RedirectAttributes 추가
+        try {
+            requestService.approveRequest(id, rackId, startUnit);
+            redirectAttributes.addFlashAttribute("successMessage", "성공적으로 승인되었습니다.");
+            return "redirect:/requests";
+        } catch (IllegalStateException e) {
+            // 탈퇴한 회원 등 비즈니스 로직 상의 오류 처리
+
+            // 서비스에서 던진 "신청자 정보 없음" 예외를 여기서 가로채서
+            // 500 에러 페이지 대신 목록 페이지에 경고 메시지(FlashAttribute)를 들고 돌아감
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/requests";
+        } catch (Exception e) {
+            // 기타 예상치 못한 오류
+            redirectAttributes.addFlashAttribute("errorMessage", "승인 중 알 수 없는 오류가 발생했습니다.");
+            return "redirect:/requests";
+        }
+    }
 
 }
