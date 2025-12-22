@@ -127,7 +127,7 @@ public class RequestController {
     @PostMapping("/{id}/reject")
     public String rejectRequestWithReason(
             @PathVariable Long id,
-            @RequestParam String rejectReason) {
+            @RequestParam(required = false) String rejectReason) {
 
         requestService.rejectRequest(id, rejectReason);
         return "redirect:/requests";

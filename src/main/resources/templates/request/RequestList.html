@@ -61,20 +61,15 @@
 
                         <div class="d-flex gap-2 mt-3">
                             <a th:href="@{/racks(reqId=${req.id})}" class="btn custom-btn-primary flex-grow-1">
-                                🔍 승인(자리 배정)
-                            </a>
-
-                            <a th:href="@{/requests/{id}/reject(id=${req.id})}"
-                               class="btn custom-btn-outline-danger flex-grow-1"
-                               onclick="return confirm('이 신청을 반려하시겠습니까?');">
-                                ⛔ 반려
+                                <i class="bi bi-check-lg"></i>
+                                승인(자리 배정)
                             </a>
 
                             <a th:href="@{/requests/{id}/reject/form(id=${req.id})}"
-                               class="btn custom-btn-outline-danger">
-                                ⛔ 반려(사유 입력)
+                               class="btn custom-btn-outline-danger flex-grow-1">
+                                <i class="bi bi-x-circle me-1"></i>
+                                반려
                             </a>
-
                         </div>
                     </div>
                 </div>

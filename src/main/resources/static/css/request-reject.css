@@ -1,0 +1,111 @@
+/* ===============================
+   Request Reject Page Only
+   관리자 테마 기반 (Dark)
+================================ */
+
+/* ===== Color System ===== */
+:root {
+    --dark-bg: #0f172a;
+    --card-bg: #1f2937;
+    --border-color: #374151;
+
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+
+    --text-main: #e5e7eb;
+    --text-sub: #9ca3af;
+}
+
+/* ===== Global ===== */
+body {
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+
+/* ===== Page Container ===== */
+.reject-container {
+    max-width: 600px;
+    margin: 80px auto;
+}
+
+/* ===== Card ===== */
+.reject-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 32px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Title ===== */
+.reject-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 12px;
+}
+
+/* ===== Label ===== */
+.reject-label {
+    font-weight: 600;
+    color: var(--text-sub);
+    margin-bottom: 8px;
+}
+
+/* ===== Textarea ===== */
+.reject-textarea {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    resize: none;
+    border-radius: 10px;
+}
+
+.reject-textarea:focus {
+    background-color: #020617;
+    border-color: var(--danger);
+    box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+    color: var(--text-main);
+}
+
+/* ===== Placeholder Color ===== */
+.reject-textarea::placeholder {
+    color: #6b7280; /* 밝은 회색 (권장) */
+    opacity: 1;     /* 브라우저 기본 투명도 제거 */
+}
+
+/* 포커스 상태에서도 유지 */
+.reject-textarea:focus::placeholder {
+    color: #6b7280;
+}
+
+/* ===== Buttons ===== */
+.reject-btn-danger {
+    background-color: var(--danger);
+    border: 1px solid var(--danger);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.reject-btn-danger:hover {
+    background-color: var(--danger-hover);
+    border-color: var(--danger-hover);
+}
+
+.reject-btn-cancel {
+    background-color: #020617;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.reject-btn-cancel:hover {
+    background-color: var(--border-color);
+    color: #fff;
+}
