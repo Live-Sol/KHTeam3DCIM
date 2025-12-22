@@ -1,0 +1,178 @@
+/* =========================================
+   Cyber Tech Dashboard - Member Detail
+   ========================================= */
+
+/* -----------------------
+   Colors / Variables
+------------------------ */
+:root {
+    --primary-bg: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --accent-cyan: #06b6d4;
+    --accent-purple: #8b5cf6;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --badge-on-bg: rgba(34, 197, 94, 0.15);
+    --badge-on-color: #34d399;
+    --badge-off-bg: rgba(248, 113, 113, 0.15);
+    --badge-off-color: #f87171;
+}
+
+/* -----------------------
+   Body & Global
+------------------------ */
+body.dashboard-body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--primary-bg);
+    background-image:
+            radial-gradient(circle at 10% 20%, rgba(6,182,212,0.08) 0%, transparent 40%),
+            radial-gradient(circle at 90% 80%, rgba(139,92,246,0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+a { text-decoration: none; transition: all 0.3s ease; }
+a:hover { color: var(--accent-cyan); }
+
+/* -----------------------
+   Main Content
+------------------------ */
+.main-content {
+    padding: 2rem;
+}
+
+.page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    margin-bottom: 2rem;
+    text-shadow: 0 0 8px rgba(6,182,212,0.5);
+}
+
+/* -----------------------
+   Glass Box Cards
+------------------------ */
+.glass-box {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    color: var(--text-main);
+    max-width: 600px; /* 중앙 집중형 폭 제한 */
+    margin: 0 auto 2rem auto;
+}
+
+.glass-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(6,182,212,0.25);
+}
+
+/* -----------------------
+   Text Highlights
+------------------------ */
+.text-cyan {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 6px rgba(6,182,212,0.4);
+}
+
+/* -----------------------
+   Badges
+------------------------ */
+.badge {
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.badge-on {
+    background-color: var(--badge-on-bg);
+    color: var(--badge-on-color);
+    border: 1px solid rgba(52,211,153,0.3);
+}
+
+.badge-off {
+    background-color: var(--badge-off-bg);
+    color: var(--badge-off-color);
+    border: 1px solid rgba(248,113,113,0.3);
+}
+
+/* -----------------------
+   Buttons
+------------------------ */
+.btn-outline-light {
+    color: var(--text-main);
+    border: 1px solid rgba(255,255,255,0.2);
+    background-color: transparent;
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(6,182,212,0.5);
+    transform: translateY(-2px);
+}
+
+/* -----------------------
+   Alerts
+------------------------ */
+.alert {
+    border-radius: 16px;
+    font-weight: 500;
+    padding: 2rem;
+}
+
+.alert-warning {
+    background-color: rgba(255, 211, 70, 0.1);
+    border: 1px solid rgba(255,211,70,0.3);
+    color: #f59e0b;
+}
+
+.alert-danger {
+    background-color: rgba(255, 70, 70, 0.1);
+    border: 1px solid rgba(255,70,70,0.3);
+    color: #f87171;
+}
+
+/* -----------------------
+   Layout Adjustments
+------------------------ */
+.member-info p {
+    margin-bottom: 0.3rem;
+}
+
+.member-info > div {
+    margin-bottom: 0.8rem;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin: 1.5rem 0;
+}
+
+/* -----------------------
+   Scrollbar
+------------------------ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(6,182,212,0.3);
+    border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}

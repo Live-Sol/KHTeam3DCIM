@@ -80,6 +80,12 @@
                     </td>
                     <td class="text-center">
                         <div sec:authorize="hasRole('ADMIN')" class="d-flex justify-content-center gap-1">
+                            <!-- 관리자 회원 목록에서 회원 상세 보기 -->
+                            <a th:href="@{/admin/members/{memberId}(memberId=${member.memberId})}"
+                               class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-search"></i> 상세보기
+                            </a>
+
                             <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"
                                th:if="${member.memberId != #authentication.name}"
                                class="btn btn-sm btn-outline-warning">수정</a>
@@ -95,9 +101,9 @@
                                         class="btn btn-sm btn-outline-danger">삭제</button>
                             </form>
                         </div>
-                        <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"
-                           th:if="${member.memberId == #authentication.name}"
-                           class="btn btn-sm btn-info text-white">내 정보</a>
+<!--                        <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"-->
+<!--                           th:if="${member.memberId == #authentication.name}"-->
+<!--                           class="btn btn-sm btn-info text-white">내 정보</a>-->
                     </td>
                 </tr>
                 </tbody>

@@ -56,7 +56,7 @@
             int totalMemberCount = auditLogService.getTotalMemberCount();
             int totalRackCount = auditLogService.getTotalRackCount();
 
-            int logLimit = 5;
+            int logLimit = 8;
             List<AuditLog> recentLogs = auditLogService.getRecentActivityLogs(logLimit);
 
             model.addAttribute("pageTitle", "관리자 페이지");
@@ -105,7 +105,7 @@
             model.addAttribute("searchPerformed", searchPerformed);
 
             // 3. 감사 로그 조회
-            List<AuditLog> recentLogs = auditLogService.findRecentLogs(5);
+            List<AuditLog> recentLogs = auditLogService.findRecentLogs(8);
             model.addAttribute("recentLogs", recentLogs);
 
             return "admin/findMembersAdmin";
@@ -115,6 +115,23 @@
         public MemberFindByIdAdmin memberFindByIdAdmin() {
             return new MemberFindByIdAdmin();
         }
+        // 아이디로 멤버 조회 (단일)
+        @GetMapping("/members/{memberId}")
+        public String findMemberByIdFromAdmin(@PathVariable String memberId, Model model) {
+            try {
+                Member member = memberService.findByMemberId(memberId);
+                model.addAttribute("member", member);
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("memberNotFound", true);
+            }
+
+            // 목록으로 버튼은 항상 관리자 회원 목록으로
+            model.addAttribute("returnUrl", "/admin/members");
+
+            return "member/memberDetail"; // 관리자용 상세 페이지
+        }
+
+
 
         // ⭐️ 관리자 회원 정보 수정 기능 (/admin/members-edit/**) ⭐️
         // (2-1) 관리자 정보 수정 폼 제공 (GET)

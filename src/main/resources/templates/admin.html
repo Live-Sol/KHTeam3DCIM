@@ -88,7 +88,13 @@
                     <tr th:each="log : ${recentLogs}">
                         <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">수정시간(NULL)</td>
 
-                        <td><span class="badge bg-secondary" th:text="${log.actor}">변경자(NULL)</span></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${log.actor == 'admin'} ? 'bg-danger' : 'bg-secondary'"
+                                  th:text="${log.actor}">
+                                변경자(NULL)
+                            </span>
+                        </td>
 
                         <td th:text="${log.actionDescription}">변경사항(NULL)</td>
                     </tr>
@@ -99,10 +105,6 @@
                 </table>
             </div>
         </div>
-<!--        &lt;!&ndash; 푸터 추가 (메인 컨텐츠 영역 하단에 배치) &ndash;&gt;-->
-<!--        <footer class="mt-auto">-->
-<!--            <div th:replace="~{fragments/footer :: footer}"></div>-->
-<!--        </footer>-->
     </main>
 </div>
 

@@ -36,6 +36,10 @@
                         <div>
                             <span class="badge bg-dark custom-badge me-1">WAITING</span>
                             <strong>No. [[${req.id}]]</strong>
+                            <!-- 요청 페이지에서 회원 상세 보기 -->
+                            <a th:href="@{/requests/members/{memberId}(memberId=${req.memberId})}" class="text-info">
+                                <i class="bi bi-search"></i> [[${req.memberId}]]
+                            </a>
                         </div>
                         <small class="text-white-50">신청일: [[${#temporals.format(req.reqDate, 'yyyy-MM-dd')}]]</small>
                     </div>

@@ -34,6 +34,11 @@ public class Member {
     @Column(name = "PROFILE_IMAGE", length = 200)
     private String profileImage; // 프로필 이미지 파일명
 
+    // ✅ 탈퇴 여부
+    @Column(name = "IS_DELETED", nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
+
     // ⭐️ 3. 관리자용 정보 통합 업데이트 메서드 ⭐️
     // 기존 updateName, updateRole 메서드를 대체하며, 추가된 필드까지 처리합니다...
     public void updateAdminInfo(String name, String email, String contact, String companyName, String companyPhone ,Role role) {

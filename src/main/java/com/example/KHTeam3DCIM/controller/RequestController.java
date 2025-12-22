@@ -94,6 +94,22 @@ public class RequestController {
         return "request/MyRequestList"; // 이력 조회 페이지 HTML
     }
 
+    @GetMapping("/members/{memberId}")
+    public String findMemberByIdFromRequest(@PathVariable String memberId, Model model) {
+        try {
+            Member member = memberService.findByMemberId(memberId);
+            model.addAttribute("member", member);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("memberNotFound", true);
+        }
+
+        // 목록으로 버튼은 항상 요청 목록으로
+        model.addAttribute("returnUrl", "/requests");
+
+        return "member/memberDetail"; // 요청용 상세 페이지
+    }
+
+
     // =======================================
     // 3. [관리자] 대기 중인 신청 목록 확인
     // =======================================

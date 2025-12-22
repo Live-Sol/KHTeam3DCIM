@@ -18,6 +18,7 @@ public interface MemberRepository extends JpaRepository<Member,String> {
     boolean existsByMemberId(String memberId);  // 자동으로 구현됩니다.
     // 회원 ID 조회
     Optional<Member> findByMemberId(String memberId);
+
     // 전체 회원을 Role을 기준으로 오름차순(Asc) 정렬하여 조회
     List<Member> findAllByOrderByRoleAsc();
 

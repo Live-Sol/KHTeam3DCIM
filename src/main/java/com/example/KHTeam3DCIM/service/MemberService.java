@@ -99,7 +99,11 @@ public class MemberService {
                 .build();
 
         Member saved = memberRepository.save(member);
-        auditLogService.saveLog(saved.getMemberId(), "회원가입 완료", LogType.MEMBER_MANAGEMENT);
+
+        // 로그 내용 보완 (회사명 등 추가 가능)
+        String logDescription = String.format("신규 회원가입 완료: %s (%s)", saved.getMemberId(), saved.getCompanyName());
+        auditLogService.saveLog(saved.getMemberId(), logDescription, LogType.MEMBER_MANAGEMENT);
+
         return MemberResponse.builder().name(saved.getName()).build();
     }
 
@@ -107,6 +111,13 @@ public class MemberService {
         if (memberId == null || !Pattern.matches("^[a-zA-Z0-9]{4,20}$", memberId)) return false;
         return !memberRepository.existsByMemberId(memberId);
     }
+    // 회원 단일 조회
+    public Member findByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+    }
+
+
 
     // ⭐️ 회원 정보 수정 (이미지 업로드 추가 & IOException 처리) ⭐️
     // 'throws IOException'이 있어야 Controller에서 catch를 할 수 있습니다.
@@ -169,9 +180,15 @@ public class MemberService {
         auditLogService.saveLog(adminActorId, logDescription, LogType.MEMBER_MANAGEMENT);
     }
 
+    @Transactional
     public void deleteMemberWithPassword(String memberId, String password) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("회원 없음"));
         if(!passwordEncoder.matches(password, member.getPassword())) throw new RuntimeException("비밀번호 불일치");
+        // 1. 로그 기록 (삭제되기 전에 수행)
+        String logDescription = String.format("회원 본인 탈퇴 처리 (ID: %s, 이름: %s)", memberId, member.getName());
+        auditLogService.saveLog(memberId, logDescription, LogType.MEMBER_MANAGEMENT);
+
+        // 2. 회원 삭제
         memberRepository.delete(member);
     }
 
