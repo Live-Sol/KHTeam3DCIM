@@ -1,41 +1,122 @@
+<!-- 회원 목록 페이지 (일반 사용자용) -->
+<!-- 안쓰는 기능 입니다. 일단 보류 -->
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전체 회원 조회</title>
+    <title>StarRoot - Member List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- 공통 스타일 -->
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="/css/memberStyle.css" rel="stylesheet">
+
+    <style>
+        /* 테이블 커스텀 스타일 */
+        .glass-table {
+            color: #e2e8f0;
+            margin-bottom: 0;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .glass-table thead th {
+            background-color: rgba(15, 23, 42, 0.8);
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            padding: 15px;
+        }
+        .glass-table tbody td {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            vertical-align: middle;
+            color: #cbd5e1;
+        }
+        .glass-table tbody tr:hover td {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #fff;
+        }
+    </style>
 </head>
-<body>
-<div class="container mt-5">
-    <h2 class="mb-4 text-primary">
-        <i class="bi bi-people me-2"></i> 전체 회원 조회
-    </h2>
+<body class="login-body"> <!-- 배경 적용을 위해 login-body 클래스 사용 -->
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a th:href="@{/}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left-square me-1"></i> 메인페이지로
-        </a>
+<!-- 헤더 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="login-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <!-- 유리 카드 -->
+                <div class="card login-card">
+                    <div class="card-body p-5">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="login-title mb-0" style="font-size: 1.8rem;">
+                                <i class="bi bi-people-fill me-2"></i>MEMBER LIST
+                            </h2>
+                            <a th:href="@{/}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                                <i class="bi bi-house-door me-1"></i> Home
+                            </a>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table glass-table align-middle">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="text-center" style="width: 80px;">No</th>
+                                    <th scope="col">Agent Name</th>
+                                    <th scope="col">Company</th>
+                                    <th scope="col" class="text-center">Role</th> <!-- Role이 있다면 추가 -->
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="member, stat : ${members}">
+                                    <td th:text="${stat.count}" class="text-center fw-bold text-white-50">1</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-dark d-flex justify-content-center align-items-center me-3"
+                                                 style="width: 35px; height: 35px; border: 1px solid var(--accent-purple);">
+                                                <i class="bi bi-person-fill text-purple"></i>
+                                            </div>
+                                            <span th:text="${member.name}" class="fw-bold">홍**</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-building me-2 text-white-50"></i>
+                                        <span th:text="${member.companyName}">삼**</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary bg-opacity-25 text-white border border-secondary">USER</span>
+                                    </td>
+                                </tr>
+                                <!-- 데이터가 없을 경우 -->
+                                <tr th:if="${#lists.isEmpty(members)}">
+                                    <td colspan="4" class="text-center py-4 text-white-50">
+                                        <i class="bi bi-inbox me-2"></i> 조회된 회원이 없습니다.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="card-footer-glow"></div>
+                </div>
+
+            </div>
+        </div>
     </div>
-
-    <table class="table table-hover table-striped border">
-        <thead class="table-dark">
-        <tr>
-            <th scope="col">No</th>
-            <th scope="col">담당자 성함</th>
-            <th scope="col">기업명</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="member, stat : ${members}">
-            <td th:text="${stat.count}">1</td>
-            <td th:text="${member.name}" class="align-middle">홍**</td>
-            <td th:text="${member.companyName}" class="align-middle">삼**</td>
-        </tr>
-        </tbody>
-    </table>
 </div>
+
+<!-- 푸터 -->
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
