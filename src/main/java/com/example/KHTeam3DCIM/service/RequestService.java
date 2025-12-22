@@ -54,4 +54,11 @@ public class RequestService {
         }
         requestRepository.deleteById(reqId);
     }
+
+    // 반려 사유
+    public void rejectRequest(Long id, String reason) {
+        Request request = findById(id);
+        request.setStatus("REJECTED");
+        request.setRejectReason(reason);
+    }
 }

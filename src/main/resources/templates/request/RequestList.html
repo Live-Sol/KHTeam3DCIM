@@ -69,6 +69,12 @@
                                onclick="return confirm('이 신청을 반려하시겠습니까?');">
                                 ⛔ 반려
                             </a>
+
+                            <a th:href="@{/requests/{id}/reject/form(id=${req.id})}"
+                               class="btn custom-btn-outline-danger">
+                                ⛔ 반려(사유 입력)
+                            </a>
+
                         </div>
                     </div>
                 </div>

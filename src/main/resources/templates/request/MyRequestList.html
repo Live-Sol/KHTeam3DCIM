@@ -26,47 +26,73 @@
             <thead>
             <tr>
                 <th style="width: 15%">신청일</th>
-                <th style="width: 35%">장비 정보 (제조사/모델)</th>
+                <th style="width: 30%">장비 정보 (제조사/모델)</th>
                 <th style="width: 15%">규격</th>
                 <th style="width: 15%">입고 희망일</th>
-                <th style="width: 20%">진행 상태</th>
+                <th style="width: 25%">진행 상태</th>
             </tr>
             </thead>
-            <tbody class="text-center">
-            <tr th:each="req : ${requests}">
-                <td>
-                    <span class="text-white" th:text="${#temporals.format(req.reqDate, 'yyyy-MM-dd')}">2023-12-01</span>
-                    <br><small class="text-sub-muted" th:text="${#temporals.format(req.reqDate, 'HH:mm')}">14:30</small>
-                </td>
-                <td class="text-center ps-4">
-                    <strong class="text-white" th:text="${req.vendor}">Dell</strong>
-                    <span class="text-sub-muted mx-1">/</span>
-                    <span class="text-white" th:text="${req.modelName}">PowerEdge R740</span>
-                </td>
-                <td>
-                    <span class="badge bg-secondary px-2" th:text="${req.heightUnit} + ' U'">2 U</span>
-                </td>
-                <td class="text-white" th:text="${req.startDate}">2023-12-15</td>
-                <td>
-                    <span th:if="${req.status == 'WAITING'}" class="badge bg-warning text-dark status-badge">
-                        <i class="bi bi-clock-history me-1"></i>대기 중
-                    </span>
-                    <span th:if="${req.status == 'APPROVED'}" class="badge bg-success status-badge">
-                        <i class="bi bi-check-circle me-1"></i>승인 완료
-                    </span>
-                    <span th:if="${req.status == 'REJECTED'}" class="badge bg-danger status-badge">
-                        <i class="bi bi-x-circle me-1"></i>반려됨
-                    </span>
-                </td>
-            </tr>
+            <tbody class="text-center" th:each="req : ${requests}">
+                <tr>
+                    <td>
+                        <span class="text-white" th:text="${#temporals.format(req.reqDate, 'yyyy-MM-dd')}">2023-12-01</span>
+                        <br><small class="text-sub-muted" th:text="${#temporals.format(req.reqDate, 'HH:mm')}">14:30</small>
+                    </td>
+                    <td class="text-center ps-4">
+                        <strong class="text-white" th:text="${req.vendor}">Dell</strong>
+                        <span class="text-sub-muted mx-1">/</span>
+                        <span class="text-white" th:text="${req.modelName}">PowerEdge R740</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary px-2" th:text="${req.heightUnit} + ' U'">2 U</span>
+                    </td>
+                    <td class="text-white" th:text="${req.startDate}">2023-12-15</td>
+                    <td>
+                        <!-- 상태 배지 -->
+                        <span th:if="${req.status == 'REJECTED'}"
+                            class="badge bg-danger status-badge d-inline-block mb-1"
+                            role="button"
+                            data-bs-toggle="collapse"
+                            th:attr="data-bs-target='#rejectReason-' + ${req.id}">
+                            <i class="bi bi-x-circle me-1"></i>반려됨<br>(사유 보기)
+                        </span>
 
-            <tr th:if="${#lists.isEmpty(requests)}">
+                        <span th:if="${req.status == 'WAITING'}"
+                            class="badge bg-warning text-dark status-badge">
+                            <i class="bi bi-clock-history me-1"></i>대기 중
+                        </span>
+
+                        <span th:if="${req.status == 'APPROVED'}"
+                            class="badge bg-success status-badge">
+                            <i class="bi bi-check-circle me-1"></i>승인 완료
+                        </span>
+
+                        <!-- 🔽 반려 사유 (같은 td 안) -->
+                        <div th:if="${req.status == 'REJECTED'}"
+                            th:id="'rejectReason-' + ${req.id}"
+                            class="collapse mt-2 text-start">
+
+                            <div class="alert alert-danger py-2 px-3 mb-0">
+                                <strong>
+                                    <i class="bi bi-exclamation-circle me-1"></i>
+                                    반려 사유
+                                </strong><br>
+                                <span th:text="${req.rejectReason ?: '반려 사유가 등록되지 않았습니다.'}"></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <tbody th:if="${#lists.isEmpty(requests)}">
+            <tr>
                 <td colspan="5" class="text-center py-5 text-sub-muted">
                     <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                     신청 내역이 존재하지 않습니다.
                 </td>
             </tr>
             </tbody>
+
         </table>
     </div>
 
@@ -74,6 +100,7 @@
         <a th:href="@{/}" class="btn custom-btn-secondary">홈으로 이동</a>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

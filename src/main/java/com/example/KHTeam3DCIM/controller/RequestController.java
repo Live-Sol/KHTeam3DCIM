@@ -116,4 +116,22 @@ public class RequestController {
         requestService.updateStatus(id, "REJECTED");
         return "redirect:/requests";
     }
+
+    // [추가] 반려 사유 입력 화면
+    @GetMapping("/{id}/reject/form")
+    public String rejectForm(@PathVariable Long id, Model model) {
+        model.addAttribute("request", requestService.findById(id));
+        return "request/RejectForm";
+    }
+    // [추가] 반려 사유 포함 반려 처리
+    @PostMapping("/{id}/reject")
+    public String rejectRequestWithReason(
+            @PathVariable Long id,
+            @RequestParam String rejectReason) {
+
+        requestService.rejectRequest(id, rejectReason);
+        return "redirect:/requests";
+    }
+
+
 }
