@@ -2,9 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!--
-    [수정됨] .footer-custom 클래스 및 새로운 디자인 적용
--->
 <footer th:fragment="footer" class="footer-custom pt-5 pb-4 mt-5">
     <div class="container text-center text-md-start">
         <div class="row text-center text-md-start">
@@ -29,7 +26,7 @@
                 <a href="/specs/cooling" class="footer-link">공조 장치</a>
             </div>
 
-            <!-- (3) 주요 솔루션 (Solutions) -->
+            <!-- (3) 주요 솔루션 -->
             <div class="col-md-2 mb-4">
                 <h6 class="text-white fw-bold text-uppercase mb-3">관리 정보</h6>
                 <a href="/solutions/racks" class="footer-link">랙 관리</a>
@@ -47,48 +44,71 @@
                 <a href="/info/contact" class="footer-link">고객센터</a>
             </div>
 
-            <!-- (5) 연락처 (Contact Us) -->
-            <div class="col-md-2 mb-4">
+            <!-- (5) 연락처 -->
+            <div class="col-md-3 mb-4">
                 <h6 class="text-uppercase mb-4 fw-bold text-light">Contact</h6>
                 <p class="text-white-50"><i class="bi bi-geo-alt me-2 text-info"></i> Ulsan, nam-gu, KH B/D</p>
-                <p class="text-white-50"><i class="bi bi-envelope me-2 text-info"></i> StarRoot@KHteam3.com</p>
+                <p class="text-white-50"><i class="bi bi-envelope me-2 text-info"></i> team3starroot@gmail.com</p>
                 <p class="text-white-50"><i class="bi bi-phone me-2 text-info"></i> +82 02-1234-5678</p>
                 <p class="text-white-50"><i class="bi bi-printer me-2 text-info"></i> +82 02-9876-5432</p>
             </div>
 
             <hr class="mb-4 border-secondary">
 
-            <!-- 하단: 저작권 및 소셜 아이콘 -->
+            <!-- 하단: 저작권 및 기술 스택/다운로드 -->
             <div class="row align-items-center">
-                <div class="col-md-7 col-lg-8">
-                    <p class="text-center text-md-start text-white-50">
+
+                <!-- 좌측: 저작권 -->
+                <div class="col-md-5 col-lg-6">
+                    <p class="text-center text-md-start text-white-50 mb-md-0">
                         © 2025 Copyright:
-                        <a href="#" class="text-white text-decoration-none">
-                            <strong>KH Information Educational Institute</strong>
-                        </a>
+                        <span class="text-white text-decoration-none fw-bold">
+                            KH Team 3 - StarRoot project by. 최성호, 조보근
+                        </span>
                     </p>
                 </div>
-                <div class="col-md-5 col-lg-4">
+
+                <!-- 우측: 기술 스택 및 자료 다운로드 -->
+                <div class="col-md-7 col-lg-6">
                     <div class="text-center text-md-end">
-                        <ul class="list-unstyled list-inline">
-                            <li class="list-inline-item">
-                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                    <i class="bi bi-facebook"></i>
+                        <ul class="list-unstyled list-inline mb-0 d-inline-flex align-items-center">
+
+                            <!-- 1. 기술 스택 아이콘 (Tech Stack) -->
+                            <li class="list-inline-item me-3">
+                                <span class="text-white-50 small me-2 d-none d-sm-inline">Built with:</span>
+                                <!-- Java -->
+                                <i class="bi bi-filetype-java fs-5 text-white me-2" title="Java 25 & JDK" data-bs-toggle="tooltip"></i>
+                                <!-- Spring Boot (Coffee Cup) -->
+                                <i class="bi bi-cup-hot-fill fs-5 text-success me-2" title="Spring Boot 3.x" data-bs-toggle="tooltip"></i>
+                                <!-- Oracle (Database) -->
+                                <i class="bi bi-database-fill fs-5 text-danger me-2" title="Oracle Database" data-bs-toggle="tooltip"></i>
+                                <!-- Bootstrap -->
+                                <i class="bi bi-bootstrap-fill fs-5 text-primary" title="Bootstrap 5" data-bs-toggle="tooltip"></i>
+                            </li>
+
+                            <!-- 경계선 (Separator) -->
+                            <li class="list-inline-item border-start border-secondary mx-2" style="height: 20px;"></li>
+
+                            <!-- 2. 다운로드 및 링크 (Downloads) -->
+                            <span class="text-white-50 small me-2 d-none d-sm-inline">Link & DownLoad:</span>
+                            <!-- GitHub -->
+                            <li class="list-inline-item ms-2">
+                                <a href="https://github.com/Live-Sol/KHTeam3DCIM.git" target="_blank"
+                                   class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                   title="GitHub Repository" data-bs-toggle="tooltip"
+                                   style="width: 35px; height: 35px;">
+                                    <i class="bi bi-github"></i>
                                 </a>
                             </li>
-                            <li class="list-inline-item">
-                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                    <i class="bi bi-twitter-x"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                    <i class="bi bi-google"></i>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 35px; height: 35px; padding-top: 6px;">
-                                    <i class="bi bi-linkedin"></i>
+                            <!-- 기획서 다운로드 -->
+                            <li class="list-inline-item ms-2">
+                                <!-- 실제 파일 경로 예시: src/static/files/StarRoot_Plan_v1.0.pdf -->
+                                <a href="/files/StarRoot_Plan_v1.0.pdf" download
+                                   class="btn btn-outline-info btn-sm rounded-circle d-flex align-items-center justify-content-center"
+                                   title="기획서 다운로드 (PDF)" data-bs-toggle="tooltip"
+                                   onclick="alert('파일 없음: src/main/resources/static/files 폴더에 PDF 파일을 넣으면 다운로드가 시작됩니다.'); return false;"
+                                   style="width: 35px; height: 35px;">
+                                    <i class="bi bi-file-earmark-arrow-down-fill"></i>
                                 </a>
                             </li>
                         </ul>
@@ -98,5 +118,15 @@
         </div>
     </div>
 </footer>
+
+<!-- 툴팁 활성화를 위한 스크립트 추가 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
 </body>
 </html>
