@@ -4,6 +4,7 @@
 package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.*;
+import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import com.example.KHTeam3DCIM.repository.RequestRepository;
@@ -11,6 +12,7 @@ import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -356,6 +359,24 @@ public class DeviceController {
     // -----------------------------------------------------------
     private void validateAndSync(Device device) {
 
+    }
+
+    // 체크박스를 이용한 일괄 수정 및 삭제
+
+    @PostMapping("/devices/batch-update")
+    @ResponseBody
+    public ResponseEntity<?> batchUpdate(@RequestBody deviceDTO dto) {
+        // dto.getIds() 리스트를 순회하며 emsStatus나 status를 업데이트하는 로직 수행
+        deviceService.updateMultipleDevices(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/devices/batch-delete")
+    @ResponseBody
+    public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
+        List<Long> ids = payload.get("ids");
+        deviceService.deleteMultipleDevices(ids);
+        return ResponseEntity.ok().build();
     }
 
 }
