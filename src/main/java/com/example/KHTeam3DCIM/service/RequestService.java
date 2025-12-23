@@ -86,6 +86,31 @@ public class RequestService {
         // 3-1. Request의 String cateId를 사용하여 실제 Category 엔티티 조회
         Category category = categoryRepository.findById(request.getCateId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 ID입니다: " + request.getCateId()));
+        // 3-2. 랙 높이 초과 검증 (중요)
+        int heightUnit = request.getHeightUnit();
+        int endUnit = startUnit + heightUnit - 1;
+
+        if (endUnit > rack.getTotalUnit()) {
+            throw new IllegalStateException(
+                    "선택한 위치에 장비를 배치할 수 없습니다. " +
+                            "(랙 최대 높이: " + rack.getTotalUnit() + "U, " +
+                            "요청 범위: " + startUnit + " ~ " + endUnit + "U)"
+            );
+        }
+
+        // 3-3. 기존 장비와 위치 충돌 검사 ⭐
+        boolean overlap = deviceRepository.existsOverlappingDevice(
+                rack,
+                startUnit,
+                endUnit
+        );
+
+        if (overlap) {
+            throw new IllegalStateException(
+                    "해당 랙의 " + startUnit + "U ~ " + endUnit +
+                            "U 구간에는 이미 장비가 배치되어 있습니다."
+            );
+        }
 
         // 4. 장비 객체 생성 (신청서 데이터를 장비로 이식)
         // Device 엔티티에 @Builder가 선언되어 있다면 아래와 같이 작성 가능합니다.
@@ -95,13 +120,14 @@ public class RequestService {
                 .category(category)
                 .vendor(request.getVendor())
                 .modelName(request.getModelName())
-                .serialNum("PENDING_" + reqId) // 시리얼은 입고 후 수정이 필요할 수 있어 임시값 세팅
+                .serialNum("StarRoot_" + reqId) // 시리얼은 입고 후 수정이 필요할 수 있어 임시값 세팅
                 .startUnit(startUnit)
                 .heightUnit(request.getHeightUnit())
                 .powerWatt(request.getPowerWatt())
                 .emsStatus(request.getEmsStatus())
-                .status("RUNNING")        // 등록 즉시 가동 상태로 설정
+                .status("OFF")        // 등록 즉시 가동 상태로 설정
                 .companyName(request.getCompanyName())
+                .companyPhone(request.getCompanyPhone())
                 .userName(request.getUserName())
                 .contact(request.getContact())
                 .description(request.getPurpose())

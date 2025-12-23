@@ -2,6 +2,7 @@ package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.*;
 import com.example.KHTeam3DCIM.dto.Rack.RackDetailDto;
+import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
@@ -368,5 +369,37 @@ public class DeviceService {
 
         // ⭐ [추가] 장비가 늘었으니 전력량 및 PUE 다시 계산
         envService.calculateSimulation(null);
+    }
+
+    // 일괄처리 기능
+    @Transactional
+    public void updateMultipleDevices(deviceDTO dto) {
+        // 1. 대상 장비들을 한 번의 쿼리로 조회
+        List<Device> devices = deviceRepository.findAllById(dto.getIds());
+
+        if (devices.isEmpty()) return;
+
+        // 2. 루프를 돌며 변경 사항 적용
+        for (Device device : devices) {
+            // EMS 상태 변경 (값이 있을 때만)
+            if (dto.getEmsStatus() != null && !dto.getEmsStatus().trim().isEmpty()) {
+                device.setEmsStatus(dto.getEmsStatus());
+            }
+
+            // 장비 상태 변경 (값이 있을 때만)
+            if (dto.getStatus() != null && !dto.getStatus().trim().isEmpty()) {
+                device.setStatus(dto.getStatus());
+            }
+        }
+        // @Transactional 어노테이션 덕분에 메서드 종료 시
+        // Dirty Checking(변경 감지)이 일어나 DB에 자동 반영됩니다.
+    }
+
+    @Transactional
+    public void deleteMultipleDevices(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return;
+
+        // Batch 삭제를 사용하여 성능 최적화 (한 번의 쿼리로 삭제)
+        deviceRepository.deleteAllByIdInBatch(ids);
     }
 }

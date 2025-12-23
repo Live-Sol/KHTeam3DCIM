@@ -4,6 +4,7 @@
 package com.example.KHTeam3DCIM.repository;
 
 import com.example.KHTeam3DCIM.domain.Device;
+import com.example.KHTeam3DCIM.domain.Rack;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -66,4 +67,18 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 8. 아이디 조회
     @Query("SELECT d FROM Device d JOIN FETCH d.member JOIN FETCH d.category LEFT JOIN FETCH d.rack")
     List<Device> findAllWithMember();
+
+    // 9. 랙 위치 중복 체크
+    @Query("""
+        SELECT COUNT(d) > 0
+        FROM Device d
+        WHERE d.rack = :rack
+          AND d.startUnit <= :endUnit
+          AND (d.startUnit + d.heightUnit - 1) >= :startUnit
+    """)
+    boolean existsOverlappingDevice(
+            @Param("rack") Rack rack,
+            @Param("startUnit") int startUnit,
+            @Param("endUnit") int endUnit
+    );
 }

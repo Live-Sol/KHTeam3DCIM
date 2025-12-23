@@ -42,7 +42,8 @@ public class SecurityConfig {
                                 "/solutions/**",        // 솔루션 페이지 전체 공개
                                 "/info/**",             // 정보 페이지 전체 공개
                                 "/specs/**",            // 제원 페이지 전체 공개
-                                "/admin/api/env/now" // ⭐️ [추가] API는 JS에서 호출하므로 허용 (필요시 authenticated로 변경 가능)
+                                "/admin/api/env/now", // ⭐️ [추가] API는 JS에서 호출하므로 허용 (필요시 authenticated로 변경 가능)
+                                "/devices/batch-update", "/devices/batch-delete"    // 장비 선택 수정 및 삭제
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/members").permitAll()
                         // 관리자 페이지는 'ADMIN' 역할을 가진 사용자만 접근 허용

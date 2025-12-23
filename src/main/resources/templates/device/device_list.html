@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>장비 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -28,7 +30,7 @@
             <form action="/devices" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
 
                 <select name="sort" class="form-select custom-select" style="width: 160px;" onchange="this.form.submit()">
-                    <option value="latest" th:selected="${sort == 'latest'}">ID</option>
+<!--                    <option value="latest" th:selected="${sort == 'latest'}">ID</option>-->
                     <option value="member" th:selected="${sort == 'member'}">신청자 아이디</option>
                     <option value="rack" th:selected="${sort == 'rack'}">위치(Rack)</option>
                     <option value="category" th:selected="${sort == 'category'}">장비 종류</option>
@@ -58,11 +60,37 @@
             </div>
         </div>
 
+        <div id="batch-control-bar" class="mb-3 p-3 bg-dark border rounded d-none">
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-white fw-bold"><i class="bi bi-check2-square me-1"></i> <span id="selected-count">0</span>개 선택됨</span>
+
+                <div class="vr text-secondary"></div>
+
+                <select id="batch-ems" class="form-select form-select-sm" style="width: 120px;">
+                    <option value="">EMS 변경</option>
+                    <option value="ON">ON</option>
+                    <option value="OFF">OFF</option>
+                </select>
+
+                <select id="batch-status" class="form-select form-select-sm" style="width: 130px;">
+                    <option value="">상태 변경</option>
+                    <option value="RUNNING">RUNNING</option>
+                    <option value="OFF">OFF</option>
+                </select>
+
+                <button type="button" onclick="applyBatchAction()" class="btn btn-sm btn-primary">적용</button>
+                <button type="button" onclick="deleteSelected()" class="btn btn-sm btn-danger ms-auto">선택 삭제</button>
+            </div>
+        </div>
+
         <div class="table-responsive table-container">
             <table class="table table-hover admin-table">
                 <thead>
                 <tr class="text-center">
-                    <th style="width: 15%">신청자</th>
+                    <th style="width: 3%">
+                        <input type="checkbox" id="selectAll" class="form-check-input">
+                    </th>
+                    <th style="width: 12%">신청자</th>
                     <th style="width: 10%">위치(Rack)</th>
                     <th style="width: 10%">장비 종류</th>
                     <th style="width: 15%">제조사/모델</th>
@@ -76,6 +104,9 @@
                 </thead>
                 <tbody class="text-center">
                 <tr th:each="device : ${devices}">
+                    <td>
+                        <input type="checkbox" name="deviceIds" th:value="${device.id}" class="form-check-input device-checkbox">
+                    </td>
                     <td>
                         <span th:if="${device.member != null}">
                             <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
@@ -109,8 +140,8 @@
                     </td>
 
                     <td class="text-white">
-                        <span th:text="${device.startUnit + device.heightUnit - 1}"></span>
-
+                        <span th:text="${device.startUnit ?: '-'}"></span>
+                        -
                         <span th:text="${(device.startUnit ?: 0) + (device.heightUnit ?: 0) - 1}"></span>
                     </td>
 
@@ -134,8 +165,8 @@
                     <span th:if="${device.status != null}">
                         <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
                         <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
-                        <span class="badge bg-secondary" th:if="${device.status == 'STOPPED'}">STOPPED</span>
-                        <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'STOPPED'}">[[${device.status}]]</span>
+                        <span class="badge bg-secondary" th:if="${device.status == 'OFF'}">OFF</span>
+                        <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'OFF'}">[[${device.status}]]</span>
                     </span>
                         <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
                     </td>
@@ -161,6 +192,110 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.device-checkbox');
+        const batchBar = document.getElementById('batch-control-bar');
+        const selectedCountSpan = document.getElementById('selected-count');
+
+        // 1. 전체 선택/해제 로직
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            toggleBatchBar();
+        });
+
+        // 2. 개별 체크박스 변경 시 상단 바 노출 제어
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', toggleBatchBar);
+        });
+
+        function toggleBatchBar() {
+            const checkedCount = document.querySelectorAll('.device-checkbox:checked').length;
+            selectedCountSpan.innerText = checkedCount;
+
+            if (checkedCount > 0) {
+                batchBar.classList.remove('d-none');
+            } else {
+                batchBar.classList.add('d-none');
+                selectAll.checked = false;
+            }
+        }
+
+        // 3. 일괄 수정 적용 (EMS, 상태)
+        window.applyBatchAction = function() {
+            const selectedIds = Array.from(document.querySelectorAll('.device-checkbox:checked')).map(cb => cb.value);
+            const emsValue = document.getElementById('batch-ems').value;
+            const statusValue = document.getElementById('batch-status').value;
+
+            if (!emsValue && !statusValue) {
+                Swal.fire('알림', '변경할 항목을 선택해주세요.', 'info');
+                return;
+            }
+
+            Swal.fire({
+                title: '일괄 수정을 진행하시겠습니까?',
+                text: `${selectedIds.length}개의 장비 정보가 업데이트됩니다.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '수정',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Fetch API를 이용한 비동기 전송 예시
+                    sendBatchRequest('/devices/batch-update', {
+                        ids: selectedIds,
+                        emsStatus: emsValue,
+                        status: statusValue
+                    });
+                }
+            });
+        };
+
+        // 4. 일괄 삭제 적용
+        window.deleteSelected = function() {
+            const selectedIds = Array.from(document.querySelectorAll('.device-checkbox:checked')).map(cb => cb.value);
+
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: "선택한 장비들이 모두 영구 삭제됩니다!",
+                icon: 'danger',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: '삭제'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendBatchRequest('/devices/batch-delete', { ids: selectedIds });
+                }
+            });
+        };
+
+        // 공통 서버 전송 함수
+        function sendBatchRequest(url, data) {
+            // 메타 태그에서 토큰 정보 읽기
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token  // CSRF 토큰 헤더 추가
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.ok) {
+                    // 성공 시 SweetAlert로 알림 후 페이지 이동/새로고침
+                    Swal.fire('성공', '요청이 처리되었습니다.', 'success').then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('에러', '처리 중 오류가 발생했습니다. (권한 부족 등)', 'error');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire('에러', '네트워크 오류가 발생했습니다.', 'error');
+            });
+        }
+
         // --- 툴팁 활성화 코드 추가 ---
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipTriggerList.map(function (tooltipTriggerEl) {
