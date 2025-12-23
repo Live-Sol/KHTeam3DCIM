@@ -155,15 +155,16 @@
 
                 <!-- 4. 로그인/회원가입 -->
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="nav-link nav-link-custom" href="/members/login">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> 로그인
-                    </a>
-                </li>
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
                     <a class="nav-link nav-link-custom" href="/members/signup">
                         <i class="bi bi-person-plus me-1"></i> 회원가입
                     </a>
                 </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link nav-link-custom" href="/members/login">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> 로그인
+                    </a>
+                </li>
+
 
             </ul>
         </div>
