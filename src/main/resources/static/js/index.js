@@ -1,28 +1,29 @@
-/* index.js - 메인 대시보드 차트 및 UI 동작 제어 */
+/* index.js - 메인 대시보드 차트 및 UI 동작 제어 통합 */
 
+document.addEventListener("DOMContentLoaded", function() {
+
+    // 1. Thymeleaf에서 전달받은 데이터로 차트 초기화
+    if (window.dashboardData && window.dashboardData.stats) {
+        initDashboardCharts(window.dashboardData.stats);
+    }
+
+    // 2. 실시간 데이터 폴링 (서버 데이터 갱신 - 2초 주기)
+    startDataPolling();
+});
+
+
+// ---------------------------------------------------------
+// 기능 1: 차트 초기화 함수
+// ---------------------------------------------------------
 function initDashboardCharts(data) {
-
-    // ---------------------------------------------------------
-    // 1. 자산 분류 차트 (Type Chart) - 3D 입체 그라데이션 적용
-    // 색상: SVR(초록), NET(노랑), STO(하늘), UPS(보라)
-    // ---------------------------------------------------------
+    // 1-1. 자산 분류 차트 (Type Chart)
     const canvasType = document.getElementById('typeChart');
     if (canvasType) {
         const ctxType = canvasType.getContext('2d');
-
-        // 그라데이션 생성 함수 (빛 반사 효과)
-        function createGradient(ctx, colorStart, colorEnd) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400); // 위에서 아래로
-            gradient.addColorStop(0, colorStart); // 밝은 색 (위쪽)
-            gradient.addColorStop(1, colorEnd);   // 어두운 색 (아래쪽/그림자)
-            return gradient;
-        }
-
-        // 각 항목별 3D 그라데이션 컬러 정의
-        const gradSvr = createGradient(ctxType, '#4ade80', '#15803d'); // Green (밝은 초록 -> 짙은 초록)
-        const gradNet = createGradient(ctxType, '#facc15', '#a16207'); // Yellow (밝은 노랑 -> 짙은 골드)
-        const gradSto = createGradient(ctxType, '#22d3ee', '#0e7490'); // Sky Blue (형광 하늘 -> 짙은 청록)
-        const gradUps = createGradient(ctxType, '#c084fc', '#7e22ce'); // Purple (밝은 보라 -> 짙은 보라)
+        const gradSvr = createGradient(ctxType, '#4ade80', '#15803d');
+        const gradNet = createGradient(ctxType, '#facc15', '#a16207');
+        const gradSto = createGradient(ctxType, '#22d3ee', '#0e7490');
+        const gradUps = createGradient(ctxType, '#c084fc', '#7e22ce');
 
         new Chart(ctxType, {
             type: 'doughnut',
@@ -30,66 +31,23 @@ function initDashboardCharts(data) {
                 labels: ['Server', 'Network', 'Storage', 'UPS'],
                 datasets: [{
                     data: [data.svr, data.net, data.sto, data.ups],
-                    backgroundColor: [
-                        gradSvr, // 초록
-                        gradNet, // 노랑
-                        gradSto, // 하늘
-                        gradUps  // 보라
-                    ],
+                    backgroundColor: [gradSvr, gradNet, gradSto, gradUps],
                     borderWidth: 0,
-                    hoverOffset: 15, // 호버 시 더 많이 튀어나오게 (입체감)
+                    hoverOffset: 15,
                     hoverBorderWidth: 2,
                     hoverBorderColor: '#ffffff'
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20,
-                            font: { family: "'Noto Sans KR', sans-serif", weight: 'bold' },
-                            color: '#475569'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        padding: 12,
-                        cornerRadius: 8,
-                        titleFont: { size: 14, family: "'Orbitron', sans-serif" },
-                        bodyFont: { size: 13 }
-                    }
-                },
-                cutout: '65%', // 도넛 두께
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
-                }
-            }
+            options: getCommonChartOptions()
         });
     }
 
-    // ---------------------------------------------------------
-    // 2. 가동 현황 차트 (Status Chart) - 3D 입체 그라데이션 적용
-    // 색상: ON(에메랄드/초록 계열), OFF(레드 계열)
-    // ---------------------------------------------------------
+    // 1-2. 가동 현황 차트 (Status Chart)
     const canvasStatus = document.getElementById('statusChart');
     if (canvasStatus) {
         const ctxStatus = canvasStatus.getContext('2d');
-
-        // 그라데이션 생성
-        function createGradient(ctx, colorStart, colorEnd) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, colorStart);
-            gradient.addColorStop(1, colorEnd);
-            return gradient;
-        }
-
-        const gradOn = createGradient(ctxStatus, '#34d399', '#059669');  // Emerald (가동)
-        const gradOff = createGradient(ctxStatus, '#f87171', '#b91c1c'); // Red (중지)
+        const gradOn = createGradient(ctxStatus, '#34d399', '#059669');
+        const gradOff = createGradient(ctxStatus, '#f87171', '#b91c1c');
 
         new Chart(ctxStatus, {
             type: 'doughnut',
@@ -97,55 +55,97 @@ function initDashboardCharts(data) {
                 labels: ['Running (ON)', 'Stopped (OFF)'],
                 datasets: [{
                     data: [data.on, data.off],
-                    backgroundColor: [
-                        gradOn,  // Live
-                        gradOff  // Off
-                    ],
+                    backgroundColor: [gradOn, gradOff],
                     borderWidth: 0,
                     hoverOffset: 15,
                     hoverBorderWidth: 2,
                     hoverBorderColor: '#ffffff'
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20,
-                            font: { family: "'Noto Sans KR', sans-serif", weight: 'bold' },
-                            color: '#475569'
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        padding: 12,
-                        cornerRadius: 8
-                    }
-                },
-                cutout: '65%',
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
-                }
-            }
+            options: getCommonChartOptions()
         });
     }
 }
 
-// 3. 헤더 스크롤 효과
+
+// ---------------------------------------------------------
+// 기능 2: 서버 데이터 폴링 (실제 데이터 갱신)
+// ---------------------------------------------------------
+function startDataPolling() {
+    setInterval(() => {
+        fetch('/admin/api/env/now')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // PUE 업데이트 (서버의 기준값으로 리셋해줌, 시뮬레이션은 이 위에서 다시 뜀)
+                const pueElem = document.getElementById('pueValue');
+                if(pueElem) pueElem.innerText = data.currentPue.toFixed(2);
+
+                // 온도 업데이트
+                const tempElem = document.getElementById('tempValue');
+                if(tempElem) tempElem.innerText = data.currentTemp.toFixed(1);
+
+                // 팬 속도 업데이트
+                const fanElem = document.getElementById('fanSpeedValue');
+                if(fanElem) fanElem.innerText = data.fanSpeed;
+            })
+            .catch(error => console.error('Error fetching environment data:', error));
+    }, 4000); // 2초 주기
+}
+
+
+// ---------------------------------------------------------
+// 유틸리티 함수들
+// ---------------------------------------------------------
+
+// 그라데이션 생성 헬퍼
+function createGradient(ctx, colorStart, colorEnd) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+    return gradient;
+}
+
+// 공통 차트 옵션
+function getCommonChartOptions() {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20,
+                    font: { family: "'Noto Sans KR', sans-serif", weight: 'bold' },
+                    color: '#94a3b8' // 텍스트 색상 수정 (더 잘 보이게)
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: { size: 14, family: "'Orbitron', sans-serif" },
+                bodyFont: { size: 13 }
+            }
+        },
+        cutout: '65%',
+        animation: {
+            animateScale: true,
+            animateRotate: true
+        }
+    };
+}
+
+// 헤더 스크롤 효과
 window.addEventListener('scroll', function() {
     const navbar = document.querySelector('.navbar-custom');
     if (!navbar) return;
-
     if (window.scrollY > 50) {
-//        navbar.style.background = 'rgba(15, 23, 42, 0.95)';
         navbar.style.padding = '0.8rem 0';
     } else {
-//        navbar.style.background = 'rgba(15, 23, 42, 0.85)';
         navbar.style.padding = '1rem 0';
     }
 });

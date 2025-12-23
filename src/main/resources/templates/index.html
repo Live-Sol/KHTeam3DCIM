@@ -192,51 +192,24 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/index.js"></script>
 
-<!-- 타임리프 데이터 전달용 인라인 스크립트 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const chartData = {
-        svr: [[${stats != null ? stats.svrCount : 10}]],
-        net: [[${stats != null ? stats.netCount : 5}]],
-        sto: [[${stats != null ? stats.stoCount : 3}]],
-        ups: [[${stats != null ? stats.upsCount : 2}]],
-        on:  [[${stats != null ? stats.onCount : 18}]],
-        off: [[${stats != null ? stats.offCount : 2}]]
+    // Thymeleaf 데이터를 JS에서 사용할 수 있도록 전역 객체에 할당
+    window.dashboardData = {
+        stats: {
+            svr: [[${stats != null ? stats.svrCount : 0}]],
+            net: [[${stats != null ? stats.netCount : 0}]],
+            sto: [[${stats != null ? stats.stoCount : 0}]],
+            ups: [[${stats != null ? stats.upsCount : 0}]],
+            on:  [[${stats != null ? stats.onCount : 0}]],
+            off: [[${stats != null ? stats.offCount : 0}]]
+        }
     };
-
-    document.addEventListener("DOMContentLoaded", function() {
-        initDashboardCharts(chartData);
-    });
     /*]]>*/
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // 2초마다 데이터를 가져와서 화면만 갱신
-        setInterval(() => {
-            fetch('/admin/api/env/now')
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    // 1. PUE 업데이트
-                    const pueElem = document.getElementById('pueValue');
-                    if(pueElem) pueElem.innerText = data.currentPue.toFixed(2); // 소수점 2자리
-
-                    // 2. 온도 업데이트
-                    const tempElem = document.getElementById('tempValue');
-                    if(tempElem) tempElem.innerText = data.currentTemp.toFixed(1); // 소수점 1자리
-
-                    // 3. 팬 속도 업데이트
-                    const fanElem = document.getElementById('fanSpeedValue');
-                    if(fanElem) fanElem.innerText = data.fanSpeed;
-                })
-                .catch(error => console.error('Error fetching environment data:', error));
-        }, 2000); // 2000ms = 2초 주기
-    });
 </script>
+
+<script src="/js/index.js"></script>
 
 </body>
 </html>

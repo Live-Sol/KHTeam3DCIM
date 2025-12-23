@@ -89,6 +89,71 @@
             background-size: 1rem 1rem;
             animation: progress-bar-stripes 1s linear infinite;
         }
+
+
+        /* [신규] 중앙 숫자 양옆 이웃 텍스트 스타일 */
+        .pue-display-wrapper {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; /* 숫자와 이웃 텍스트 사이 간격 */
+            z-index: 2;
+            width: 100%;
+        }
+
+        .pue-neighbor {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 0.4); /* 기본 반투명 */
+            text-align: center;
+            font-weight: 300;
+            transition: all 0.3s;
+        }
+        .pue-neighbor strong {
+            font-family: 'Orbitron', sans-serif;
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .neighbor-left { text-align: right; }
+        .neighbor-right { text-align: left; }
+
+        /* [신규] 상태 배지 스타일 (4개 나열용) */
+        .status-scale-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .status-step {
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background-color: rgba(255, 255, 255, 0.05); /* 기본 비활성 배경 */
+            color: rgba(255, 255, 255, 0.3); /* 기본 비활성 텍스트 */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* 활성화 상태 (Active) - 각 단계별 색상 */
+        .status-step.active-excellent {
+            background-color: #22c55e; color: #000; box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
+        }
+        .status-step.active-good {
+            background-color: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
+        }
+        .status-step.active-average {
+            background-color: #facc15; color: #000; box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
+        }
+        .status-step.active-poor {
+            background-color: #f87171; color: #fff; box-shadow: 0 0 15px rgba(248, 113, 113, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
+        }
     </style>
 </head>
 <body>
@@ -109,29 +174,63 @@
             <div class="col-lg-6">
                 <div class="card custom-card-dark shadow border-0 position-relative overflow-hidden mb-4">
                     <div class="card-body text-center d-flex flex-column justify-content-center align-items-center p-4">
-                        <h5 class="text-secondary text-uppercase letter-spacing-2 mb-4">Real-time PUE Efficiency</h5>
+                        <h5 class="text-white-50 text-uppercase letter-spacing-2 mb-2">실시간 전력 효율 지수(PUE) 모니터링 </h5>
+                        <h6 class="text-white-50 mb-4">Real-time PUE Efficiency</h6>
 
                         <div class="gauge-container"
-                             th:with="percent=${(env.currentPue - 1.0) / 2.0 * 100}"
-                             th:style="'--gauge-percent: ' + ${percent > 100 ? 100 : (percent < 0 ? 0 : percent)} + '%; --gauge-color: ' + ${env.currentPue <= 1.5 ? '#4ade80' : (env.currentPue <= 2.0 ? '#facc15' : '#f87171')} + '; --gauge-color-dim: ' + ${env.currentPue <= 1.5 ? 'rgba(74, 222, 128, 0.3)' : 'rgba(248, 113, 113, 0.3)'}">
-
+                             th:with="percent=${(env.currentPue - 1.0) / 1.0 * 100},
+                                     pueColor=${env.currentPue <= 1.35 ? '#22c55e' : (env.currentPue <= 1.5 ? '#38bdf8' : (env.currentPue <= 1.65 ? '#facc15' : '#f87171'))}"
+                             th:style="'--gauge-percent: ' + ${percent > 100 ? 100 : (percent < 0 ? 0 : percent)} + '%; --gauge-color: ' + ${pueColor} + '; --gauge-color-dim: ' + ${pueColor} + '4D'">
                             <div class="gauge-ring"></div>
 
-                            <div class="pue-value-box pue-pulse" th:text="${env.currentPue}">1.52</div>
+                            <div class="pue-display-wrapper">
+                                <div class="pue-neighbor neighbor-left me-5">
+                                    <span th:if="${env.currentPue <= 1.35}" class="text-info">Good<br><strong>1.35</strong></span>
+                                    <span th:if="${env.currentPue > 1.35 && env.currentPue <= 1.5}" class="text-warning">Average<br><strong>1.50</strong></span>
+                                    <span th:if="${env.currentPue > 1.5 && env.currentPue <= 1.65}" class="text-danger">Poor<br><strong>1.65</strong></span>
+                                    <span th:if="${env.currentPue > 1.65}"></span>
+                                </div>
+
+                                <div id="pueValueDisplay" class="pue-value-box pue-pulse ms-5 me-5"
+                                     th:text="${env.currentPue}" style="color: var(--gauge-color);">1.52
+                                </div>
+
+                                <div class="pue-neighbor neighbor-right ms-5">
+                                    <span th:if="${env.currentPue <= 1.35}"></span>
+                                    <span th:if="${env.currentPue > 1.35 && env.currentPue <= 1.5}" class="text-success" style="opacity: 0.8">Excellent<br><strong>1.35</strong></span>
+                                    <span th:if="${env.currentPue > 1.5 && env.currentPue <= 1.65}" class="text-info" style="opacity: 0.8">Good<br><strong>1.50</strong></span>
+                                    <span th:if="${env.currentPue > 1.65}" class="text-warning" style="opacity: 0.8">Average<br><strong>1.65</strong></span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <span th:if="${env.currentPue <= 1.2}" class="badge bg-success fs-5 px-4 py-2 rounded-pill shadow-lg">Excellent (최우수)</span>
-                            <span th:if="${env.currentPue > 1.2 && env.currentPue <= 1.5}" class="badge bg-info fs-5 px-4 py-2 rounded-pill shadow-lg">Good (우수)</span>
-                            <span th:if="${env.currentPue > 1.5 && env.currentPue <= 2.0}" class="badge bg-warning text-dark fs-5 px-4 py-2 rounded-pill shadow-lg">Average (보통)</span>
-                            <span th:if="${env.currentPue > 2.0}" class="badge bg-danger fs-5 px-4 py-2 rounded-pill shadow-lg">Poor (비효율)</span>
+                        <div class="status-scale-container">
+                            <div class="status-step"
+                                 th:classappend="${env.currentPue > 1.65} ? 'active-poor' : ''">
+                                Poor (1.65~)
+                            </div>
+
+                            <div class="status-step"
+                                 th:classappend="${env.currentPue > 1.5 && env.currentPue <= 1.65} ? 'active-average' : ''">
+                                Average (~1.65)
+                            </div>
+
+                            <div class="status-step"
+                                 th:classappend="${env.currentPue > 1.35 && env.currentPue <= 1.5} ? 'active-good' : ''">
+                                Good (~1.50)
+                            </div>
+
+                            <div class="status-step"
+                                 th:classappend="${env.currentPue <= 1.35} ? 'active-excellent' : ''">
+                                Excellent (~1.35)
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card custom-card-dark shadow border-0">
-                    <div class="card-header bg-transparent border-0 text-white">
-                        <i class="bi bi-graph-up"></i> PUE Trend (Last 1 Hour)
+                    <div class="card-header bg-transparent border-0 text-white-50">
+                        <i class="bi bi-graph-up"></i> 실시간 PUE 변화 (PUE History)
                     </div>
                     <div class="card-body">
                         <canvas id="pueChart" style="max-height: 200px;"></canvas>
@@ -181,7 +280,7 @@
 
                     <div class="col-12">
                         <div class="card custom-card-dark p-4 h-100">
-                            <h6 class="text-white mb-3">에너지 소비 비율 (Energy Breakdown)</h6>
+                            <h6 class="text-white-50 mb-3">에너지 소비 비율 (Energy Breakdown)</h6>
 
                             <div class="progress" style="height: 35px; background-color: #1e293b; border-radius: 8px; overflow: hidden;">
                                 <div class="progress-bar bg-primary progress-bar-animated-stripe" role="progressbar"
@@ -276,6 +375,30 @@
                 }
             }
         });
+
+        // [신규 기능] PUE 숫자 실시간 변동 시뮬레이션 (4초 간격)
+        const pueDisplay = document.getElementById('pueValueDisplay');
+
+        // 초기값 (서버에서 받은 값)을 기준으로 시작
+        let currentPueVal = parseFloat(pueDisplay.innerText);
+
+        setInterval(() => {
+            // -0.01 ~ +0.01 사이의 난수 생성
+            const noise = (Math.random() * 0.02) - 0.01;
+
+            // 값 업데이트
+            currentPueVal += noise;
+
+            // 소수점 2자리로 고정하여 화면 표시
+            pueDisplay.innerText = currentPueVal.toFixed(2);
+
+            // (선택사항) 값이 변할 때 텍스트 그림자 효과를 강하게 줬다 빼기
+            pueDisplay.style.textShadow = "0 0 25px var(--gauge-color)";
+            setTimeout(() => {
+                pueDisplay.style.textShadow = "0 0 15px var(--gauge-color)";
+            }, 500);
+
+        }, 4000); // 4000ms = 4초
     });
     /*]]>*/
 </script>
