@@ -75,7 +75,7 @@ public class RequestController {
         }
 
         requestService.saveRequest(requestDTO);
-        return "redirect:/";
+        return "redirect:/requests/my";
     }
 
     // =======================================
