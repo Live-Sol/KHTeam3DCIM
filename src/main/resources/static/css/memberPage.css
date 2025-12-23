@@ -187,3 +187,27 @@ hr {
 #passwordModal .btn-primary:hover {
     transform: translateY(-2px);
 }
+
+/* 프로필 이미지 컨테이너 스타일 */
+.profile-display-container {
+    padding: 10px;
+}
+
+.profile-preview-static {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 3px solid rgba(0, 209, 255, 0.3); /* 사이버네틱한 느낌의 테두리 */
+    box-shadow: 0 0 15px rgba(0, 209, 255, 0.2);
+    background-color: #2a2a2a;
+}
+
+/* 모바일 환경에서 경계선 제거 */
+@media (max-width: 768px) {
+    .col-md-8 {
+        border-end: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+}
