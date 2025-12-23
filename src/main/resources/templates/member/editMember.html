@@ -1,82 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="|${memberId} 님의 정보 수정|">회원 정보 수정</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="|${memberId} 님의 정보 수정|">회원 정보 수정</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 
-    <!-- CSS 파일들 -->
-    <link href="/css/index.css" rel="stylesheet">
-    <link href="/css/memberStyle.css" rel="stylesheet">
-
-    <!-- 인라인 스타일은 추후 memberEdit.css로 옮기시는 것을 추천합니다 -->
-    <style>
-        /* 이미지 프리뷰 스타일 */
-        .profile-upload-container {
-            position: relative;
-            width: 140px; /* 크기 약간 키움 */
-            height: 140px;
-            margin: 0 auto 2.5rem;
-        }
-        .profile-preview {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-cyan);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
-            background: #1e293b;
-            transition: transform 0.3s ease;
-        }
-        .profile-preview:hover {
-            transform: scale(1.02);
-        }
-        .upload-icon-btn {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background: var(--accent-purple);
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 3px solid #0f172a; /* 배경색과 동일하게 하여 분리감 줌 */
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .upload-icon-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-            background: #fff;
-            color: var(--accent-purple);
-        }
-        /* 읽기 전용 정보 박스 스타일 */
-        .info-readonly-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            color: #94a3b8;
-            font-size: 0.95rem;
-        }
-        .delete-account-link {
-            font-size: 0.85rem;
-            color: #ef4444; /* Red color */
-            text-decoration: underline;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        .delete-account-link:hover {
-            color: #f87171;
-            opacity: 1;
-        }
-    </style>
+<!-- CSS 파일들 -->
+<link href="/css/index.css" rel="stylesheet">
+<link href="/css/memberStyle.css" rel="stylesheet">
+<link href="/css/memberEdit.css" rel="stylesheet">
 </head>
 <body class="login-body">
 <div class="login-wrapper">
@@ -218,22 +153,27 @@
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // 1. 이미지 미리보기 & 용량 체크
     function previewFile(input) {
         const preview = document.getElementById('previewImg');
         const file = input.files[0];
-
-        // 파일 선택 취소 시
         if (!file) return;
 
-        // 용량 제한 (10MB)
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
-            alert("이미지 파일 크기는 10MB를 초과할 수 없습니다.");
-            input.value = ""; // 파일 선택 초기화
+            Swal.fire({
+                icon: 'error',
+                title: '용량 초과',
+                text: '이미지 파일 크기는 10MB를 초과할 수 없습니다.',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            });
+            input.value = "";
             return;
         }
 
@@ -244,21 +184,75 @@
         reader.readAsDataURL(file);
     }
 
-    // 2. 폼 제출 시 유효성 검사
-    document.getElementById('editForm').addEventListener('submit', function(e) {
+    // 2. 폼 제출 시 SweetAlert2 및 중복 클릭 방지 적용
+    const editForm = document.getElementById('editForm');
+
+    editForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
         const newPw = document.getElementById('newPassword').value;
         const confirmPw = document.getElementById('confirmPassword').value;
         const errorMsg = document.getElementById('passwordMatchError');
 
-        // 비밀번호가 입력되어 있는데 서로 다르면 제출 막기
         if (newPw && newPw !== confirmPw) {
-            e.preventDefault(); // 제출 중단
             errorMsg.style.display = 'block';
             document.getElementById('confirmPassword').focus();
+            return;
         } else {
             errorMsg.style.display = 'none';
         }
+
+        Swal.fire({
+            title: '정보를 수정하시겠습니까?',
+            text: "입력하신 정보로 회원 정보가 갱신됩니다.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#00d1ff',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '수정 완료',
+            cancelButtonText: '취소',
+            background: '#1a1a1a',
+            color: '#ffffff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // [중복 클릭 방지 처리]
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `처리 중... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+
+                form.submit();
+            }
+        });
     });
+
+    // 3. 회원 탈퇴 시 SweetAlert2 확인창 적용
+    const deleteLink = document.querySelector('.delete-account-link');
+    if (deleteLink) {
+        deleteLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetUrl = this.getAttribute('href');
+
+            Swal.fire({
+                title: '정말로 탈퇴하시겠습니까?',
+                text: "탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '탈퇴하기',
+                cancelButtonText: '취소',
+                background: '#1a1a1a',
+                color: '#ffffff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.style.pointerEvents = 'none';
+                    this.innerText = '탈퇴 처리 중...';
+                    window.location.href = targetUrl;
+                }
+            });
+        });
+    }
 </script>
 </body>
 </html>

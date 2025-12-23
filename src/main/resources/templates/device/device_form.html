@@ -257,9 +257,9 @@
                 <div class="d-grid gap-2 mt-4">
                     <button type="submit" class="btn custom-btn-primary btn-lg fw-bold"
                             th:text="${isEdit == true} ? '수정 내용 저장' : '장비 등록 완료'"></button>
-                    <a th:href="${isEdit == true} ? @{/racks} : @{/requests}"
+                    <a th:href="${isEdit == true} ? @{/devices} : @{/racks}"
                        class="btn custom-btn-secondary"
-                       th:text="${isEdit == true} ? '취소 후 Rack 목록으로' : '취소 후 신청 목록으로'">
+                       th:text="${isEdit == true} ? '취소 후 장비 목록으로' : '취소 후 Rack 목록으로'">
                     </a>
                 </div>
             </form>

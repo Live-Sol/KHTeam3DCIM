@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,6 +34,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     // 전체 회원 조회 (회원용)
     @GetMapping
@@ -276,5 +278,29 @@ public class MemberController {
             model.addAttribute("error", e.getMessage());
             return "member/forgot_password";
         }
+    }
+    // 내정보 페이지
+    @GetMapping("/my")
+    public String mypage(@AuthenticationPrincipal CustomUserDetails user, Model model) {
+        String memberId = user.getMember().getMemberId();
+        Member member = memberService.findMember(memberId);
+        model.addAttribute("member", member);
+        model.addAttribute("returnUrl", "/"); // 메인으로
+
+        return "member/memberPage";
+    }
+    // 내정보 → 회원정보수정 이동 전 비밀번호 입력
+    @PostMapping("/check-password")
+    @ResponseBody
+    public Map<String, Boolean> checkPassword(
+            @RequestBody Map<String, String> request,
+            @AuthenticationPrincipal CustomUserDetails user) {
+
+        String inputPassword = request.get("password");
+        String savedPassword = user.getPassword();
+
+        boolean matches = passwordEncoder.matches(inputPassword, savedPassword);
+
+        return Map.of("valid", matches);
     }
 }
