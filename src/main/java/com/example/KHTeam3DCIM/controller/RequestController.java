@@ -115,12 +115,20 @@ public class RequestController {
     // 3. [관리자] 대기 중인 신청 목록 확인
     // =======================================
     @GetMapping
-    public String requestList(Model model, HttpServletRequest request) {
-        // 서비스에서 대기 중인 목록만 가져옴
-        List<Request> waitingRequests = requestService.findWaitingRequests();
+    public String requestList(Model model, HttpServletRequest request,
+                              @RequestParam(required = false) String keyword,        // 검색어
+                              @RequestParam(required = false, defaultValue = "ALL") String emsStatus) { // 필터
 
-        model.addAttribute("request", request); // 네비게이션 활성화 등을 위한 서블릿 객체
+        // 서비스 호출 시 파라미터 전달
+        List<Request> waitingRequests = requestService.findWaitingRequests(keyword, emsStatus);
+
+        model.addAttribute("request", request);
         model.addAttribute("requests", waitingRequests);
+
+        // ⭐ 검색 조건 유지 (화면의 input value에 다시 넣어주기 위함)
+        model.addAttribute("paramKeyword", keyword);
+        model.addAttribute("paramEmsStatus", emsStatus);
+
         return "request/RequestList";
     }
 

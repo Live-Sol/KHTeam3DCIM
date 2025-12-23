@@ -28,8 +28,18 @@ public class RequestService {
 
     // 2. 대기 중인 신청 목록 조회 (관리자용)
     @Transactional(readOnly = true)
-    public List<Request> findWaitingRequests() {
-        return requestRepository.findByStatusOrderByReqDateDesc("WAITING");
+    public List<Request> findWaitingRequests(String keyword, String emsStatus) {
+        // 1. 빈 문자열 처리 (검색어가 없으면 null로)
+        if (keyword != null && keyword.trim().isEmpty()) {
+            keyword = null;
+        }
+
+        // 2. "전체" 선택 시 null로 처리하여 필터 해제
+        if ("ALL".equals(emsStatus) || (emsStatus != null && emsStatus.trim().isEmpty())) {
+            emsStatus = null;
+        }
+
+        return requestRepository.searchWaitingRequests(keyword, emsStatus);
     }
 
     // 3. [추가] 내 신청 이력 조회 (사용자용)

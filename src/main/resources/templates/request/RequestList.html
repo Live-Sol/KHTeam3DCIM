@@ -81,6 +81,29 @@
             <i class="bi bi-bell-fill me-2"></i> 입고 승인 대기 목록
         </h2>
 
+        <div class="d-flex justify-content-between mb-4 align-items-center">
+
+            <form action="/requests" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
+
+                <select name="emsStatus" class="form-select custom-select" style="width: 180px;" onchange="this.form.submit()">
+                    <option value="ALL" th:selected="${paramEmsStatus == 'ALL'}">⚡ EMS 전체</option>
+                    <option value="ON" th:selected="${paramEmsStatus == 'ON'}">EMS 신청 (ON)</option>
+                    <option value="OFF" th:selected="${paramEmsStatus == 'OFF'}">EMS 미신청 (OFF)</option>
+                </select>
+
+                <input type="text" name="keyword" class="form-control custom-form-control"
+                       placeholder="회사명 또는 담당자명 검색..."
+                       th:value="${paramKeyword}">
+
+                <button type="submit" class="btn custom-btn-primary text-nowrap">🔍 검색</button>
+
+                <a href="/requests" class="btn custom-btn-secondary text-nowrap" title="검색 조건 초기화">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </form>
+        </div>
+
+
         <div class="text-center p-5 text-secondary" th:if="${requests.isEmpty()}">
             <i class="bi bi-inbox fs-1 d-block mb-3"></i>
             <h5>현재 대기 중인 신청 내역이 없습니다.</h5>
