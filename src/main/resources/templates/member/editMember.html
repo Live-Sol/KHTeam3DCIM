@@ -138,34 +138,22 @@
 
                             <hr class="divider-line my-4">
 
-                            <!-- 3. 비밀번호 변경 섹션 (확인 필드 추가) -->
-                            <div class="mb-4">
-                                <div class="form-floating mb-2">
-                                    <input type="password" class="form-control form-control-custom" id="newPassword" th:field="*{newPassword}" placeholder="New Password" autocomplete="new-password">
-                                    <label for="newPassword"><i class="bi bi-key me-2"></i>새 비밀번호 (변경 시에만 입력)</label>
+                            <!-- 3. 수정 가능 정보 -->
+                            <div class="row g-2 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control form-control-custom" id="contact" th:field="*{contact}" placeholder="Contact" required>
+                                        <label for="contact"><i class="bi bi-phone me-2"></i>연락처</label>
+                                        <div class="validation-msg text-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
+                                    </div>
                                 </div>
-                                <!-- [추가됨] 비밀번호 확인 필드 -->
-                                <div class="form-floating">
-                                    <input type="password" class="form-control form-control-custom" id="confirmPassword" placeholder="Confirm Password">
-                                    <label for="confirmPassword"><i class="bi bi-check-all me-2"></i>비밀번호 확인</label>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control form-control-custom" id="email" th:field="*{email}" placeholder="Email" required>
+                                        <label for="email"><i class="bi bi-envelope me-2"></i>이메일</label>
+                                        <div class="validation-msg text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                    </div>
                                 </div>
-                                <div id="passwordMatchError" class="validation-msg text-error mt-2" style="display:none;">
-                                    <i class="bi bi-x-circle"></i> 비밀번호가 일치하지 않습니다.
-                                </div>
-                                <div class="validation-msg text-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
-                            </div>
-
-                            <!-- 4. 수정 가능 정보 -->
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control form-control-custom" id="contact" th:field="*{contact}" placeholder="Contact" required>
-                                <label for="contact"><i class="bi bi-phone me-2"></i>연락처</label>
-                                <div class="validation-msg text-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
-                            </div>
-
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control form-control-custom" id="email" th:field="*{email}" placeholder="Email" required>
-                                <label for="email"><i class="bi bi-envelope me-2"></i>이메일</label>
-                                <div class="validation-msg text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
 
                             <div class="row g-2 mb-4">
@@ -185,6 +173,23 @@
                                         <div class="validation-msg text-error" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- 4. 비밀번호 변경 섹션 (확인 필드 추가) -->
+                            <div class="mb-4">
+                                <div class="form-floating mb-2">
+                                    <input type="password" class="form-control form-control-custom" id="newPassword" th:field="*{newPassword}" placeholder="New Password" autocomplete="new-password">
+                                    <label for="newPassword"><i class="bi bi-key me-2"></i>새 비밀번호 (변경 시에만 입력)</label>
+                                </div>
+                                <!-- [추가됨] 비밀번호 확인 필드 -->
+                                <div class="form-floating">
+                                    <input type="password" class="form-control form-control-custom" id="confirmPassword" placeholder="Confirm Password">
+                                    <label for="confirmPassword"><i class="bi bi-check-all me-2"></i>비밀번호 확인</label>
+                                </div>
+                                <div id="passwordMatchError" class="validation-msg text-error mt-2" style="display:none;">
+                                    <i class="bi bi-x-circle"></i> 비밀번호가 일치하지 않습니다.
+                                </div>
+                                <div class="validation-msg text-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
                             </div>
 
                             <!-- 버튼 영역 -->
