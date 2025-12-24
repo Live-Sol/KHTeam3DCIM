@@ -80,11 +80,21 @@
                     </td>
                     <td class="text-center">
                         <div sec:authorize="hasRole('ADMIN')" class="d-flex justify-content-center gap-1">
-                            <!-- 관리자 회원 목록에서 회원 상세 보기 -->
-                            <a th:href="@{/admin/members/{memberId}(memberId=${member.memberId})}"
-                               class="btn btn-sm btn-outline-info">
+                            <!-- [수정됨] 상세보기: Modal Trigger Button -->
+                            <!-- data-* 속성을 통해 모달로 전달할 데이터를 정의합니다 -->
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-info"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#memberDetailModal"
+                                    th:data-id="${member.memberId}"
+                                    th:data-name="${member.name}"
+                                    th:data-company="${member.companyName}"
+                                    th:data-cphone="${member.companyPhone}"
+                                    th:data-email="${member.email}"
+                                    th:data-contact="${member.contact}"
+                                    th:data-role="${member.role}">
                                 <i class="bi bi-search"></i> 상세보기
-                            </a>
+                            </button>
 
                             <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"
                                th:if="${member.memberId != #authentication.name}"
@@ -108,14 +118,98 @@
         </div>
     </main>
 </div>
+
+<!-- [추가됨] 회원 상세 정보 Modal -->
+<div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="memberDetailModalLabel">
+                    <i class="bi bi-person-badge me-2"></i>회원 상세 정보
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12 border-bottom border-secondary pb-2 mb-2">
+                        <label class="small text-muted d-block mb-1">회원 ID</label>
+                        <span id="modalId" class="h5 text-info fw-bold"></span>
+                        <span id="modalRole" class="badge ms-2"></span>
+                    </div>
+
+                    <div class="col-6">
+                        <label class="small text-muted d-block">담당자명</label>
+                        <span id="modalName" class="fs-6"></span>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted d-block">연락처</label>
+                        <span id="modalContact" class="fs-6"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="small text-muted d-block">이메일</label>
+                        <span id="modalEmail" class="fs-6"></span>
+                    </div>
+
+                    <div class="col-12 border-top border-secondary pt-2 mt-2"></div>
+
+                    <div class="col-6">
+                        <label class="small text-muted d-block">기업명</label>
+                        <span id="modalCompany" class="fs-6 fw-bold"></span>
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted d-block">기업 전화번호</label>
+                        <span id="modalCPhone" class="fs-6"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // 삭제 확인 스크립트
     function confirmDeleteFromButton(buttonElement) {
         const memberId = buttonElement.getAttribute('data-id');
         const memberName = buttonElement.getAttribute('data-name');
         if (confirm(memberName + " [" + memberId + "] 회원을 삭제하시겠습니까?")) {
             document.getElementById('deleteForm_' + memberId).submit();
         }
+    }
+
+    // [추가됨] 모달 데이터 바인딩 스크립트
+    const memberDetailModal = document.getElementById('memberDetailModal');
+    if (memberDetailModal) {
+        memberDetailModal.addEventListener('show.bs.modal', event => {
+            // 트리거한 버튼 요소 가져오기
+            const button = event.relatedTarget;
+
+            // data-* 속성에서 값 추출
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const company = button.getAttribute('data-company');
+            const cphone = button.getAttribute('data-cphone');
+            const email = button.getAttribute('data-email');
+            const contact = button.getAttribute('data-contact');
+            const role = button.getAttribute('data-role');
+
+            // 모달 내부 요소에 값 주입
+            document.getElementById('modalId').textContent = id;
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalCompany').textContent = company;
+            document.getElementById('modalCPhone').textContent = cphone;
+            document.getElementById('modalEmail').textContent = email;
+            document.getElementById('modalContact').textContent = contact;
+
+            // 역할 배지 스타일링
+            const roleBadge = document.getElementById('modalRole');
+            roleBadge.textContent = role;
+            roleBadge.className = 'badge ms-2 ' + (role === 'ADMIN' ? 'bg-danger' : 'bg-secondary');
+        });
     }
 </script>
 </body>
