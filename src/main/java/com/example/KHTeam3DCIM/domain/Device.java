@@ -113,4 +113,20 @@ public class Device {
     @Column(name = "EMS_STATUS", length = 10)
     private String emsStatus;       // EMS 감시 상태 (ON/OFF)
 
+    // 마감일 계산 (contractDate: 시작일, contractMonth: 기간)
+    public LocalDate getEndDate() {
+        if (this.contractDate == null || this.contractMonth == null) return null;
+        return this.contractDate.plusMonths(this.contractMonth);
+    }
+
+    // 만료 여부 확인
+    public boolean getIsExpired() {
+        LocalDate endDate = getEndDate();
+        if (endDate == null) return false;
+        return endDate.isBefore(LocalDate.now());
+    }
+
+    // 관리자 삭제 사유 필드 (DB 컬럼 추가 필요)
+    private String deleteReason;
+
 }

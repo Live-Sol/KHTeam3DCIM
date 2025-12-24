@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>입고 장비 현황</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/myRequestList.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/myDevice.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-content container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-white border-bottom pb-2">
+            <i class="bi bi-clipboard-data me-2"></i>입고 장비 현황
+        </h3>
+        <div class="text-sub-muted">
+            <i class="bi bi-info-circle me-1"></i> 승인 완료 후 운영 중이거나 계약 종료된 장비 목록입니다.
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4 align-items-center">
+        <form action="/devices/my" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
+            <select name="sort" class="form-select custom-select" style="width: 160px;" onchange="this.form.submit()">
+                <option value="contractDate" th:selected="${sort == 'contractDate'}">마감일 기준</option>
+                <option value="serialNum" th:selected="${sort == 'serialNum'}">관리번호 기준</option>
+                <option value="status" th:selected="${sort == 'status'}">상태 기준</option>
+            </select>
+
+            <input type="text" name="keyword" class="form-control custom-form-control"
+                   placeholder="관리번호 또는 모델명 검색..." th:value="${keyword}">
+
+            <button type="submit" class="btn custom-btn-primary text-nowrap">🔍 검색</button>
+        </form>
+    </div>
+
+    <div class="table-responsive table-container">
+        <table class="table table-hover admin-table">
+            <thead>
+            <tr>
+                <th style="width: 15%">관리 번호(SN)</th>
+                <th style="width: 30%">장비 정보 (제조사/모델)</th>
+                <th style="width: 10%">규격</th>
+                <th style="width: 15%">마감일 (계약종료)</th>
+                <th style="width: 20%">상태</th>
+                <th style="width: 10%">상세</th>
+            </tr>
+            </thead>
+            <tbody class="text-center">
+            <tr th:each="device : ${devices}">
+                <td>
+                    <strong class="text-info font-orbitron" th:text="${device.serialNum}">SN-20231201</strong>
+                </td>
+                <td class="text-center ps-4">
+                    <strong class="text-white" th:text="${device.vendor}">Dell</strong>
+                    <span class="text-sub-muted mx-1">/</span>
+                    <span class="text-white" th:text="${device.modelName}">PowerEdge R740</span>
+                </td>
+                <td>
+                    <span class="badge bg-secondary px-2" th:text="${device.heightUnit} + ' U'">2 U</span>
+                </td>
+                <td>
+                    <span th:class="${device.isExpired ? 'text-danger fw-bold' : 'text-white'}"
+                          th:text="${#temporals.format(device.endDate, 'yyyy-MM-dd')}">
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${device.status == 'RUNNING'}" class="badge bg-success status-badge">
+                        <i class="bi bi-play-circle-fill me-1"></i> Running
+                    </span>
+
+                    <span th:if="${device.status == 'OFF'}" class="badge bg-secondary status-badge">
+                        <i class="bi bi-power me-1"></i> Off
+                    </span>
+
+                    <div th:if="${device.status == 'DELETED'}">
+                        <span class="badge bg-danger status-badge mb-1"
+                            role="button"
+                            data-bs-toggle="collapse"
+                            th:attr="data-bs-target='#deleteReason-' + ${device.id}">
+                            <i class="bi bi-trash-fill me-1"></i>삭제(사유)
+                        </span>
+
+                        <div th:id="'deleteReason-' + ${device.id}" class="collapse mt-2 text-start">
+                            <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.85rem;">
+                                <strong><i class="bi bi-exclamation-triangle me-1"></i> 삭제 사유</strong><br>
+                                <span th:text="${device.deleteReason ?: '계약 기간 만료로 인한 자동 삭제'}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-light"
+                            th:onclick="showDeviceDetail([[${device.id}]])">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+
+            <tbody th:if="${#lists.isEmpty(devices)}">
+            <tr>
+                <td colspan="6" class="text-center py-5 text-sub-muted">
+                    <i class="bi bi-hdd-network fs-1 d-block mb-3"></i>
+                    입고된 장비 현황이 존재하지 않습니다.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <nav th:if="${page.totalPages > 1}" class="mt-4">
+            <ul class="pagination justify-content-center custom-pagination">
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/devices/my(page=${page.number - 1}, keyword=${keyword}, sort=${sort}, sortDir=${sortDir})}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="idx : ${#numbers.sequence(0, page.totalPages - 1)}"
+                    th:classappend="${idx == page.number} ? 'active'">
+                    <a class="page-link" th:href="@{/devices/my(page=${idx}, keyword=${keyword}, sort=${sort}, sortDir=${sortDir})}"
+                       th:text="${idx + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/devices/my(page=${page.number + 1}, keyword=${keyword}, sort=${sort}, sortDir=${sortDir})}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a th:href="@{/}" class="btn custom-btn-secondary">홈으로 이동</a>
+    </div>
+</div>
+
+<div class="modal fade" id="deviceDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title font-orbitron"><i class="bi bi-info-circle me-2 text-info"></i>장비 상세 명세</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label text-sub-muted small">관리 번호 (S/N)</label>
+                        <p id="modalSerial" class="form-control bg-black text-info border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">제조사</label>
+                        <p id="modalVendor" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">모델명</label>
+                        <p id="modalModel" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">장비 규격</label>
+                        <p id="modalHeight" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">소비전력</label>
+                        <p id="modalPower" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">EMS 유무</label>
+                        <p id="modalEms" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-sub-muted small">용도 및 설명</label>
+                        <p id="modalDesc" class="form-control bg-black text-white border-secondary mb-0" style="min-height: 60px;"></p>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label text-sub-muted small">계약 종료일</label>
+                        <p id="modalEndDate" class="form-control bg-black text-white border-secondary mb-0"></p>
+                    </div>
+                    <div id="modalReasonArea" class="col-12" style="display: none;">
+                        <label class="form-label text-danger small">삭제 사유</label>
+                        <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.85rem;">
+                            <span id="modalDeleteReason"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    function showDeviceDetail(deviceId) {
+        // 서버의 상세 조회 API 호출 (이미 만들어두신 ID 기반 조회 엔드포인트)
+        fetch(`/api/mydevices/${deviceId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('데이터를 가져오지 못했습니다.');
+                return response.json();
+            })
+            .then(device => {
+                // 데이터 매핑
+                document.getElementById('modalSerial').innerText = device.serialNum;
+                document.getElementById('modalVendor').innerText = device.vendor;
+                document.getElementById('modalModel').innerText = device.modelName;
+                document.getElementById('modalHeight').innerText = device.heightUnit + " U";
+                document.getElementById('modalPower').innerText = (device.powerWatt || 0) + " W";
+                document.getElementById('modalEms').innerText = device.emsStatus || "OFF";
+                document.getElementById('modalDesc').innerText = device.description || "등록된 설명이 없습니다.";
+
+                if (device.contractDate) {
+                    const date = new Date(device.contractDate);
+                    const day = date.getDate(); // 원래 '일' 저장
+
+                    // 월 단위 합산 시 발생할 수 있는 오차 방지 로직
+                    date.setMonth(date.getMonth() + (device.contractMonth || 0));
+
+                    // 만약 계산된 월의 일수가 원래 일수보다 작으면 자동으로 말일로 조정됨
+                    if (date.getDate() < day) {
+                        date.setDate(0);
+                    }
+                    // 만약 날짜가 하루 전으로 나온다면 이 코드로 적용해 보세요
+                    const offset = date.getTimezoneOffset() * 60000;
+                    const localISOTime = new Date(date.getTime() - offset).toISOString().split('T')[0];
+                    document.getElementById('modalEndDate').innerText = localISOTime;
+                } else {
+                    document.getElementById('modalEndDate').innerText = "정보 없음";
+                }
+
+                // 삭제 사유 표시 여부
+                const reasonArea = document.getElementById('modalReasonArea');
+                if (device.status === 'DELETED') {
+                    reasonArea.style.display = 'block';
+                    document.getElementById('modalDeleteReason').innerText = device.deleteReason || "계약 기간 만료로 인한 자동 삭제";
+                } else {
+                    reasonArea.style.display = 'none';
+                }
+
+                // 모달 띄우기
+                const detailModal = new bootstrap.Modal(document.getElementById('deviceDetailModal'));
+                detailModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('장비 정보를 불러오는 중 오류가 발생했습니다.');
+            });
+    }
+</script>
+</body>
+</html>

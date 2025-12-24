@@ -7,11 +7,14 @@ import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -181,20 +184,6 @@ public class DeviceService {
         return deviceRepository.findAllWithMemberByKeyword(keyword, sort);
     }
 
-//    public List<Device> findAllDevices(String sortOption, String sortDir) {
-//        Sort sort = createSort(sortOption, sortDir);
-//        return deviceRepository.findAll(sort);
-//    }
-//
-//    public List<Device> searchDevices(String keyword, String sortOption, String sortDir) {
-//        Sort sort = createSort(sortOption, sortDir);
-//        if (keyword == null || keyword.trim().isEmpty()) {
-//            return findAllDevices(sortOption, sortDir);
-//        }
-//        return deviceRepository.findByVendorContainingIgnoreCaseOrModelNameContainingIgnoreCaseOrSerialNumContainingIgnoreCase(
-//                keyword, keyword, keyword, sort);
-//    }
-
     // ⭐ [NEW] 총 장비 개수 조회 메서드 추가
     public long countAllDevices() {
         return deviceRepository.count();
@@ -246,13 +235,41 @@ public class DeviceService {
     // ==========================================
     // 6. 삭제/수정/전원
     // ==========================================
+//    @Transactional
+//    public void deleteDevice(Long id) {
+//        Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+//        deviceRepository.delete(device);
+//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
+//    }
+    // [물리 삭제] 실제 데이터를 DB에서 삭제
     @Transactional
     public void deleteDevice(Long id) {
-        Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
-        deviceRepository.delete(device);
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+
+        deviceRepository.delete(device); // 실제 삭제
+
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
+        auditLogService.saveLog(currentMemberId, "장비 영구 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
     }
+    // [논리 삭제] 상태만 바꾸고 기록 보존
+    @Transactional
+    public void deleteDeviceWithReason(Long id, String reason) {
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 장비가 존재하지 않습니다."));
+
+        device.setStatus("DELETED");
+        device.setDeleteReason(reason);
+        device.setRack(null);      // 랙 공간 반납
+        device.setStartUnit(0); // 유닛 위치 반납
+
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        auditLogService.saveLog(currentMemberId,
+                "장비 논리 삭제: " + device.getSerialNum() + " (사유: " + reason + ")",
+                LogType.DEVICE_OPERATION);
+    }
+
     @Transactional
     public void updateDevice(Long id, Device formDevice, Long rackId, String cateId) { // rackId 파라미터 추가 추천
         // 1. 공간 점유 체크
@@ -395,11 +412,40 @@ public class DeviceService {
         // Dirty Checking(변경 감지)이 일어나 DB에 자동 반영됩니다.
     }
 
-    @Transactional
-    public void deleteMultipleDevices(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) return;
+//    @Transactional
+//    public void deleteMultipleDevices(List<Long> ids) {
+//        if (ids == null || ids.isEmpty()) return;
+//
+//        // Batch 삭제를 사용하여 성능 최적화 (한 번의 쿼리로 삭제)
+//        deviceRepository.deleteAllByIdInBatch(ids);
+//    }
+        @Transactional
+        public void deleteMultipleDevices(List<Long> ids) {
+            if (ids == null || ids.isEmpty()) return;
 
-        // Batch 삭제를 사용하여 성능 최적화 (한 번의 쿼리로 삭제)
-        deviceRepository.deleteAllByIdInBatch(ids);
+            // 로그 기록을 위해 삭제 전 대상 정보 가져오기 (선택사항)
+            int count = ids.size();
+
+            deviceRepository.deleteAllByIdInBatch(ids); // 영구 삭제
+
+            String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+            auditLogService.saveLog(currentMemberId, "장비 " + count + "건 일괄 영구 삭제", LogType.DEVICE_OPERATION);
+        }
+
+    // [사용자용] 페이징 처리된 내 장비 목록
+    public Page<Device> getMyDeviceList(String memberId, String keyword, Pageable pageable) {
+        // Repository에 위에서 제안한 findMyDevicesByKeyword 등의 메서드가 있어야 함
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return deviceRepository.findMyDevices(memberId, pageable);
+        }
+        return deviceRepository.findMyDevicesByKeyword(memberId, keyword, pageable);
+    }
+
+    // [추가] 마감일 만료 체크 로직 (필요 시 컨트롤러나 스케줄러에서 호출)
+    // 실제로는 Device 엔티티에 getEndDate() 메서드가 (contractDate + contractMonth)로 구현되어 있어야 합니다.
+    public boolean isDeviceExpired(Device device) {
+        if (device.getContractDate() == null) return false;
+        // contractDate(시작일)에 contractMonth(기간)을 더한 날짜와 오늘 비교
+        return device.getContractDate().plusMonths(device.getContractMonth()).isBefore(LocalDate.now());
     }
 }

@@ -182,9 +182,11 @@
                     <td>
                         <div class="d-flex justify-content-center gap-1">
                             <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-outline-warning">수정</a>
-                            <a th:href="@{/devices/{id}/delete(id=${device.id})}"
-                               class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('정말 이 장비를 폐기하시겠습니까?');">삭제</a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    th:onclick="confirmDelete([[${device.id}]], [[${device.serialNum}]])">
+                                삭제
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -338,6 +340,50 @@
             });
         }
     });
+
+    function confirmDelete(deviceId, serialNum) {
+        Swal.fire({
+            title: '장비 삭제 선택',
+            text: `[${serialNum}] 장비를 어떻게 처리하시겠습니까?`,
+            icon: 'warning',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: '기록 보존 (논리 삭제)',
+            denyButtonText: '영구 제거 (물리 삭제)',
+            cancelButtonText: '취소',
+            confirmButtonColor: '#3085d6',
+            denyButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 논리 삭제: 사유 입력창
+                Swal.fire({
+                    title: '삭제 사유 입력',
+                    input: 'text',
+                    inputPlaceholder: '예: 계약 만료, 장비 노후화 등',
+                    showCancelButton: true,
+                    confirmButtonText: '확인'
+                }).then((res) => {
+                    if (res.isConfirmed && res.value) {
+                        location.href = `/devices/${deviceId}/soft-delete?reason=` + encodeURIComponent(res.value);
+                    }
+                });
+            } else if (result.isDenied) {
+                // 물리 삭제: 2차 확인
+                Swal.fire({
+                    title: '정말 영구 삭제하시겠습니까?',
+                    text: "이 작업은 DB에서 데이터를 완전히 지우며 복구할 수 없습니다.",
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonText: '네, 삭제합니다',
+                    confirmButtonColor: '#d33'
+                }).then((secondRes) => {
+                    if (secondRes.isConfirmed) {
+                        location.href = `/devices/${deviceId}/hard-delete`;
+                    }
+                });
+            }
+        });
+    }
 </script>
 </body>
 </html>

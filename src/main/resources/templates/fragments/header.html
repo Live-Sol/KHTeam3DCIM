@@ -82,6 +82,11 @@
                                 <i class="bi-clock-history me-2 text-success"></i>나의 입고 이력
                             </a>
                         </li>
+                        <li sec:authorize="!hasRole('ADMIN')">
+                            <a class="dropdown-item dropdown-item-custom" href="/devices/my">
+                                <i class="bi-clock-history me-2 text-success"></i>입고 장비 현황
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

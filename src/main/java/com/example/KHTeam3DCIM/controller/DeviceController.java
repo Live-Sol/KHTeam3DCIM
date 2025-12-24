@@ -4,6 +4,7 @@
 package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.*;
+import com.example.KHTeam3DCIM.dto.device.DeviceResponse;
 import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
@@ -12,6 +13,11 @@ import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -21,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequiredArgsConstructor
@@ -215,14 +222,52 @@ public class DeviceController {
     // ==========================================
     // 4. 장비 삭제
     // ==========================================
-    @GetMapping("/devices/{id}/delete")
-    public String delete(@PathVariable Long id, RedirectAttributes rttr) {
+//    @GetMapping("/devices/{id}/delete")
+//    public String delete(@PathVariable Long id, RedirectAttributes rttr) {
+//        try {
+//            deviceService.deleteDevice(id);
+//            rttr.addFlashAttribute("successMessage", "장비가 목록에서 성공적으로 삭제되었습니다.");
+//        } catch (Exception e) {
+//            // 삭제 실패 시 에러 메시지 전달
+//            rttr.addFlashAttribute("errorMessage", "장비 삭제 중 오류가 발생했습니다: " + e.getMessage());
+//        }
+//        return "redirect:/devices";
+//    }
+    // [물리 삭제 요청 처리]
+    @GetMapping("/devices/{id}/hard-delete")
+    public String hardDelete(@PathVariable Long id, RedirectAttributes rttr) {
         try {
-            deviceService.deleteDevice(id);
-            rttr.addFlashAttribute("successMessage", "장비가 목록에서 성공적으로 삭제되었습니다.");
+            deviceService.deleteDevice(id); // DB에서 영구 삭제
+            rttr.addFlashAttribute("successMessage", "장비 데이터가 DB에서 영구 삭제되었습니다.");
         } catch (Exception e) {
-            // 삭제 실패 시 에러 메시지 전달
-            rttr.addFlashAttribute("errorMessage", "장비 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            rttr.addFlashAttribute("errorMessage", "영구 삭제 중 오류 발생: " + e.getMessage());
+        }
+        return "redirect:/devices";
+    }
+    //    @PostMapping("/devices/{id}/delete-with-reason")
+//    @ResponseBody
+//    public ResponseEntity<?> deleteWithReason(@PathVariable Long id,
+//                                              @RequestBody Map<String, String> payload) {
+//        try {
+//            String reason = payload.get("reason");
+//            if (reason == null || reason.trim().isEmpty()) {
+//                return ResponseEntity.badRequest().body("삭제 사유를 입력해주세요.");
+//            }
+//
+//            deviceService.deleteDeviceWithReason(id, reason);
+//            return ResponseEntity.ok().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body(e.getMessage());
+//        }
+//    }
+    // [논리 삭제 요청 처리]
+    @GetMapping("/devices/{id}/soft-delete")
+    public String softDelete(@PathVariable Long id, @RequestParam String reason, RedirectAttributes rttr) {
+        try {
+            deviceService.deleteDeviceWithReason(id, reason); // 위 Service의 deleteDeviceWithReason 호출
+            rttr.addFlashAttribute("successMessage", "장비가 논리 삭제 처리되었습니다. (사유 저장됨)");
+        } catch (Exception e) {
+            rttr.addFlashAttribute("errorMessage", "삭제 중 오류 발생: " + e.getMessage());
         }
         return "redirect:/devices";
     }
@@ -371,12 +416,69 @@ public class DeviceController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/devices/batch-delete")
-    @ResponseBody
-    public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
-        List<Long> ids = payload.get("ids");
-        deviceService.deleteMultipleDevices(ids);
-        return ResponseEntity.ok().build();
+//    @PostMapping("/devices/batch-delete")
+//    @ResponseBody
+//    public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
+//        List<Long> ids = payload.get("ids");
+//        deviceService.deleteMultipleDevices(ids);
+//        return ResponseEntity.ok().build();
+//    }
+        @PostMapping("/devices/batch-delete")
+        @ResponseBody
+        public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
+            try {
+                List<Long> ids = payload.get("ids");
+                if (ids == null || ids.isEmpty()) return ResponseEntity.badRequest().body("삭제할 장비를 선택해주세요.");
+
+                deviceService.deleteMultipleDevices(ids); // 물리 삭제 실행
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body("일괄 삭제 중 오류 발생: " + e.getMessage());
+            }
+        }
+
+    // ==========================================
+    // 9. [사용자용] 나의 입고 장비 현황 페이지
+    // ==========================================
+    @GetMapping("/devices/my")
+    public String myDeviceList(Model model,
+                               @RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "contractDate") String sort, // 마감일 기준 기본 정렬
+                               @RequestParam(defaultValue = "asc") String sortDir,
+                               @RequestParam(defaultValue = "0") int page,
+                               HttpServletRequest request) {
+
+        // 현재 로그인한 사용자 정보 가져오기
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 페이징 및 정렬 설정
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(direction, sort));
+
+        // 사용자 전용 장비 목록 조회 (Service에 추가한 메서드 호출)
+        // ※ Service의 getMyDeviceList는 Page<Device>를 반환하도록 설계됨
+        Page<Device> devicePage = deviceService.getMyDeviceList(currentMemberId, keyword, pageable);
+
+        model.addAttribute("devices", devicePage.getContent());
+        model.addAttribute("page", devicePage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sort", sort);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("request", request);
+
+        return "device/myDevice"; // 앞서 만든 HTML 파일명
     }
 
+    @GetMapping("/api/mydevices/{id}")
+    @ResponseBody
+    public ResponseEntity<DeviceResponse> getDeviceApi(@PathVariable Long id) {
+        // 1. 서비스에서 id로 장비 조회 (기존에 확인한 findById 사용)
+        Device device = deviceService.findById(id);
+
+        // 2. DTO로 변환하여 민감 정보 필터링
+        DeviceResponse response = DeviceResponse.from(device);
+
+        // 3. 응답
+        return ResponseEntity.ok(response);
+    }
 }

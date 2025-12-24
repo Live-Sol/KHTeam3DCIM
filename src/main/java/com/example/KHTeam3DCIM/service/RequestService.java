@@ -122,9 +122,8 @@ public class RequestService {
 
         // ⭐ [추가] 시리얼 번호 생성 (기존 임시값 대신 사용)
         // 예: StarRoot_오늘날짜_신청ID (예: SR_231224_105)
-        String generatedSerial = "SR_" +
-                java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd")) +
-                "_" + reqId;
+        String generatedSerial = "SR-" +
+                java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd")) + reqId;
 
         // 4. 장비 객체 생성 (신청서 데이터를 장비로 이식)
         Device device = Device.builder()

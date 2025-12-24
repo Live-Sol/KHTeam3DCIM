@@ -5,6 +5,8 @@ package com.example.KHTeam3DCIM.repository;
 
 import com.example.KHTeam3DCIM.domain.Device;
 import com.example.KHTeam3DCIM.domain.Rack;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -81,4 +83,25 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
             @Param("startUnit") int startUnit,
             @Param("endUnit") int endUnit
     );
+
+    // 10. 특정 사용자의 장비 목록 조회 (페이징 지원)
+    // status가 'DELETED'인 것도 내역 확인을 위해 포함하거나, 필요에 따라 구분할 수 있습니다.
+    @Query("SELECT d FROM Device d " +
+            "JOIN FETCH d.category " +
+            "LEFT JOIN FETCH d.rack " +
+            "WHERE d.member.memberId = :memberId " +
+            "AND (LOWER(d.vendor) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(d.modelName) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(d.serialNum) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    Page<Device> findMyDevicesByKeyword(@Param("memberId") String memberId, @Param("kw") String kw, Pageable pageable);
+
+    @Query("SELECT d FROM Device d " +
+            "JOIN FETCH d.category " +
+            "LEFT JOIN FETCH d.rack " +
+            "WHERE d.member.memberId = :memberId")
+    Page<Device> findMyDevices(@Param("memberId") String memberId, Pageable pageable);
+
+    // 이미 삭제된 장비를 제외하고, 계약 정보가 있는 장비만 조회
+    @Query("SELECT d FROM Device d WHERE d.status != 'DELETED' AND d.contractDate IS NOT NULL")
+    List<Device> findAllActiveDevices();
 }

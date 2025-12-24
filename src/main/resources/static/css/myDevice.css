@@ -1,0 +1,146 @@
+/* =========================================
+   [StarRoot Device Status System]
+   Theme: Cyber Tech & Deep Space (Dark Mode)
+   Usage: my-devices.html
+   ========================================= */
+
+:root {
+    --primary-bg: #0f172a;       /* 짙은 우주색 */
+    --panel-bg: #1e293b;         /* 컨테이너 배경 */
+    --header-bg: #334155;        /* 테이블 헤더 */
+    --accent-cyan: #06b6d4;      /* 네온 시안 */
+    --accent-purple: #8b5cf6;    /* 네온 퍼플 */
+    --text-main: #f1f5f9;        /* 메인 텍스트 */
+    --text-sub: #94a3b8;         /* 보조 텍스트 */
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* Status Colors */
+    --running-green: #34d399;
+    --off-gray: #94a3b8;
+    --deleted-red: #f87171;
+}
+
+/* 1. Layout & Typography */
+.main-content {
+    padding: 32px 50px;
+}
+
+.font-orbitron {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* 2. Table Design (Glassmorphism 적용) */
+.table-container {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.admin-table {
+    margin-bottom: 0 !important;
+    color: var(--text-main) !important;
+}
+
+.admin-table thead th {
+    background-color: var(--header-bg) !important;
+    color: #ffffff !important;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    padding: 18px !important;
+    border: none !important;
+}
+
+.admin-table tbody td {
+    padding: 16px !important;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color) !important;
+    background-color: transparent !important;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(6, 182, 212, 0.05) !important; /* 시안색 호버 효과 */
+}
+
+/* 3. Device Status Badges */
+.status-badge {
+    min-width: 100px;
+    padding: 8px 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Running: 네온 그린 글로우 */
+.bg-success.status-badge {
+    background: rgba(52, 211, 153, 0.15) !important;
+    color: var(--running-green) !important;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+}
+
+/* Off: 무채색 회색 */
+.bg-secondary.status-badge {
+    background: rgba(148, 163, 184, 0.15) !important;
+    color: var(--off-gray) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Deleted: 네온 레드 글로우 */
+.bg-danger.status-badge {
+    background: rgba(248, 113, 113, 0.15) !important;
+    color: var(--deleted-red) !important;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
+}
+
+/* 4. Form Controls (Search Bar) */
+.custom-select, .custom-form-control {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid var(--border-color) !important;
+    color: #fff !important;
+    border-radius: 8px;
+}
+
+.custom-select:focus, .custom-form-control:focus {
+    border-color: var(--accent-cyan) !important;
+    box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.2);
+}
+
+/* 5. Buttons */
+.custom-btn-primary {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border: none;
+    color: #fff !important;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    padding: 8px 20px;
+    transition: all 0.3s;
+}
+
+.custom-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+}
+
+.custom-btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-main) !important;
+}
+
+/* 6. Utility */
+.text-sub-muted {
+    color: var(--text-sub) !important;
+    font-size: 0.85rem;
+}
+
+.alert-danger {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    color: var(--deleted-red);
+}
