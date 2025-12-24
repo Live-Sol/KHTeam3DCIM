@@ -34,7 +34,7 @@
                 <h6 class="summary-label">Total Racks</h6>
                 <h2 class="summary-value text-info">
                     <i class="bi bi-hdd-rack me-2"></i>[[${totalRacks}]]
-                    <span class="trend-badge trend-neutral" title="변동 없음">(<i class="bi bi-dash"></i>)</span>
+                    <span class="trend-badge trend-neutral fs-6 ms-1" title="변동 없음">(<i class="bi bi-dash"></i>)</span>
                 </h2>
             </div>
 
@@ -43,7 +43,7 @@
                 <h6 class="summary-label">Total Devices</h6>
                 <h2 class="summary-value text-success">
                     <i class="bi bi-server me-2"></i>[[${stats.totalDevices}]]
-                    <span class="trend-badge trend-up" title="전월 대비 증가">
+                    <span class="trend-badge trend-up fs-6 ms-1" title="전월 대비 증가">
                         (<i class="bi bi-arrow-up-short"></i> 1)
                     </span>
                 </h2>
@@ -52,15 +52,39 @@
             <!-- (3) Power Usage Effectiveness (PUE) -->
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Power Usage (PUE)</h6>
-                <h2 class="summary-value text-cyan">
-                    <i class="bi bi-lightning-charge me-2"></i>
-                    <span id="pueValue">[[${env.currentPue}]]</span>
+                <h2 class="summary-value mb-1">
+                    <!-- 상태별 표정 이모지 아이콘 적용 -->
 
-                    <span class="trend-badge trend-down" th:if="${env.currentPue <= 1.5}" title="효율 좋음">
-                        (<i class="bi bi-check-lg"></i> Good)
+                    <!-- 1. Excellent (<= 1.35) : 활짝 웃는 얼굴 -->
+                    <i class="bi bi-emoji-laughing-fill me-2 text-success"
+                       th:if="${env.currentPue <= 1.35}" title="Excellent"></i>
+
+                    <!-- 2. Good (1.35 < x <= 1.5) : 미소 -->
+                    <i class="bi bi-emoji-smile-fill me-2 text-primary"
+                       th:if="${env.currentPue > 1.35 and env.currentPue <= 1.5}" title="Good"></i>
+
+                    <!-- 3. Average (1.5 < x <= 1.65) : 정색 -->
+                    <i class="bi bi-emoji-neutral-fill me-2 text-warning"
+                       th:if="${env.currentPue > 1.5 and env.currentPue <= 1.65}" title="Average"></i>
+
+                    <!-- 4. Poor (> 1.65) : 울음(찡그림) -->
+                    <i class="bi bi-emoji-frown-fill me-2 text-danger"
+                       th:if="${env.currentPue > 1.65}" title="Poor"></i>
+
+                    <!-- PUE 숫자 (색상 동적 변경) -->
+                    <span id="pueValue"
+                          th:classappend="${env.currentPue <= 1.35} ? 'text-success' :
+                                         (${env.currentPue > 1.35 and env.currentPue <= 1.5} ? 'text-primary' :
+                                         (${env.currentPue > 1.5 and env.currentPue <= 1.65} ? 'text-warning' : 'text-danger'))">
+                        [[${env.currentPue}]]
                     </span>
-                    <span class="trend-badge trend-up" th:unless="${env.currentPue <= 1.5}" title="주의 필요">
-                        (<i class="bi bi-exclamation"></i> High)
+
+                    <!-- [추가됨] 단위 PUE 표시 (숫자와 동일한 색상 적용) -->
+                    <span class="fs-6 ms-1"
+                          th:classappend="${env.currentPue <= 1.35} ? 'text-success' :
+                                         (${env.currentPue > 1.35 and env.currentPue <= 1.5} ? 'text-primary' :
+                                         (${env.currentPue > 1.5 and env.currentPue <= 1.65} ? 'text-warning' : 'text-danger'))">
+                        PUE
                     </span>
                 </h2>
             </div>
@@ -75,7 +99,7 @@
                     <i class="bi bi-fan text-primary"></i>
                     <span id="fanSpeedValue">[[${env.fanSpeed}]]</span>%
                 </span>
-                </h2>
+            </h2>
             </div>
         </div>
     </div>
