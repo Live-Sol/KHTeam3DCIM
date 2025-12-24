@@ -119,52 +119,56 @@
     </main>
 </div>
 
-<!-- [추가됨] 회원 상세 정보 Modal -->
+<!-- 회원 상세 정보 Modal -->
 <div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="memberDetailModalLabel">
-                    <i class="bi bi-person-badge me-2"></i>회원 상세 정보
+            <div class="modal-header border-0 pb-0"> <!-- 헤더 경계선 제거 -->
+                <h5 class="modal-title ps-2 text-white" id="memberDetailModalLabel">
+                    <i class="bi bi-person-vcard-fill me-2"></i>회원 상세 정보
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="row g-3">
-                    <div class="col-12 border-bottom border-secondary pb-2 mb-2">
-                        <label class="small text-muted d-block mb-1">회원 ID</label>
-                        <span id="modalId" class="h5 text-info fw-bold"></span>
-                        <span id="modalRole" class="badge ms-2"></span>
-                    </div>
 
-                    <div class="col-6">
-                        <label class="small text-muted d-block">담당자명</label>
-                        <span id="modalName" class="fs-6"></span>
-                    </div>
-                    <div class="col-6">
-                        <label class="small text-muted d-block">연락처</label>
-                        <span id="modalContact" class="fs-6"></span>
-                    </div>
+            <div class="modal-body pt-4 px-4 pb-2">
+                <!-- memberDetail.html의 구조를 모달 내부에 재현 -->
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">ID:</strong>
+                    <span id="modalId" class="text-white fs-5 fw-bold align-middle"></span>
+                    <!-- 역할 배지는 JS로 클래스 제어 -->
+                    <span id="modalRole" class="badge ms-2 align-middle"></span>
+                </div>
 
-                    <div class="col-12">
-                        <label class="small text-muted d-block">이메일</label>
-                        <span id="modalEmail" class="fs-6"></span>
-                    </div>
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">이름:</strong>
+                    <span id="modalName" class="text-white"></span>
+                </div>
 
-                    <div class="col-12 border-top border-secondary pt-2 mt-2"></div>
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">이메일:</strong>
+                    <span id="modalEmail" class="text-white"></span>
+                </div>
 
-                    <div class="col-6">
-                        <label class="small text-muted d-block">기업명</label>
-                        <span id="modalCompany" class="fs-6 fw-bold"></span>
-                    </div>
-                    <div class="col-6">
-                        <label class="small text-muted d-block">기업 전화번호</label>
-                        <span id="modalCPhone" class="fs-6"></span>
-                    </div>
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">연락처:</strong>
+                    <span id="modalContact" class="text-white"></span>
+                </div>
+
+                <hr class="my-4"> <!-- 네온 스타일 HR -->
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">회사명:</strong>
+                    <span id="modalCompany" class="text-white"></span>
+                </div>
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">회사 전화번호:</strong>
+                    <span id="modalCPhone" class="text-white"></span>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+
+            <div class="modal-footer border-0 pt-0 pb-4 pe-4">
+                <button type="button" class="btn-glass-close" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
@@ -181,14 +185,12 @@
         }
     }
 
-    // [추가됨] 모달 데이터 바인딩 스크립트
+    // 모달 데이터 바인딩 스크립트
     const memberDetailModal = document.getElementById('memberDetailModal');
     if (memberDetailModal) {
         memberDetailModal.addEventListener('show.bs.modal', event => {
-            // 트리거한 버튼 요소 가져오기
             const button = event.relatedTarget;
 
-            // data-* 속성에서 값 추출
             const id = button.getAttribute('data-id');
             const name = button.getAttribute('data-name');
             const company = button.getAttribute('data-company');
@@ -197,7 +199,6 @@
             const contact = button.getAttribute('data-contact');
             const role = button.getAttribute('data-role');
 
-            // 모달 내부 요소에 값 주입
             document.getElementById('modalId').textContent = id;
             document.getElementById('modalName').textContent = name;
             document.getElementById('modalCompany').textContent = company;
@@ -205,10 +206,16 @@
             document.getElementById('modalEmail').textContent = email;
             document.getElementById('modalContact').textContent = contact;
 
-            // 역할 배지 스타일링
+            // 역할 배지 스타일링 (memberDetail.css의 badge-on/badge-off 스타일 활용 가능하지만, 여기선 admin.css 내 스타일 사용)
             const roleBadge = document.getElementById('modalRole');
             roleBadge.textContent = role;
-            roleBadge.className = 'badge ms-2 ' + (role === 'ADMIN' ? 'bg-danger' : 'bg-secondary');
+
+            // 역할에 따라 배지 클래스 설정
+            if (role === 'ADMIN') {
+                roleBadge.className = 'badge bg-danger ms-2 align-middle';
+            } else {
+                roleBadge.className = 'badge bg-secondary ms-2 align-middle';
+            }
         });
     }
 </script>

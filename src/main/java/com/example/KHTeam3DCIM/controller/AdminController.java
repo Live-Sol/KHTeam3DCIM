@@ -110,25 +110,11 @@
 
             return "admin/findMembersAdmin";
         }
+
         // 폼 바인딩을 위한 초기 객체 생성
         @ModelAttribute("searchForm")
         public MemberFindByIdAdmin memberFindByIdAdmin() {
             return new MemberFindByIdAdmin();
-        }
-        // 아이디로 멤버 조회 (단일)
-        @GetMapping("/members/{memberId}")
-        public String findMemberByIdFromAdmin(@PathVariable String memberId, Model model) {
-            try {
-                Member member = memberService.findByMemberId(memberId);
-                model.addAttribute("member", member);
-            } catch (IllegalArgumentException e) {
-                model.addAttribute("memberNotFound", true);
-            }
-
-            // 목록으로 버튼은 항상 관리자 회원 목록으로
-            model.addAttribute("returnUrl", "/admin/members");
-
-            return "member/memberDetail"; // 관리자용 상세 페이지
         }
 
 
