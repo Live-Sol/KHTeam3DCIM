@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/requests.css}">
-    <link rel="stylesheet" th:href="@{/css/devices.css}"> </head>
+    <!-- [통합] admin.css 하나만 사용 -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
@@ -22,15 +23,14 @@
     <main class="main-content flex-grow-1">
 
         <h2 class="mb-4 text-white border-bottom pb-2">
-            <i class="bi bi-hdd-stack me-2"></i> 총 장비 리스트
+            <i class="bi bi-hdd-stack me-2"></i> 장비 관리
         </h2>
 
         <div class="d-flex justify-content-between mb-4 align-items-center">
 
-            <form action="/devices" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
+            <form action="/devices" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 900px;">
 
                 <select name="sort" class="form-select custom-select" style="width: 160px;" onchange="this.form.submit()">
-<!--                    <option value="latest" th:selected="${sort == 'latest'}">ID</option>-->
                     <option value="member" th:selected="${sort == 'member'}">신청자 아이디</option>
                     <option value="rack" th:selected="${sort == 'rack'}">위치(Rack)</option>
                     <option value="category" th:selected="${sort == 'category'}">장비 종류</option>
@@ -51,12 +51,19 @@
                 <input type="text" name="keyword" class="form-control custom-form-control"
                        placeholder="검색어 입력..." th:value="${keyword}">
 
-                <button type="submit" class="btn custom-btn-primary text-nowrap">🔍 검색</button>
+                <button type="submit" class="btn custom-btn-primary text-nowrap">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+
+                <a href="/devices" class="btn custom-btn-secondary text-nowrap">
+                    <i class="bi bi-arrow-clockwise"></i> 초기화
+                </a>
             </form>
 
-            <div>
-<!--                <a href="/" class="btn custom-btn-secondary me-2">🏠 홈</a>-->
-                <a href="/devices/new" class="btn custom-btn-primary">➕ 신규 등록</a>
+            <div class="ms-2">
+                <a href="/devices/new" class="btn custom-btn-primary text-nowrap shadow-sm">
+                    <i class="bi bi-plus-lg"></i> 신규 장비 등록
+                </a>
             </div>
         </div>
 

@@ -1,58 +1,108 @@
+/* ==========================================================================
+   Admin Unified Stylesheet (admin.css)
+   통합 대상: admin.css, requests.css, devices.css, findMembersAdmin.css, racks.css
+   ========================================================================== */
+
 /* ===============================
-   Color System (관리자 테마) - 공통 변수
+   1. Color System (공통 변수)
 ================================ */
 :root {
     --dark-bg: #0f172a;        /* 전체 배경 */
-    --panel-bg: #111827;      /* 사이드바 */
-    --card-bg: #1f2937;       /* 카드 */
-    --border-color: #374151;
+    --panel-bg: #111827;       /* 사이드바/패널 배경 */
+    --card-bg: #1f2937;        /* 카드/테이블 컨테이너 배경 */
+    --border-color: #374151;   /* 테두리 */
 
-    --primary: #6366f1;
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --info: #38bdf8;
+    --primary: #6366f1;        /* 메인 컬러 (Indigo) */
+    --success: #22c55e;        /* 성공 (Green) */
+    --warning: #f59e0b;        /* 경고/대기 (Amber) */
+    --danger: #ef4444;         /* 위험/삭제 (Red) */
+    --info: #38bdf8;           /* 정보 (Sky) */
 
-    --text-main: #e5e7eb;
-    --text-sub: #9ca3af;
-    --text-muted: #6b7280;
-}
-/* ===============================
-   HR (전역)
-================================ */
-hr {
-    border-color: var(--border-color);
+    --text-main: #e5e7eb;      /* 기본 텍스트 (Light Gray) */
+    --text-sub: #9ca3af;       /* 보조 텍스트 */
+    --text-muted: #6b7280;     /* 흐린 텍스트 */
 }
 
-
 /* ===============================
-   Global
+   2. Global Reset & Typography
 ================================ */
 body {
     background-color: var(--dark-bg);
     color: var(--text-main);
-    font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
-a {
-    text-decoration: none;
-}
-
+a { text-decoration: none; }
+hr { border-color: var(--border-color); opacity: 0.5; }
 
 /* ===============================
-   Main Content
+   3. Main Layout & Page Title
 ================================ */
 .main-content {
+    /* 모든 페이지의 여백을 통일 */
     padding: 32px;
+    flex-grow: 1;
 }
 
-.main-content h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 28px;
+/* [UPGRADE] 페이지 소제목 스타일 업그레이드
+   기존 HTML 클래스(text-white, border-bottom 등)보다 우선 적용됩니다.
+*/
+.main-content h1,
+.main-content h2 {
+    font-size: 1.75rem;  /* 크기를 조금 키워 가독성 확보 */
+    font-weight: 800;    /* 굵은 폰트로 무게감 전달 */
+    color: #fff;         /* 밝은 흰색 */
+
+    position: relative;  /* 액센트 바 배치를 위한 기준점 */
+    padding-bottom: 15px;
+    margin-bottom: 30px !important;
+
+    /* 기존의 단순한 선 대신 아주 연한 베이스 라인 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    letter-spacing: -0.5px;
 }
+
+/* [NEW] 하단 그라데이션 액센트 바 (포인트 디자인) */
+.main-content h1::after,
+.main-content h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;        /* 베이스 라인 위에 겹치도록 배치 */
+    width: 60px;         /* 짧고 강렬한 길이 */
+    height: 4px;         /* 두께감 있는 선 */
+
+    /* Indigo -> Sky Blue 그라데이션 */
+    background: linear-gradient(90deg, var(--primary), var(--info));
+    border-radius: 2px;
+
+    /* 네온 글로우 효과 */
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+}
+
+/* [NEW] 아이콘 스타일링 (빛나는 효과) */
+.main-content h1 i,
+.main-content h2 i {
+    color: var(--info); /* 아이콘은 밝은 하늘색 */
+    margin-right: 15px !important;
+
+    /* 아이콘 자체 발광 효과 */
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+
+    /* 부드러운 움직임 준비 */
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+/* 마우스를 제목에 올렸을 때 아이콘 인터랙션 */
+.main-content h1:hover i,
+.main-content h2:hover i {
+    transform: scale(1.15) rotate(10deg); /* 살짝 커지며 회전 */
+}
+
 
 /* ===============================
-   KPI Cards
+   4. Components: Cards
 ================================ */
 .card {
     background-color: var(--card-bg);
@@ -72,45 +122,49 @@ a {
     border-bottom: none;
     font-weight: 600;
     color: var(--text-sub);
-    padding-bottom: 0;
+    padding: 12px 20px;
 }
 
-.card-body {
-    padding: 24px;
-}
+.card-body { padding: 24px 20px; }
+.card-title { font-size: 1.25rem; font-weight: 700; }
+.card-text { font-size: 0.9rem; color: var(--text-muted); }
 
-.card-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-}
+/* Card Variants (왼쪽 라인 강조) */
+.card-primary { border-left: 4px solid var(--primary); }
+.card-success { border-left: 4px solid var(--success); }
+.card-warning { border-left: 4px solid var(--warning); }
+.card-info { border-left: 4px solid var(--info); }
 
-.card-text {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-/* ===============================
-   Card Accent Variants
-================================ */
-.card-primary {
-    border-left: 4px solid var(--primary);
-}
-
-.card-success {
-    border-left: 4px solid var(--success);
-}
-
-.card-warning {
+/* Custom Card Warning (RequestList 전용 스타일) */
+.custom-card-warning {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     border-left: 4px solid var(--warning);
+    transition: all 0.25s ease;
 }
-
-.card-info {
-    border-left: 4px solid var(--info);
+.custom-card-warning:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+.custom-card-header-warning {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    padding: 12px 20px;
+}
+.custom-purpose-box {
+    background-color: #111827;
+    color: var(--text-sub);
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
 }
 
 /* ===============================
-   Buttons
+   5. Components: Buttons
 ================================ */
+/* 공통 버튼 스타일 */
 .btn-light {
     background-color: #020617;
     border: 1px solid var(--border-color);
@@ -119,44 +173,232 @@ a {
     font-size: 0.75rem;
     padding: 6px 14px;
 }
-
 .btn-light:hover {
     background-color: var(--primary);
     border-color: var(--primary);
     color: #fff;
 }
 
-/* ===============================
-   Logs Table
-================================ */
-.table {
-    color: var(--text-main);
+/* Custom Buttons (Primary, Secondary, Warning, Danger) */
+.custom-btn-primary {
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+.custom-btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: #fff;
 }
 
-.table thead th {
-    background-color: #020617;
-    color: var(--text-sub);
-    border-bottom: 1px solid var(--border-color);
-    font-size: 0.85rem;
-}
-
-.table tbody td {
-    font-size: 0.85rem;
-    padding: 14px;
-    border-top: 1px solid var(--border-color);
-    background-color: var(--card-bg);
-    color: var(--text-main);
-}
-
-.table-hover tbody tr:hover {
-    background-color: #020617;
-}
-
-/* ================================
-   Badge
-================================ */
-.badge {
+.custom-btn-secondary {
     background-color: #020617;
     border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+.custom-btn-secondary:hover {
+    background-color: var(--text-muted);
+    border-color: var(--text-muted);
+    color: #fff;
+}
+
+.custom-btn-warning {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    color: #1f2937;
+    border-radius: 8px;
+}
+.custom-btn-warning:hover {
+    background-color: #d9900a;
+    border-color: #d9900a;
+    color: #1f2937;
+}
+
+.custom-btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+    border-radius: 8px;
+}
+.custom-btn-danger:hover {
+    background-color: #cc3636;
+    border-color: #cc3636;
+    color: #fff;
+}
+
+/* Outline Danger (반려 버튼 등) */
+.custom-btn-outline-danger {
+    background-color: var(--card-bg);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+.custom-btn-outline-danger:hover {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+/* [추가됨] Custom Btn Info (Rack 실장도 버튼용) */
+.custom-btn-info, .btn-outline-info {
+    border: 1px solid var(--info);
+    color: var(--info);
+    border-radius: 8px;
+    background-color: transparent;
+    transition: all 0.2s;
+}
+.custom-btn-info:hover, .btn-outline-info:hover {
+    background-color: var(--info);
+    color: #000;
+}
+
+
+/* Legacy Button Support (회원관리 등에서 사용된 클래스 호환용) */
+.btn-primary-admin {
+    background-color: var(--primary);
+    border: none;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 8px;
+}
+.btn-outline-secondary-admin {
+    border: 1px solid var(--border-color);
+    color: var(--text-sub);
+    padding: 6px 16px;
+    border-radius: 8px;
+}
+.btn-outline-secondary-admin:hover {
+    background-color: var(--border-color);
+    color: #fff;
+}
+
+/* ===============================
+   6. Components: Form Controls (Input, Select)
+================================ */
+/* 투명하고 어두운 배경의 입력창 (device_list 스타일 통일) */
+.custom-form-control,
+.custom-select,
+.form-control-dark {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.custom-form-control:focus,
+.custom-select:focus,
+.form-control-dark:focus {
+    background-color: var(--dark-bg);
+    border-color: var(--primary);
+    color: var(--text-main);
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+}
+
+.custom-form-control::placeholder,
+.form-control-dark::placeholder {
+    color: var(--text-muted);
+}
+
+/* ===============================
+   7. Components: Tables (Unified)
+================================ */
+/* 테이블 컨테이너 */
+.table-container {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 테이블 본체 */
+.admin-table {
+    margin-bottom: 0 !important;
+    color: var(--text-main) !important;
+    width: 100%;
+}
+
+/* 테이블 헤더 */
+.admin-table thead th {
+    background-color: #334155 !important; /* 헤더 전용 진한 회색 */
+    color: #ffffff !important;
+    border-bottom: none !important;
+    font-weight: 500 !important;
+    padding: 12px !important;
+    font-size: 0.95rem !important;
+    text-align: center;
+}
+
+/* 테이블 바디 셀 */
+.admin-table tbody td {
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px !important;
+    vertical-align: middle;
+    background-color: transparent !important;
+    color: var(--text-main);
+}
+
+/* 행 호버 효과 */
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ===============================
+   8. Components: Badges & Alerts
+================================ */
+.badge {
+    border: 1px solid var(--border-color);
     font-weight: 500;
+}
+.badge.bg-secondary { color: #fff !important; } /* 가독성 확보 */
+
+.custom-badge { background-color: #020617 !important; border: 1px solid var(--border-color); }
+.custom-badge-success { background-color: var(--success) !important; color: var(--dark-bg); font-weight: 600; }
+.custom-badge-secondary { background-color: var(--text-muted) !important; color: var(--dark-bg); font-weight: 600; }
+
+.custom-alert {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+}
+.alert-success-admin {
+    background-color: rgba(34, 197, 94, 0.2);
+    border: 1px solid var(--success);
+    color: #4ade80;
+}
+.alert-danger-admin {
+    background-color: rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--danger);
+    color: #fca5a5;
+}
+
+/* [추가됨] Rack Assign Alert (자리 배정 모드 알림) */
+.custom-alert-info {
+    background-color: #1e3a8a; /* Indigo Darker */
+    color: #bfdbfe; /* Light Blue Text */
+    border-left: 5px solid #60a5fa;
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+}
+
+/* ===============================
+   9. Utilities
+================================ */
+.custom-hr { border-top: 1px solid var(--border-color); opacity: 0.5; }
+.text-sub-muted { color: var(--text-muted) !important; font-size: 0.85rem; }
+.text-info-custom { color: var(--info) !important; font-weight: bold; }
+
+/* Progress Bar (Rack Utilization) */
+.progress {
+    background-color: #0f172a !important;
+    border: 1px solid var(--border-color);
 }

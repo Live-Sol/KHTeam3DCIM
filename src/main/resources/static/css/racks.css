@@ -1,7 +1,4 @@
-/* requests.css 파일에 이미 정의되어 있어야 할 공통 다크 모드 스타일:
-   --dark-bg, --card-bg, --border-color, --primary, --text-main, .custom-table-dark 등
-   (만약 이전에 requests.css에 추가하지 않았다면, devices.css를 참고하여 추가해야 합니다.)
-*/
+/* 제거 가능 */
 
 /* --- Racks 전용 스타일 --- */
 

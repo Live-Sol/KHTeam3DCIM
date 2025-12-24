@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <!-- 통합된 스타일시트 적용 -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
@@ -19,81 +20,90 @@
     <div th:replace="fragments/sidebar :: sidebar"></div>
 
     <main class="main-content flex-grow-1">
-        <h1 class="h3 mb-4 text-white">
-            <i class="bi bi-house-door me-2"></i>
-            <span th:text="${pageTitle} ?: '관리자 페이지'">관리자 페이지</span>
-        </h1>
+
+        <h2 class="mb-4 text-white border-bottom pb-2">
+            <!--<span>은 글자 크기 연하고 작게-->
+
+            <i class="bi bi-house-door me-2 text-danger"></i> 관리자 페이지 <span class="" (Admin Dashboard)
+        </h2>
 
         <div class="row g-4">
 
+            <!-- 1. 입고 승인 대기 카드 -->
             <div class="col-md-6 col-lg-3">
-                <div class="card card-primary mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 승인 대기</div>
+                <div class="card border-warning mb-3 shadow-sm h-100">
+                    <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 입고 승인 대기</div>
                     <div class="card-body">
-                        <h5 class="card-title"><span th:text="${pendingRequestCount}">0</span> 건</h5>
+                        <h1 class="card-title fw-bold"><span th:text="${pendingRequestCount}">0</span> 건</h1>
                         <p class="card-text">새로운 입고 신청 승인을 기다리고 있습니다.</p>
-                        <a href="/requests" class="btn btn-light btn-sm mt-2">자세히 보기</a>
+                        <a href="/requests" class="btn btn-light btn-sm mt-2 stretched-link">입고 승인 관리로 이동</a>
                     </div>
                 </div>
             </div>
 
+            <!-- 2. 총 등록 장비 카드 -->
             <div class="col-md-6 col-lg-3">
-                <div class="card card-success mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-hdd-stack me-2"></i> 총 등록 장비</div>
+                <div class="card border-primary mb-3 shadow-sm h-100">
+                    <div class="card-header"><i class="bi bi-hdd-stack me-2"></i> 전체 등록 장비</div>
                     <div class="card-body">
-                        <h5 class="card-title"><span th:text="${totalDeviceCount}">0</span> 대</h5>
+                        <h1 class="card-title fw-bold"><span th:text="${totalDeviceCount}">0</span> 대</h1>
                         <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
-                        <a href="/devices" class="btn btn-light btn-sm mt-2">장비 관리로 이동</a>
+                        <a href="/devices" class="btn btn-light btn-sm mt-2 stretched-link">장비 관리로 이동</a>
                     </div>
                 </div>
             </div>
 
+            <!-- 3. 총 등록 Rack 카드 -->
             <div class="col-md-6 col-lg-3">
-                <div class="card card-warning mb-3 shadow-sm">
-                    <div class="card-header"><i class="bi bi-grid-1x2 me-2"></i> 총 등록 Rack</div>
+                <div class="card border-success mb-3 shadow-sm h-100">
+                    <div class="card-header"><i class="bi bi-terminal-split me-2"></i> 전체 등록 랙</div>
                     <div class="card-body">
-                        <h5 class="card-title"><span th:text="${totalRackCount}">0</span> 대</h5>
+                        <h1 class="card-title fw-bold"><span th:text="${totalRackCount}">0</span> 대</h1>
                         <p class="card-text">현재 시스템에 등록된 전체 Rack의 수입니다.</p>
-                        <a href="/racks" class="btn btn-light btn-sm mt-2">Rack 관리로 이동</a>
+                        <a href="/racks" class="btn btn-light btn-sm mt-2 stretched-link">Rack 관리로 이동</a>
                     </div>
                 </div>
             </div>
 
+            <!-- 4. 전체 회원 카드 -->
             <div class="col-md-6 col-lg-3">
-                <div class="card card-info mb-3 shadow-sm">
+                <div class="card border-light mb-3 shadow-sm h-100">
                     <div class="card-header"><i class="bi bi-person-fill me-1"></i> 전체 회원</div>
                     <div class="card-body">
-                        <h5 class="card-title"><span th:text="${totalMemberCount}">0</span> 명</h5>
+                        <h1 class="card-title fw-bold"><span th:text="${totalMemberCount}">0</span> 명</h1>
                         <p class="card-text">일반 이용자 및 관리자 포함 전체 회원 수입니다.</p>
-                        <a href="/admin/members" class="btn btn-light btn-sm mt-2">회원 관리로 이동</a>
+                        <a href="/admin/members" class="btn btn-light btn-sm mt-2 stretched-link">회원 관리로 이동</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card shadow-sm mt-5">
+        <div class="card border-dark shadow-sm mt-5">
             <div class="card-header">
-                <h5 class="mb-3"><i class="bi bi-clock-history"></i> 최근 활동 내역 (Recent Logs)</h5>
+                <h5><i class="bi bi-clock-history"></i> 최근 활동 내역 (Recent Logs)</h5>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-secondary">
+
+            <div class="card-body table-responsive">
+
+                <table class="table table-hover admin-table mb-0">
+                    <thead>
                     <tr>
                         <th>시간</th>
                         <th>사용자</th>
                         <th>활동 내용</th>
                     </tr>
                     </thead>
+
                     <tbody>
-                    <tr th:each="log : ${recentLogs}">
+                    <tr th:each="log : ${recentLogs}" class="text-center">
                         <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}">수정시간(NULL)</td>
 
                         <td>
-                            <span class="badge"
-                                  th:classappend="${log.actor == 'admin'} ? 'bg-danger' : 'bg-secondary'"
-                                  th:text="${log.actor}">
-                                변경자(NULL)
-                            </span>
+                        <span class="badge"
+                              th:classappend="${log.actor == 'admin'} ? 'bg-danger' : 'bg-secondary'"
+                              th:text="${log.actor}">
+                            변경자(NULL)
+                        </span>
                         </td>
 
                         <td th:text="${log.actionDescription}">변경사항(NULL)</td>

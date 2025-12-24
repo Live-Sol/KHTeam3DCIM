@@ -8,36 +8,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/requests.css}">
+    <!-- [수정됨] 통합된 admin.css 하나만 사용 -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 
     <style>
-        /* 반려 모달 전용 다크 테마 스타일 */
+        /* 반려 모달 전용 다크 테마 스타일 (페이지 고유 스타일은 유지) */
         #rejectModal .modal-content {
-            background-color: #212529; /* 어두운 배경색 (Bootstrap 다크 테마 기준) */
-            color: #ffffff;            /* 흰색 텍스트 */
-            border: 1px solid #495057; /* 테두리 색상 */
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); /* 그림자 효과 */
+            background-color: #212529;
+            color: #ffffff;
+            border: 1px solid #495057;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
         }
 
         #rejectModal .modal-header {
-            border-bottom: 1px solid #373b3e; /* 헤더 구분선 */
+            border-bottom: 1px solid #373b3e;
         }
 
         #rejectModal .modal-footer {
-            border-top: 1px solid #373b3e; /* 푸터 구분선 */
+            border-top: 1px solid #373b3e;
         }
 
         #rejectModal .modal-title {
             font-weight: 700;
-            color: #ff6b6b; /* 제목에 붉은색 포인트 (반려 느낌) */
+            color: #ff6b6b;
         }
 
-        /* 닫기 버튼(X) 흰색으로 변경 */
         #rejectModal .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
 
-        /* 텍스트 입력창 다크 스타일 */
         #rejectModal textarea.form-control {
             background-color: #2c3034;
             color: #e0e0e0;
@@ -47,12 +46,12 @@
         #rejectModal textarea.form-control:focus {
             background-color: #2c3034;
             color: #ffffff;
-            border-color: #ff6b6b; /* 포커스 시 붉은 테두리 */
+            border-color: #ff6b6b;
             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
         }
 
         #rejectModal textarea.form-control::placeholder {
-            color: #adb5bd; /* 플레이스홀더 색상 */
+            color: #adb5bd;
         }
     </style>
 </head>
@@ -78,7 +77,7 @@
         </div>
 
         <h2 class="mb-4 text-white border-bottom pb-2">
-            <i class="bi bi-bell-fill me-2"></i> 입고 승인 대기 목록
+            <i class="bi bi-bell-fill me-2 text-warning"></i> 입고 승인 관리
         </h2>
 
         <div class="d-flex justify-content-between mb-4 align-items-center">
@@ -95,10 +94,12 @@
                        placeholder="회사명 또는 담당자명 검색..."
                        th:value="${paramKeyword}">
 
-                <button type="submit" class="btn custom-btn-primary text-nowrap">🔍 검색</button>
+                <button type="submit" class="btn custom-btn-primary text-nowrap">
+                    <i class="bi bi-search"></i> 검색
+                </button>
 
                 <a href="/requests" class="btn custom-btn-secondary text-nowrap" title="검색 조건 초기화">
-                    <i class="bi bi-arrow-counterclockwise"></i>
+                    <i class="bi bi-arrow-clockwise"></i> 초기화
                 </a>
             </form>
         </div>
@@ -114,7 +115,7 @@
 
             <div class="col" th:each="req : ${requests}">
 
-                <div class="card custom-card-warning h-100 shadow-sm">
+                <div class="card h-100 shadow-sm">
                     <div class="card-header custom-card-header-warning d-flex justify-content-between align-items-center">
                         <div>
                             <span class="badge bg-dark custom-badge me-1">대기 중</span>

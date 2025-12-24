@@ -10,9 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <!-- [수정됨] 통합된 admin.css 하나만 사용 -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <link rel="stylesheet" th:href="@{/css/findMembersAdmin.css}">
-    <link rel="stylesheet" th:href="@{/css/requests.css}">
 </head>
 <body class="admin-body">
 
@@ -21,28 +20,28 @@
 <div class="d-flex">
     <div th:replace="fragments/sidebar :: sidebar"></div>
 
-    <main class="main-content flex-grow-1 p-4">
+    <main class="main-content flex-grow-1">
 
         <h2 class="mb-4 text-white border-bottom pb-2">
-            <i class="bi bi-people me-2"></i> 전체 회원 조회
+            <i class="bi bi-people me-2 text-white"></i> 회원 관리
         </h2>
 
-        <div class="search-container mb-3">
-            <form th:action="@{/admin/members}" th:object="${searchForm}" method="get" class="row g-2 align-items-center">
-                <div class="col-auto">
-                    <label for="searchId" class="visually-hidden">회원 ID</label>
-                    <input type="text" id="searchId" th:field="*{searchId}"
-                           class="form-control form-control-dark"
-                           placeholder="회원 ID 검색..." style="width: 250px;">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary-admin">
-                        <i class="bi bi-search"></i> 검색
-                    </button>
-                    <a th:href="@{/admin/members}" class="btn btn-outline-secondary-admin">
-                        <i class="bi bi-arrow-clockwise"></i> 초기화
-                    </a>
-                </div>
+        <div class="mb-3">
+            <form th:action="@{/admin/members}" th:object="${searchForm}" method="get" class="d-flex gap-2 align-items-center">
+
+                <label for="searchId" class="visually-hidden">회원 ID</label>
+
+                <input type="text" id="searchId" th:field="*{searchId}"
+                       class="form-control custom-form-control"
+                       placeholder="회원 ID 검색..." style="width: 250px;">
+
+                <button type="submit" class="btn custom-btn-primary">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+
+                <a th:href="@{/admin/members}" class="btn custom-btn-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> 초기화
+                </a>
             </form>
         </div>
 
@@ -66,7 +65,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="member : ${members}">
+                <tr th:each="member : ${members}" class="text-center">
                     <td th:text="${member.memberId}" class="fw-bold text-info"></td>
                     <td th:text="${member.name}"></td>
                     <td th:text="${member.companyName}"></td>
@@ -101,9 +100,6 @@
                                         class="btn btn-sm btn-outline-danger">삭제</button>
                             </form>
                         </div>
-<!--                        <a th:href="@{/admin/members-edit/{memberId}(memberId=${member.memberId})}"-->
-<!--                           th:if="${member.memberId == #authentication.name}"-->
-<!--                           class="btn btn-sm btn-info text-white">내 정보</a>-->
                     </td>
                 </tr>
                 </tbody>

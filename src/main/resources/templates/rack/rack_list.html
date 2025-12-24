@@ -8,8 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/requests.css}">
-    <link rel="stylesheet" th:href="@{/css/racks.css}">
+    <!-- [수정됨] 통합된 admin.css 하나만 사용 -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
 
@@ -20,11 +20,15 @@
 
     <main class="main-content flex-grow-1">
 
-        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-            <h2 class="text-white mb-0">
-                <i class="bi bi-grid-1x2 me-2"></i> 서버 랙(Rack) 관리
-            </h2>
-            <a href="/racks/new" class="btn custom-btn-primary">➕ 새 랙 추가</a>
+        <h2 class="mb-4 text-white border-bottom pb-2">
+            <i class="bi bi-terminal-split me-2 text-success"></i> 랙 관리
+        </h2>
+
+
+        <div class="mb-3 text-end">
+            <a href="/racks/new" class="btn custom-btn-primary text-nowrap shadow-sm">
+                <i class="bi bi-plus-lg"></i> 신규 랙 등록
+            </a>
         </div>
 
         <div class="alert custom-alert-info border-info" th:if="${reqId != null}">
@@ -44,7 +48,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="rack : ${racks}">
+                <tr th:each="rack : ${racks}" class="text-center align-middle">
                     <td th:text="${rack.id}" class="fw-bold text-info">1</td>
 
                     <td>
@@ -72,7 +76,7 @@
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-2">
                             <a th:href="@{/racks/{id}/view(id=${rack.id}, reqId=${reqId})}"
-                               class="btn btn-sm btn-outline-info">실장도</a>
+                               class="btn btn-sm btn-outline-info px-4">실장도</a>
 
                             <a th:href="@{/racks/{id}/edit(id=${rack.id})}"
                                class="btn btn-sm btn-outline-warning">수정</a>

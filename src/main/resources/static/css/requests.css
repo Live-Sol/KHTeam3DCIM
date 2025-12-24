@@ -1,6 +1,6 @@
-/* ===============================
-   Color System (관리자 테마) - 공통 변수 재정의
-================================ */
+/* 제거 가능 */
+
+
 :root {
     --dark-bg: #0f172a;        /* 전체 배경 */
     --card-bg: #1f2937;       /* 카드 */
@@ -166,10 +166,11 @@ h2.border-bottom {
    Main Content Layout (Sidebar 옆 메인 영역)
 ================================ */
 .main-content {
-    /* * 좌우에 충분한 패딩을 주어 사이드바와 콘텐츠 사이의 간격을 확보합니다.
-     * 상하 패딩은 32px, 좌우 패딩은 50px로 설정합니다.
-     */
-    padding: 32px 50px;
+    /* [수정됨] cooling.html (admin.css)의 기준인 32px로 통일
+       기존: 32px 50px -> 변경: 32px
+       이제 모든 페이지의 콘텐츠 여백이 동일해집니다.
+    */
+    padding: 32px;
     flex-grow: 1; /* flex 속성을 통해 남은 공간을 모두 차지하도록 보장 */
 }
 
@@ -209,14 +210,16 @@ h2.border-bottom {
 /* 장비 리스트와 동일한 검색창 디자인 적용 */
 .custom-select,
 .custom-form-control {
-    background-color: var(--card-bg); /* #1f2937 */
+    /* [수정됨] 기존 var(--card-bg)에서 var(--dark-bg)로 변경하여 투명(배경색과 동일)하게 처리 */
+    background-color: var(--dark-bg);
     border: 1px solid var(--border-color);
     color: var(--text-main);
 }
 
 .custom-select:focus,
 .custom-form-control:focus {
-    background-color: var(--card-bg);
+    /* 포커스 시에도 어두운 배경 유지 */
+    background-color: var(--dark-bg);
     border-color: var(--primary);
     color: var(--text-main);
     box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25); /* Primary Color Glow */

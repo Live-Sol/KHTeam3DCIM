@@ -9,7 +9,7 @@
                 <a class="nav-link"
                    th:classappend="${requestURI == '/admin' or requestURI == '/' ? 'active' : ''}"
                    aria-current="page" href="/admin">
-                    <i class="bi bi-house-door me-2"></i> 관리자 페이지
+                    <i class="bi bi-house-door me-2 text-danger"></i> 관리자 페이지
                 </a>
             </li>
 
@@ -17,7 +17,7 @@
                 <a class="nav-link"
                    th:classappend="${requestURI != null && requestURI.startsWith('/requests') ? 'active' : ''}"
                    href="/requests">
-                    <i class="bi bi-bell-fill me-2"></i> 입고 승인 관리
+                    <i class="bi bi-bell-fill me-2 text-warning"></i> 입고 승인 관리
                 </a>
             </li>
 
@@ -25,7 +25,7 @@
                 <a class="nav-link"
                    th:classappend="${requestURI != null && requestURI.startsWith('/devices') ? 'active' : ''}"
                    href="/devices">
-                    <i class="bi bi-hdd-stack me-2"></i> 장비 관리
+                    <i class="bi bi-hdd-stack me-2 text-primary"></i> 장비 관리
                 </a>
             </li>
 
@@ -33,23 +33,7 @@
                 <a class="nav-link"
                    th:classappend="${requestURI != null && requestURI.startsWith('/racks') ? 'active' : ''}"
                    href="/racks">
-                    <i class="bi bi-grid-1x2 me-2"></i> Rack 관리
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link"
-                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/cooling') ? 'active' : ''}"
-                   href="/admin/cooling">
-                    <i class="bi bi-snow2 me-2"></i> Cooling 관리
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link"
-                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/pue') ? 'active' : ''}"
-                   href="/admin/pue">
-                    <i class="bi bi-lightning-charge me-2"></i> PUE 관리
+                    <i class="bi bi-terminal-split me-2 text-success"></i> 랙 관리
                 </a>
             </li>
 
@@ -57,7 +41,25 @@
                 <a class="nav-link"
                    th:classappend="${requestURI != null && requestURI.startsWith('/admin/members') ? 'active' : ''}"
                    href="/admin/members">
-                    <i class="bi bi-people me-2"></i> 회원 관리
+                    <i class="bi bi-people me-2 text-white"></i> 회원 관리
+                </a>
+            </li>
+
+            <hr class="text-white mx-3">
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/cooling') ? 'active' : ''}"
+                   href="/admin/cooling">
+                    <i class="bi bi-snow2 me-2 text-info"></i> 냉방 시스템 제어
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   th:classappend="${requestURI != null && requestURI.startsWith('/admin/pue') ? 'active' : ''}"
+                   href="/admin/pue">
+                    <i class="bi bi-lightning-charge me-2 text-warning"></i>에너지 효율 모니터링
                 </a>
             </li>
 
