@@ -4,7 +4,10 @@
 package com.example.KHTeam3DCIM.repository;
 
 import com.example.KHTeam3DCIM.domain.Request;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,6 +38,41 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> searchWaitingRequests(@Param("keyword") String keyword,
                                         @Param("emsStatus") String emsStatus);
 
+    // 승인완료 이력 숨김 기능
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = false ORDER BY r.reqDate DESC")
+    List<Request> findActiveRequestsByMemberId(@Param("memberId") String memberId);
 
+    // 1. 숨겨진(hidden=true) 내역만 조회
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = true ORDER BY r.reqDate DESC")
+    List<Request> findHiddenRequestsByMemberId(@Param("memberId") String memberId);
+
+    // 2. 숨김 해제 (다시 false로 변경)
+    @Modifying // 데이터 변경 시 필요
+    @Query("UPDATE Request r SET r.isHidden = false WHERE r.id = :id AND r.memberId = :memberId")
+    void restoreRequest(@Param("id") Long id, @Param("memberId") String memberId);
+
+    // 페이징
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = false")
+    Page<Request> findActiveRequestsByMemberIdPaged(@Param("memberId") String memberId, Pageable pageable);
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = true")
+    Page<Request> findHiddenRequestsByMemberIdPaged(@Param("memberId") String memberId, Pageable pageable);
+
+    // 검색어 (내 신청 내역 중 숨겨지지 않은 것)
+    // ⭐ 시리얼 번호(serialNum)로도 검색이 가능하도록 조건 추가
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = false " +
+            "AND (:keyword IS NULL OR r.vendor LIKE %:keyword% OR r.modelName LIKE %:keyword% OR r.serialNum LIKE %:keyword%)")
+    Page<Request> findMyActiveRequestsWithSearch(
+            @Param("memberId") String memberId,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+    // 3. 숨겨진 내역 중 검색 + 페이징
+    @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = true " +
+            "AND (:keyword IS NULL OR r.vendor LIKE %:keyword% OR r.modelName LIKE %:keyword%)")
+    Page<Request> findMyHiddenRequestsWithSearch(
+            @Param("memberId") String memberId,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 }
 

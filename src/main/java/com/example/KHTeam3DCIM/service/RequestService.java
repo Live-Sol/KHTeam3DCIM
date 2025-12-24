@@ -4,6 +4,10 @@ import com.example.KHTeam3DCIM.domain.*;
 import com.example.KHTeam3DCIM.dto.Request.RequestDTO;
 import com.example.KHTeam3DCIM.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,15 +81,12 @@ public class RequestService {
     }
 
     // [7] 입고 승인 및 장비 등록 로직
+    @Transactional // 데이터 일관성을 위해 추가 권장
     public void approveRequest(Long reqId, Long rackId, Integer startUnit) {
         // 1. 신청서 정보 가져오기
-        Request request = findById(reqId); // 이미 만들어두신 4번 메서드 활용
+        Request request = findById(reqId);
 
         // 2. 신청서에 담긴 회원(Member) 찾기
-        // request.getMemberId()가 String이므로 memberRepository에서 찾아야 함
-        // [기존 IllegalArgumentException 대신 IllegalStateException 사용 이유]
-        // 1. 단순 파라미터 오류가 아니라, DB에 회원이 없는 '시스템 상태'의 문제임을 명시
-        // 2. 컨트롤러에서 이 예외만 콕 집어 catch하여 화이트라벨(500에러) 대신 경고창을 띄우기 위함
         Member requester = memberRepository.findByMemberId(request.getMemberId())
                 .orElseThrow(() -> new IllegalStateException("신청자 정보를 찾을 수 없습니다. (ID: " + request.getMemberId() + ")"));
 
@@ -96,7 +97,8 @@ public class RequestService {
         // 3-1. Request의 String cateId를 사용하여 실제 Category 엔티티 조회
         Category category = categoryRepository.findById(request.getCateId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 ID입니다: " + request.getCateId()));
-        // 3-2. 랙 높이 초과 검증 (중요)
+
+        // 3-2. 랙 높이 초과 검증
         int heightUnit = request.getHeightUnit();
         int endUnit = startUnit + heightUnit - 1;
 
@@ -108,12 +110,8 @@ public class RequestService {
             );
         }
 
-        // 3-3. 기존 장비와 위치 충돌 검사 ⭐
-        boolean overlap = deviceRepository.existsOverlappingDevice(
-                rack,
-                startUnit,
-                endUnit
-        );
+        // 3-3. 기존 장비와 위치 충돌 검사
+        boolean overlap = deviceRepository.existsOverlappingDevice(rack, startUnit, endUnit);
 
         if (overlap) {
             throw new IllegalStateException(
@@ -122,34 +120,121 @@ public class RequestService {
             );
         }
 
+        // ⭐ [추가] 시리얼 번호 생성 (기존 임시값 대신 사용)
+        // 예: StarRoot_오늘날짜_신청ID (예: SR_231224_105)
+        String generatedSerial = "SR_" +
+                java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd")) +
+                "_" + reqId;
+
         // 4. 장비 객체 생성 (신청서 데이터를 장비로 이식)
-        // Device 엔티티에 @Builder가 선언되어 있다면 아래와 같이 작성 가능합니다.
         Device device = Device.builder()
-                .member(requester)        // 실제 신청자를 장비 소유자로 연결 ⭐
-                .rack(rack)               // 관리자가 지정한 랙 위치
+                .member(requester)
+                .rack(rack)
                 .category(category)
                 .vendor(request.getVendor())
                 .modelName(request.getModelName())
-                .serialNum("StarRoot_" + reqId) // 시리얼은 입고 후 수정이 필요할 수 있어 임시값 세팅
+                .serialNum(generatedSerial) // ⭐ [수정] 생성한 시리얼 번호 주입
                 .startUnit(startUnit)
                 .heightUnit(request.getHeightUnit())
                 .powerWatt(request.getPowerWatt())
                 .emsStatus(request.getEmsStatus())
-                .status("OFF")        // 등록 즉시 가동 상태로 설정
+                .status("OFF")
                 .companyName(request.getCompanyName())
                 .companyPhone(request.getCompanyPhone())
                 .userName(request.getUserName())
                 .contact(request.getContact())
                 .description(request.getPurpose())
-                .contractDate(request.getStartDate()) // 신청서의 시작일을 계약일로
+                .contractDate(request.getStartDate())
                 .contractMonth(request.getTermMonth())
                 .build();
 
         // 5. 장비 저장
         deviceRepository.save(device);
 
-        // 6. 신청서 상태 완료 처리
+        // 6. 신청서 상태 완료 처리 및 시리얼 번호 기록
         request.setStatus("APPROVED");
+        request.setSerialNum(generatedSerial); // ⭐ [추가] Request 엔티티에도 시리얼 번호 저장
     }
 
+    // 8. 요청 삭제 또는 숨김 처리 (사용자용)
+    public void processRemoveOrHide(Long id) {
+        Request request = findById(id);
+
+        if ("APPROVED".equals(request.getStatus())) {
+            // 승인된 건은 숨김 처리 (Entity에 @Data가 있으므로 바로 사용 가능)
+            request.setHidden(true);
+            // @Transactional이 있으므로 별도의 save 호출 없이도 반영됨
+        } else {
+            // 대기 중/반려 건은 실제 삭제 (기존에 구현된 deleteRequest 활용)
+            deleteRequest(id);
+        }
+    }
+    // 내 신청 이력 중 숨겨지지 않은 것만 조회
+    @Transactional(readOnly = true)
+    public List<Request> findActiveRequests(String memberId) {
+        return requestRepository.findActiveRequestsByMemberId(memberId);
+    }
+    // 숨김 내역 조회
+    @Transactional(readOnly = true)
+    public List<Request> findHiddenRequests(String memberId) {
+        return requestRepository.findHiddenRequestsByMemberId(memberId);
+    }
+
+    // 숨김 내역 복구
+    public void restoreRequest(Long id, String memberId) {
+        requestRepository.restoreRequest(id, memberId);
+    }
+
+    // [수정] 페이징 + 검색 + 정렬 기능이 통합된 메서드
+    @Transactional(readOnly = true)
+    public Page<Request> findMyRequestsPaged(String memberId, String keyword, String sort, String sortDir, Pageable pageable) {
+
+        // 1. 정렬(Sort) 객체 동적 생성
+        // 컨트롤러에서 sort 파라미터가 넘어왔을 경우 (예: vendor, startDate 등)
+        if (sort != null && !sort.isEmpty()) {
+            Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+            // 기존 pageable 정보에 사용자가 선택한 정렬 조건을 덮어씌움
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(direction, sort)
+            );
+        }
+
+        // 2. 검색어 가공 (빈 문자열일 경우 null로 처리)
+        if (keyword != null && keyword.trim().isEmpty()) {
+            keyword = null;
+        }
+
+        // 3. 리포지토리 호출 (검색어와 새로운 pageable 전달)
+        // 아래 2번 항목에서 만들 리포지토리 메서드를 호출합니다.
+        return requestRepository.findMyActiveRequestsWithSearch(memberId, keyword, pageable);
+    }
+    @Transactional(readOnly = true)
+    public Page<Request> findHiddenRequestsPaged(String memberId, Pageable pageable) {
+        return requestRepository.findHiddenRequestsByMemberIdPaged(memberId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Request> findHiddenRequestsPaged(String memberId, String keyword, String sort, String sortDir, Pageable pageable) {
+
+        // 1. 정렬 객체 조립
+        if (sort != null && !sort.isEmpty()) {
+            Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    Sort.by(direction, sort)
+            );
+        }
+
+        // 2. 검색어 처리
+        if (keyword != null && keyword.trim().isEmpty()) {
+            keyword = null;
+        }
+
+        // 3. 숨김 내역 전용 검색 리포지토리 호출
+        return requestRepository.findMyHiddenRequestsWithSearch(memberId, keyword, pageable);
+    }
 }

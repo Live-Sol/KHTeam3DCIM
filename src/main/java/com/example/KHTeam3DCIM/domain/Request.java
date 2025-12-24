@@ -81,4 +81,12 @@ public class Request {
     // 반려 사유
     @Column(name = "REJECT_REASON", length = 300)
     private String rejectReason;
+
+    // 승인 이력 숨김
+    @Column(name = "is_hidden", nullable = false)
+    private boolean isHidden = false; // 기본값 false
+
+    // 승인 완료 시 부여된 장비의 시리얼 번호를 저장
+    @Column(name = "SERIAL_NUM", length = 100)
+    private String serialNum;
 }

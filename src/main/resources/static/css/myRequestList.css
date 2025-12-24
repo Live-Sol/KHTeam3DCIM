@@ -120,3 +120,91 @@ body {
     color: var(--text-sub) !important;
     font-size: 0.85rem;
 }
+
+/* 아이콘 회전 애니메이션 */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* 숨김 내역 관리 전용 버튼 스타일 */
+.custom-btn-archive {
+    background-color: transparent;
+    border: 1px solid var(--border-color); /* 패널 보더와 통일 */
+    color: var(--text-sub) !important;
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.custom-btn-archive:hover {
+    background-color: var(--header-bg); /* 호버 시 헤더 배경색과 일치 */
+    border-color: var(--text-muted);
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.custom-btn-archive i {
+    color: var(--warning); /* 보관함 아이콘만 포인트 컬러(주황색)로 강조 */
+}
+
+/* 페이지네이션 통합 스타일 */
+.custom-pagination .page-item .page-link {
+    /* 기존 스타일: 색상 및 배경 */
+    background-color: #2a2a2a;
+    border-color: #3d3d3d;
+    color: #ccc;
+    transition: all 0.3s ease;
+
+    /* 추가 스타일: 구조 및 간격 */
+    min-width: 40px;
+    text-align: center;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+/* 활성화된 페이지 (현재 페이지) */
+.custom-pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    font-weight: bold; /* 추가된 스타일 병합 */
+}
+
+/* 비활성화된 버튼 (이전/다음 없을 때) */
+.custom-pagination .page-item.disabled .page-link {
+    background-color: #1a1a1a;
+    border-color: #2a2a2a;
+    color: #555;
+}
+
+/* 마우스 호버 효과 */
+.custom-pagination .page-link:hover:not(.disabled) {
+    background-color: #3d3d3d;
+    color: #fff;
+}
+
+/* 검색바 내부 입력창 스타일 (어두운 테마용 예시) */
+.custom-select, .custom-form-control {
+    background-color: #2a2a2a !important;
+    border: 1px solid #444 !important;
+    color: #fff !important;
+}
+
+.custom-select:focus, .custom-form-control:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 플레이스홀더 색상 */
+.custom-form-control::placeholder {
+    color: #888;
+}

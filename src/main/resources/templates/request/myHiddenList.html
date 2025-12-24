@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>나의 입고 신청 내역</title>
+    <title>나의 입고 신청 숨긴 내역</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
@@ -19,11 +19,11 @@
 <div class="main-content container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-white border-bottom pb-2">
-            <i class="bi bi-list-check me-2"></i> 입고 신청 내역
+            <i class="bi bi-archive me-2"></i>숨긴 신청 내역
         </h3>
         <div class="d-flex gap-2">
-            <a th:href="@{/requests/my-hidden-requests}" class="btn custom-btn-archive">
-                <i class="bi bi-archive me-2"></i>숨긴 내역 관리
+            <a th:href="@{/requests/my}" class="btn custom-btn-archive">
+                <i class="bi bi-arrow-left me-1"></i>목록으로 돌아가기
             </a>
             <a th:href="@{/requests/new}" class="btn custom-btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>새 신청 작성
@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-between mb-4 align-items-center">
-        <form action="/requests/my" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
+        <form action="/requests/my-hidden-requests" method="get" class="d-flex gap-2" style="flex-grow: 1; max-width: 800px;">
 
             <select name="sort" class="form-select custom-select" style="width: 160px;" onchange="this.form.submit()">
                 <option value="reqDate" th:selected="${sort == 'reqDate'}">신청일 기준</option>
@@ -57,78 +57,79 @@
             <thead>
             <tr>
                 <th style="width: 10%">신청번호</th>
-                <th style="width: 12%">신청일</th>
-                <th style="width: 27%">장비 정보 (제조사/모델)</th>
-                <th style="width: 12%">규격</th>
-                <th style="width: 12%">입고 희망일</th>
-                <th style="width: 22%">진행 상태</th>
-                <th style="width: 5%">삭제</th>
+                <th style="width: 11%">신청일</th>
+                <th style="width: 26%">장비 정보 (제조사/모델)</th>
+                <th style="width: 11%">규격</th>
+                <th style="width: 11%">입고 희망일</th>
+                <th style="width: 21%">진행 상태</th>
+                <th style="width: 10%">숨김해제</th>
             </tr>
             </thead>
             <tbody class="text-center" th:each="req : ${requests}">
-                <tr>
-                    <td>
-                        <strong th:class="${req.status == 'APPROVED' ? 'text-info' : 'text-white'}"
-                                th:text="${req.status == 'APPROVED' ? req.serialNum : req.id}">
-                            신청번호
-                        </strong>
-                    </td>
-                    <td>
-                        <span class="text-white" th:text="${#temporals.format(req.reqDate, 'yyyy-MM-dd')}">2023-12-01</span>
-                        <br><small class="text-sub-muted" th:text="${#temporals.format(req.reqDate, 'HH:mm')}">14:30</small>
-                    </td>
-                    <td class="text-center ps-4">
-                        <strong class="text-white" th:text="${req.vendor}">Dell</strong>
-                        <span class="text-sub-muted mx-1">/</span>
-                        <span class="text-white" th:text="${req.modelName}">PowerEdge R740</span>
-                    </td>
-                    <td>
-                        <span class="badge bg-secondary px-2" th:text="${req.heightUnit} + ' U'">2 U</span>
-                    </td>
-                    <td class="text-white" th:text="${req.startDate}">2023-12-15</td>
-                    <td>
-                        <!-- 상태 배지 -->
-                        <span th:if="${req.status == 'REJECTED'}"
-                            class="badge bg-danger status-badge d-inline-block mb-1"
-                            role="button"
-                            data-bs-toggle="collapse"
-                            th:attr="data-bs-target='#rejectReason-' + ${req.id}">
+            <tr>
+                <td>
+                    <strong class="text-info"
+                            th:text="${req.status == 'APPROVED' ? req.serialNum : req.id}">
+                        SR_251224_105
+                    </strong>
+                    <br>
+                    <small class="badge bg-dark text-sub-muted">숨김 처리됨</small>
+                </td>
+                <td>
+                    <span class="text-white" th:text="${#temporals.format(req.reqDate, 'yyyy-MM-dd')}">2023-12-01</span>
+                    <br><small class="text-sub-muted" th:text="${#temporals.format(req.reqDate, 'HH:mm')}">14:30</small>
+                </td>
+                <td class="text-center ps-4">
+                    <strong class="text-white" th:text="${req.vendor}">Dell</strong>
+                    <span class="text-sub-muted mx-1">/</span>
+                    <span class="text-white" th:text="${req.modelName}">PowerEdge R740</span>
+                </td>
+                <td>
+                    <span class="badge bg-secondary px-2" th:text="${req.heightUnit} + ' U'">2 U</span>
+                </td>
+                <td class="text-white" th:text="${req.startDate}">2023-12-15</td>
+                <td>
+                    <!-- 상태 배지 -->
+                    <span th:if="${req.status == 'REJECTED'}"
+                          class="badge bg-danger status-badge d-inline-block mb-1"
+                          role="button"
+                          data-bs-toggle="collapse"
+                          th:attr="data-bs-target='#rejectReason-' + ${req.id}">
                             <i class="bi bi-x-circle me-1"></i>반려됨<br>(사유 보기)
                         </span>
 
-                        <span th:if="${req.status == 'WAITING'}"
-                            class="badge bg-warning text-dark status-badge">
+                    <span th:if="${req.status == 'WAITING'}"
+                          class="badge bg-warning text-dark status-badge">
                             <i class="bi bi-clock-history me-1"></i>대기 중
                         </span>
 
-                        <span th:if="${req.status == 'APPROVED'}"
-                            class="badge bg-success status-badge">
+                    <span th:if="${req.status == 'APPROVED'}"
+                          class="badge bg-success status-badge">
                             <i class="bi bi-check-circle me-1"></i>승인 완료
                         </span>
 
-                        <!-- 🔽 반려 사유 (같은 td 안) -->
-                        <div th:if="${req.status == 'REJECTED'}"
-                            th:id="'rejectReason-' + ${req.id}"
-                            class="collapse mt-2 text-start">
+                    <!-- 🔽 반려 사유 (같은 td 안) -->
+                    <div th:if="${req.status == 'REJECTED'}"
+                         th:id="'rejectReason-' + ${req.id}"
+                         class="collapse mt-2 text-start">
 
-                            <div class="alert alert-danger py-2 px-3 mb-0">
-                                <strong>
-                                    <i class="bi bi-exclamation-circle me-1"></i>
-                                    반려 사유
-                                </strong><br>
-                                <span th:text="${req.rejectReason ?: '반려 사유가 등록되지 않았습니다.'}"></span>
-                            </div>
+                        <div class="alert alert-danger py-2 px-3 mb-0">
+                            <strong>
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                반려 사유
+                            </strong><br>
+                            <span th:text="${req.rejectReason ?: '반려 사유가 등록되지 않았습니다.'}"></span>
                         </div>
-                    </td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-sm btn-outline-danger ms-2 delete-btn"
-                                th:data-id="${req.id}"
-                                th:data-status="${req.status}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
+                    </div>
+                </td>
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-success restore-btn"
+                            th:data-id="${req.id}">
+                        <i class="bi bi-arrow-counterclockwise"></i> 숨김 해제
+                    </button>
+                </td>
+            </tr>
             </tbody>
 
             <tbody th:if="${#lists.isEmpty(requests)}">
@@ -141,7 +142,6 @@
             </tbody>
         </table>
     </div>
-
     <nav th:if="${page != null and !page.isEmpty()}" aria-label="Page navigation" class="mt-4"
          th:with="
     pageSize = 5,
@@ -153,13 +153,13 @@
         <ul class="pagination justify-content-center custom-pagination">
 
             <li class="page-item" th:classappend="${page.first} ? 'disabled'">
-                <a class="page-link" th:href="@{/requests/my(page=0, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
+                <a class="page-link" th:href="@{/requests/my-hidden-requests(page=0, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
                     <i class="bi bi-chevron-double-left"></i>
                 </a>
             </li>
 
             <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
-                <a class="page-link" th:href="@{/requests/my(page=${page.number - 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
+                <a class="page-link" th:href="@{/requests/my-hidden-requests(page=${page.number - 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -168,85 +168,95 @@
                 <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
                     class="page-item" th:classappend="${i == page.number} ? 'active'">
                     <a class="page-link"
-                       th:href="@{/requests/my(page=${i}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}"
+                       th:href="@{/requests/my-hidden-requests(page=${i}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}"
                        th:text="${i + 1}">1</a>
                 </li>
             </th:block>
 
             <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
-                <a class="page-link" th:href="@{/requests/my(page=${page.number + 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
+                <a class="page-link" th:href="@{/requests/my-hidden-requests(page=${page.number + 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
 
             <li class="page-item" th:classappend="${page.last} ? 'disabled'">
-                <a class="page-link" th:href="@{/requests/my(page=${page.totalPages - 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
+                <a class="page-link" th:href="@{/requests/my-hidden-requests(page=${page.totalPages - 1}, sort=${sort}, sortDir=${sortDir}, keyword=${keyword})}">
                     <i class="bi bi-chevron-double-right"></i>
                 </a>
             </li>
         </ul>
     </nav>
 
-        <div class="mt-4 text-end">
-            <a th:href="@{/}" class="btn custom-btn-secondary">홈으로 이동</a>
-        </div>
+    <div class="mt-4 text-end">
+        <a th:href="@{/}" class="btn custom-btn-secondary">홈으로 이동</a>
     </div>
+</div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.querySelectorAll('.delete-btn').forEach(btn => {
+    // 복구 버튼 이벤트 리스너 등록
+    document.querySelectorAll('.restore-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // 클릭된 버튼과 내부 아이콘 찾기
             const currentBtn = e.currentTarget;
             const icon = currentBtn.querySelector('i');
             const id = currentBtn.dataset.id;
-            const status = currentBtn.dataset.status;
 
-            confirmDelete(id, status, currentBtn, icon);
+            confirmRestore(id, currentBtn, icon);
         });
     });
 
-    function confirmDelete(id, status, btn, icon) {
-        const isApproved = (status === 'APPROVED');
-
+    function confirmRestore(id, btn, icon) {
         Swal.fire({
-            title: isApproved ? '내역을 숨기시겠습니까?' : '정말로 삭제하시겠습니까?',
-            icon: isApproved ? 'info' : 'warning',
+            title: '내역을 복구하시겠습니까?',
+            text: '복구된 내역은 다시 "나의 신청 내역" 목록에 표시됩니다.',
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonText: '확인',
+            confirmButtonColor: '#198754', // 복구는 긍정적 의미이므로 초록색 계열 추천
+            cancelButtonColor: '#6e7881',
+            confirmButtonText: '복구하기',
             cancelButtonText: '취소',
             background: '#1a1a1a',
             color: '#fff'
         }).then((result) => {
             if (result.isConfirmed) {
-                // --- [시작] 버튼 비활성화 및 아이콘 변경 ---
-                btn.disabled = true; // 다중 클릭 방지
-                const originalClass = icon.className; // 원래 아이콘 클래스 저장 (bi-trash)
-                icon.className = 'bi bi-arrow-clockwise spinning'; // 회전 마크로 교체
+                // --- [시작] 버튼 비활성화 및 아이콘 회전 ---
+                btn.disabled = true;
+                const originalClass = icon.className; // 원래 아이콘 클래스 저장 (예: bi-arrow-counterclockwise)
+                icon.className = 'bi bi-arrow-clockwise spinning';
                 // ------------------------------------------
 
                 const token = document.querySelector('meta[name="_csrf"]').content;
                 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-                fetch(`/requests/delete/${id}`, {
-                    method: 'DELETE',
+                // 서버에 복구 요청 (POST 방식)
+                fetch(`/requests/restore/${id}`, {
+                    method: 'POST',
                     headers: { [header]: token }
                 }).then(res => {
                     if (res.ok) {
-                        Swal.fire({ icon: 'success', title: '완료!', background: '#1a1a1a', color: '#fff' })
-                            .then(() => location.reload());
+                        Swal.fire({
+                            icon: 'success',
+                            title: '복구 완료!',
+                            background: '#1a1a1a',
+                            color: '#fff'
+                        }).then(() => location.reload());
                     } else {
                         throw new Error();
                     }
                 }).catch(() => {
-                    // --- [실패 시] 버튼 복구 ---
+                    // --- [실패 시] 복구 ---
                     btn.disabled = false;
-                    icon.className = originalClass; // 다시 쓰레기통 아이콘으로
-                    // --------------------------
-                    Swal.fire({ icon: 'error', title: '실패', text: '오류가 발생했습니다.', background: '#1a1a1a', color: '#fff' });
+                    icon.className = originalClass;
+                    Swal.fire({
+                        icon: 'error',
+                        title: '실패',
+                        text: '복구 처리 중 오류가 발생했습니다.',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                 });
             }
         });

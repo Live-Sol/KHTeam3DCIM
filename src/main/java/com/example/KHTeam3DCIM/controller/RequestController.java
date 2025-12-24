@@ -10,6 +10,12 @@ import com.example.KHTeam3DCIM.service.RequestService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -82,17 +88,30 @@ public class RequestController {
     // 2-1. [고객] 내 신청 이력 조회 (새로 추가)
     // =======================================
     @GetMapping("/my")
-    public String myRequestList(Model model, Principal principal) {
+    public String myRequestList(
+            @PageableDefault(size = 5, sort = "reqDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String sort,    // 추가
+            @RequestParam(required = false) String sortDir, // 추가
+            @RequestParam(required = false) String keyword, // 추가
+            Model model,
+            Principal principal) {
+
         if (principal == null) {
-            return "redirect:/login"; // 로그인 안 한 사용자는 로그인 페이지로
+            return "redirect:/login";
         }
 
         String memberId = principal.getName();
-        // 서비스의 findMyRequests를 호출하여 내 데이터만 가져옴
-        List<Request> myRequests = requestService.findMyRequests(memberId);
 
-        model.addAttribute("requests", myRequests);
-        return "request/MyRequestList"; // 이력 조회 페이지 HTML
+        // 서비스 메서드에 memberId와 pageable을 함께 전달하도록 수정해야 함
+        Page<Request> requestPage = requestService.findMyRequestsPaged(memberId, keyword, sort, sortDir, pageable);
+
+        model.addAttribute("requests", requestPage.getContent()); // 테이블에 뿌릴 리스트
+        model.addAttribute("page", requestPage);                 // 페이징 UI를 위한 정보
+        model.addAttribute("sort", sort != null ? sort : "reqDate"); // 기본값 설정
+        model.addAttribute("sortDir", sortDir != null ? sortDir : "desc");
+        model.addAttribute("keyword", keyword);
+
+        return "request/MyRequestList";
     }
 
     @GetMapping("/members/{memberId}")
@@ -108,6 +127,57 @@ public class RequestController {
         model.addAttribute("returnUrl", "/requests");
 
         return "member/memberDetail"; // 요청용 상세 페이지
+    }
+    // =======================================
+    // 2-2. [고객] 내 신청 이력 삭제/숨김 처리
+    // =======================================
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> removeRequest(@PathVariable Long id) {
+        try {
+            requestService.processRemoveOrHide(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("삭제 처리 중 오류 발생");
+        }
+    }
+    // 숨김 내역 페이지 이동
+    @GetMapping("/my-hidden-requests")
+    public String myHiddenRequestList(
+            @PageableDefault(size = 5, sort = "reqDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String sortDir,
+            @RequestParam(required = false) String keyword,
+            Model model,
+            Principal principal) {
+
+        if (principal == null) return "redirect:/login";
+
+        String memberId = principal.getName();
+
+        // 서비스 호출 (인자 5개)
+        Page<Request> requestPage = requestService.findHiddenRequestsPaged(memberId, keyword, sort, sortDir, pageable);
+
+        model.addAttribute("requests", requestPage.getContent());
+        model.addAttribute("page", requestPage);
+        model.addAttribute("sort", sort != null ? sort : "reqDate");
+        model.addAttribute("sortDir", sortDir != null ? sortDir : "desc");
+        model.addAttribute("keyword", keyword);
+
+        return "request/myHiddenList"; // 해당 HTML 파일명
+    }
+
+
+    // 숨김 해제 처리 (복구)
+    @PostMapping("/restore/{id}")
+    @ResponseBody
+    public ResponseEntity<String> restoreRequest(@PathVariable Long id, Principal principal) {
+        try {
+            requestService.restoreRequest(id, principal.getName());
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("fail");
+        }
     }
 
 
@@ -183,5 +253,6 @@ public class RequestController {
             return "redirect:/requests";
         }
     }
+    //
 
 }
