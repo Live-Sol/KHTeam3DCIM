@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Network Topology</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="/css/index.css" rel="stylesheet">
+
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <style>
+        /* 토폴로지 컨테이너 스타일 */
+        .topology-wrapper {
+            position: relative;
+            height: 50vh; /* 화면 높이의 80% */
+            margin-top: -20px; /* 헤더와 자연스럽게 연결 */
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* 네트워크 맵이 그려질 영역 */
+        #mynetwork {
+            width: 100%;
+            height: 100%;
+            /* 모눈종이 같은 격자 배경 효과 */
+            background-image:
+                linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* 우측 상단 정보 패널 */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 250px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            color: #fff;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            display: none; /* 클릭 시 등장 */
+        }
+
+        /* 모바일(화면 폭 768px 이하)일 때 패널 규격 변경 */
+        @media (max-width: 768px) {
+            .info-panel {
+                top: auto;          /* 위쪽 위치 해제 */
+                bottom: 20px;       /* 아래쪽에 붙임 */
+                left: 20px;         /* 왼쪽 여백 */
+                right: 20px;        /* 오른쪽 여백 */
+                width: auto;        /* 너비 자동 (꽉 차게) */
+                z-index: 1000;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- 1. 페이지 히어로 -->
+<section class="page-hero" style="background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), var(--primary-bg)), url('/images/solutions/solutions_Network_Topology.png');">
+    <div class="container position-relative z-1">
+        <h1 class="page-title">Network Topology</h1>
+        <p class="page-subtitle">
+            장비들이 서로 어떻게 연결되어 있는지 선으로 이어 보여주는<br>
+            실시간 네트워크 연결 상태 및 트래픽 흐름 시각화 지도입니다
+        </p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container py-4">
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="glass-box feature-box text-center">
+                    <i class="bi bi-diagram-3 feature-icon"></i>
+                    <h4 class="text-white fw-bold mb-3">Intuitive Visibility</h4>
+                    <p class="text-white-50">
+                        복잡하게 얽힌 네트워크 연결 구조를 한눈에 파악할 수 있도록 시각화합니다.
+                        장비 간의 물리적/논리적 연결 흐름을 직관적으로 이해하여 관리 효율을 높입니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="glass-box feature-box text-center">
+                    <i class="bi bi-activity feature-icon"></i>
+                    <h4 class="text-white fw-bold mb-3">Live Status Check</h4>
+                    <p class="text-white-50">
+                        모든 노드(장비)의 통신 상태를 실시간으로 모니터링합니다.
+                        Ping 체크를 통해 다운된 장비를 즉시 색상(Red)으로 표시하여 장애 대응 골든타임을 확보합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="glass-box feature-box text-center">
+                    <i class="bi bi-bezier2 feature-icon"></i>
+                    <h4 class="text-white fw-bold mb-3">Impact Analysis</h4>
+                    <p class="text-white-50">
+                        상위 스위치 장애 발생 시, 연결 끊김이 예상되는 하위 서버들을 즉각 식별합니다.
+                        연결 종속성(Dependency)을 분석하여 장애 확산 범위를 사전에 예측합니다.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="stat-card">
+            <div class="row align-items-center">
+                <!-- 1. 설명 텍스트는 상단에 밀착 -->
+                <div class="col-lg-6">
+                    <h3 class="section-header text-cyan mb-3">LOOK IN ONE SYSTEM</h3>
+                    <h5 class="text-white fw-bold mb-4">한 눈에 보는 서버!<br>전체 요약을 확인하세요.</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> 동그란 노드(장비)들을 드래그해서 움직일 수 있습니다.</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> 연결된 선(Cable)을 클릭하면 포트 정보를 보여줍니다.</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> 스위치가 다운되면 연결된 서버들이 전부 빨간색으로 변하는 연쇄 효과를 줄 수 있습니다.</li>
+                    </ul>
+                </div>
+
+               <!-- 2. 라이브 토폴로지 맵 -->
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <div class="glass-box p-4" style="border: 1px solid rgba(6,182,212,0.3); background: rgba(15, 23, 42, 0.6);">
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h6 class="text-white fw-bold mb-0"><i class="bi bi-grid-3x3-gap text-danger me-2"></i>Live Topology Map</h6>
+                            <span class="text-white-50 small">192.168.0.1</span>
+                        </div>
+
+                        <!-- 토폴로지 컨테이너 스타일 -->
+                        <div class="topology-wrapper">
+                            <div id="mynetwork"></div>
+
+                            <div id="node-info" class="info-panel">
+                                <h5 id="panel-title" class="fw-bold text-info mb-3">Device Info</h5>
+                                <p class="small text-white-50 mb-1">Status:</p>
+                                <p id="panel-status" class="fw-bold text-success mb-3">Online</p>
+                                <p class="small text-white-50 mb-1">IP Address:</p>
+                                <p id="panel-ip" class="mb-3">192.168.0.1</p>
+                                <button class="btn btn-sm btn-outline-info w-100"
+                                        data-dummy-download>상세 정보 보기</button>
+                            </div>
+                        </div>
+
+                        <!-- 범례 -->
+                        <div class="mt-3 d-flex justify-content-center gap-3 small text-white-50">
+                            <span class="d-flex align-items-center"><i class="bi bi-diamond-fill me-1" style="color: #f472b6;"></i> Internet</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-hexagon-fill me-2" style="color: #22d3ee;"></i> Switch</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-square-fill me-2" style="color: #f87171;"></i> Firewall</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-circle-fill me-2" style="color: #4ade80;"></i> Server</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-database-fill me-2" style="color: #fbbf24;"></i> Database</span>
+                            <span class="d-flex align-items-center"><i class="bi bi-hdd-fill me-2" style="color: #a78bfa;"></i> Storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 토스트 메시지 -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="notImplementedToast"
+         class="toast text-bg-dark border-0"
+         role="alert"
+         aria-live="assertive"
+         aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                🚧 현재 미구현 기능입니다.
+            </div>
+            <button type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"
+                    aria-label="Close">
+            </button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    // 1. 노드 데이터 (장비들)
+    // id: 고유번호, label: 이름, group: 장비종류(아이콘 결정)
+    var nodes = new vis.DataSet([
+        { id: 1, label: 'Internet', group: 'internet', value: 30 },
+        { id: 2, label: 'Core Switch\n(L3)', group: 'switch', value: 25 },
+        { id: 3, label: 'Firewall', group: 'firewall', value: 20 },
+        { id: 4, label: 'Edge SW 01', group: 'switch', value: 15 },
+        { id: 5, label: 'Edge SW 02', group: 'switch', value: 15 },
+        { id: 6, label: 'Web Server 1', group: 'server', status: 'normal' },
+        { id: 7, label: 'Web Server 2', group: 'server', status: 'normal' },
+        { id: 8, label: 'DB Server', group: 'database', status: 'warning' }, // 주의 상태
+        { id: 9, label: 'Storage NAS', group: 'storage', status: 'normal' }
+    ]);
+
+    // 2. 엣지 데이터 (연결 선)
+    var edges = new vis.DataSet([
+        { from: 1, to: 3, length: 150 }, // 인터넷 -> 방화벽
+        { from: 3, to: 2, length: 150 }, // 방화벽 -> 코어 스위치
+        { from: 2, to: 4, length: 200 }, // 코어 -> 엣지1
+        { from: 2, to: 5, length: 200 }, // 코어 -> 엣지2
+        { from: 4, to: 6 }, // 엣지1 -> 웹서버1
+        { from: 4, to: 7 }, // 엣지1 -> 웹서버2
+        { from: 5, to: 8, color: { color: '#fbbf24' } }, // 엣지2 -> DB (주의 색상)
+        { from: 5, to: 9 }  // 엣지2 -> 스토리지
+    ]);
+
+    // 3. 아이콘 및 스타일 설정
+    var container = document.getElementById('mynetwork');
+    var data = { nodes: nodes, edges: edges };
+    var options = {
+        nodes: {
+            shape: 'dot',
+        size: 30,  // 기존 20 -> 30 (클릭하기 편하게 확대)
+        font: {
+            color: '#ffffff',
+            size: 16, // 글씨 크기 추가 (기본값보다 크게)
+            face: 'Noto Sans KR'
+        },
+            borderWidth: 2,
+            shadow: true
+        },
+        edges: {
+            width: 2,
+            color: { color: '#06b6d4', highlight: '#a855f7' }, // 기본 시안, 선택 시 퍼플
+            smooth: { type: 'continuous' } // 부드러운 곡선
+        },
+        groups: {
+            internet: { color: { background: '#f472b6', border: '#db2777' }, shape: 'diamond' },
+            switch:   { color: { background: '#22d3ee', border: '#0891b2' }, shape: 'hexagon' },
+            firewall: { color: { background: '#f87171', border: '#dc2626' }, shape: 'box' },
+            server:   { color: { background: '#4ade80', border: '#16a34a' } },
+            database: { color: { background: '#fbbf24', border: '#d97706' } },
+            storage:  { color: { background: '#a78bfa', border: '#7c3aed' }, shape: 'square' }
+        },
+        physics: {
+            stabilization: false,
+            barnesHut: { gravitationalConstant: -3000, springConstant: 0.04 } // 물리 효과
+        },
+        interaction: { hover: true, tooltipDelay: 200 }
+    };
+
+    // 4. 네트워크 맵 생성
+    var network = new vis.Network(container, data, options);
+
+    // 5. 클릭 이벤트 (정보 패널 표시)
+    network.on("click", function (params) {
+        var panel = document.getElementById('node-info');
+        if (params.nodes.length > 0) {
+            var nodeId = params.nodes[0];
+            var node = nodes.get(nodeId);
+
+            // 정보 패널 내용 업데이트
+            document.getElementById('panel-title').innerText = node.label.replace('\n', ' ');
+            document.getElementById('panel-status').innerText = node.status === 'warning' ? 'Warning' : 'Normal';
+            document.getElementById('panel-status').className = node.status === 'warning' ? 'fw-bold text-warning mb-3' : 'fw-bold text-success mb-3';
+
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const toastEl = document.getElementById("notImplementedToast");
+    const toast = new bootstrap.Toast(toastEl, {
+        delay: 2500
+    });
+
+        document.querySelectorAll("[data-dummy-download]").forEach(button => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                toast.show();
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

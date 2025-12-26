@@ -117,16 +117,56 @@
             </div>
         </div>
     </div>
-</footer>
+
+<!-- Back to Top 버튼 -->
+<button type="button" class="btn" id="btn-back-to-top">
+    <i class="bi bi-arrow-up"></i>
+</button>
 
 <!-- 툴팁 활성화를 위한 스크립트 추가 -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // 툴팁 활성화 (기존 코드 유지)
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
     });
+
+    // 버튼 요소 가져오기
+    let mybutton = document.getElementById("btn-back-to-top");
+
+    // 스크롤 시 함수 작동
+    window.onscroll = function () {
+        scrollFunction();
+    };
+
+    function scrollFunction() {
+        // 스크롤이 200px 이상 내려갔을 때
+        if (
+            document.body.scrollTop > 200 ||
+            document.documentElement.scrollTop > 200
+        ) {
+            // [수정] 클래스를 추가하여 부드럽게 등장 (CSS의 .show 스타일 적용)
+            mybutton.classList.add("show");
+        } else {
+            // [수정] 클래스를 제거하여 부드럽게 퇴장
+            mybutton.classList.remove("show");
+        }
+    }
+
+    // 버튼 클릭 시 맨 위로 이동
+    if(mybutton) {
+        mybutton.addEventListener("click", backToTop);
+    }
+
+    function backToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
 </script>
+</footer>
 </body>
 </html>

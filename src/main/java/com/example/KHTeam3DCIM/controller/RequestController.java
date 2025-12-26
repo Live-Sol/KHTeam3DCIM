@@ -21,6 +21,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.List;
@@ -253,6 +255,20 @@ public class RequestController {
             return "redirect:/requests";
         }
     }
-    //
+
+    /**
+     * [API] 현재 승인 대기 중인 요청이 있는지 확인
+     * 리턴값: true(대기 있음), false(대기 없음)
+     */
+    @GetMapping("/api/requests/check-pending")
+    @ResponseBody
+    public boolean checkPendingRequests() {
+        // 서비스 계층을 통해 DB에서 'PENDING' 상태인 요청의 개수를 확인합니다.
+        // 예시: return requestService.countByStatus("PENDING") > 0;
+
+        // [임시 코드] 서비스 로직이 연결되기 전 테스트를 위해 true로 설정해보세요.
+        // 구현 후에는 실제 DB 조회 로직으로 변경해야 합니다.
+        return true;
+    }
 
 }

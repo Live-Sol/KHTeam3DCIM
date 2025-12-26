@@ -36,4 +36,10 @@ public class SolutionController {
         model.addAttribute("pageTitle", "Eco-Friendly Cooling System");
         return "solutions/cooling_system";
     }
+
+    @GetMapping("/topology")
+    public String networkTopology(Model model) {
+        model.addAttribute("pageTitle", "Dynamic Network Topology");
+        return "solutions/network_topology";
+    }
 }

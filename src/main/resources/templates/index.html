@@ -33,7 +33,8 @@
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Total Racks</h6>
                 <h2 class="summary-value text-info">
-                    <i class="bi bi-hdd-rack me-2"></i>[[${totalRacks}]]
+                    <i class="bi bi-hdd-rack me-2"></i>
+                    [[${totalRacks}]]
                     <span class="trend-badge trend-neutral fs-6 ms-1" title="변동 없음">(<i class="bi bi-dash"></i>)</span>
                 </h2>
             </div>
@@ -41,8 +42,9 @@
             <!-- (2) Total Devices -->
             <div class="col-md-3 summary-item">
                 <h6 class="summary-label">Total Devices</h6>
-                <h2 class="summary-value text-success">
-                    <i class="bi bi-server me-2"></i>[[${stats.totalDevices}]]
+                <h2 class="summary-value text-danger">
+                    <i class="bi bi-router me-2 text-danger"></i>
+                    [[${stats.totalDevices}]]
                     <span class="trend-badge trend-up fs-6 ms-1" title="전월 대비 증가">
                         (<i class="bi bi-arrow-up-short"></i> 1)
                     </span>

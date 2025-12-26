@@ -452,3 +452,110 @@ a { text-decoration: none; }
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+
+/* =========================================
+   [Top Button] Scroll back to top
+   ========================================= */
+#btn-back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+
+    /* [수정] 부드러운 등장을 위한 초기 설정 */
+    display: flex;          /* flex를 유지하여 아이콘 중앙 정렬 */
+    opacity: 0;             /* 투명하게 */
+    visibility: hidden;     /* 클릭 방지 */
+    transform: translateY(20px); /* 살짝 아래에 가 있음 (올라오면서 등장 효과) */
+
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+    /* 테마 스타일 */
+    background: rgba(15, 23, 42, 0.6);
+    border: 2px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+
+    /* [중요] 모든 속성에 대해 0.4초 동안 부드럽게 변함 */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 0;
+}
+
+/* [추가] 이 클래스가 붙으면 버튼이 나타남 */
+#btn-back-to-top.show {
+    opacity: 1;             /* 불투명하게 (보임) */
+    visibility: visible;    /* 클릭 가능 */
+    transform: translateY(0); /* 원래 위치로 올라옴 */
+}
+
+/* 호버 효과 */
+#btn-back-to-top:hover {
+    background: var(--accent-cyan);
+    color: #0f172a;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 40px rgba(6, 182, 212, 0.4);
+    transform: translateY(-5px); /* 호버 시 살짝 더 위로 */
+}
+
+
+/* =========================================
+   [Active Menu] Header 활성화된 메뉴 표시
+   ========================================= */
+
+/* 1. 일반 메뉴 및 드롭다운 상위 메뉴 활성화 상태 */
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.active:hover {
+    color: var(--accent-cyan) !important; /* 글자색 시안으로 변경 */
+    font-weight: 700; /* 글자 두껍게 */
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); /* 은은한 네온 빛 */
+    position: relative;
+}
+
+/* 2. 드롭다운 내부 아이템 활성화 상태 */
+.dropdown-item.active {
+    background-color: rgba(6, 182, 212, 0.15) !important; /* 배경을 연한 시안색으로 */
+    color: var(--accent-cyan) !important; /* 글자색 시안 */
+    font-weight: 600;
+    border-left: 3px solid var(--accent-cyan); /* 왼쪽에 강조 선 추가 */
+}
+
+/* 드롭다운 아이템 호버 시 (기존 스타일과 조화) */
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+
+/* =========================================
+   [Header Notification] 관리자 알림 도트
+   ========================================= */
+.admin-notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: #ef4444; /* 강렬한 빨간색 */
+    border-radius: 50%;
+    border: 1px solid #0f172a; /* 배경색과 동일한 테두리로 분리감 줌 */
+    box-shadow: 0 0 8px #ef4444; /* 붉은색 네온 글로우 */
+    z-index: 10;
+    display: none; /* 기본적으로는 숨김 */
+    animation: pulse-red 2s infinite;
+}
+
+/* 붉은색 깜빡임 애니메이션 */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
