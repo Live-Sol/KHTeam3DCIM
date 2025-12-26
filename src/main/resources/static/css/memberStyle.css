@@ -157,6 +157,31 @@
     box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
 }
 
+/* 메인으로/뒤로가기 아웃라인 버튼 (추가됨) */
+.btn-outline-custom {
+    color: var(--accent-cyan);       /* 텍스트: 네온 시안 (#06b6d4) */
+    border: 1px solid var(--accent-cyan); /* 테두리: 네온 시안 */
+    background: transparent;         /* 배경 투명 */
+    font-family: 'Orbitron', sans-serif; /* 테마 폰트 적용 */
+    font-weight: 600;
+    padding: 12px 24px;              /* btn-login과 높이/크기 균형 맞춤 */
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: inline-flex;            /* 아이콘과 텍스트 수직 정렬 */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;           /* 링크 밑줄 제거 */
+    cursor: pointer;
+}
+
+.btn-outline-custom:hover {
+    background: var(--accent-cyan);  /* 호버 시 배경 채움 */
+    color: #0f172a;                  /* 텍스트: 어두운 배경색 (가독성 확보) */
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); /* 강렬한 네온 글로우 효과 */
+    transform: translateY(-2px);     /* 살짝 위로 떠오르는 효과 */
+    border-color: var(--accent-cyan);
+}
+
 /* 6. 유효성 검사 메시지 */
 .validation-msg {
     font-size: 0.8rem;
@@ -200,4 +225,155 @@
     opacity: 0.15;
     z-index: 0;
     pointer-events: none;
+}
+
+/* =========================================
+   [내 정보] 비밀번호 재확인 모달 스타일
+   ========================================= */
+.modal-custom .modal-content {
+    background-color: rgba(15, 23, 42, 0.95); /* 짙은 남색 배경 */
+    backdrop-filter: blur(16px);              /* 유리 효과 */
+    border: 1px solid rgba(6, 182, 212, 0.3); /* 테두리: 은은한 Cyan */
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); /* 깊은 그림자 */
+    color: #fff; /* 기본 텍스트 흰색 */
+}
+
+/* 모달 헤더 (하단 선) */
+.modal-custom .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 모달 제목 아이콘 색상 */
+.modal-custom .modal-title i {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* 모달 푸터 (상단 선) */
+.modal-custom .modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 닫기 버튼 (흰색 X 아이콘 호버 효과) */
+.modal-custom .btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+    transition: transform 0.2s;
+}
+.modal-custom .btn-close-white:hover {
+    transform: rotate(90deg); /* 호버 시 회전 효과 */
+    opacity: 1;
+}
+
+
+/* =========================================
+    내 정보 수정 페이지 전용 CSS
+   ========================================= */
+
+/* 1. 읽기 전용 정보 표시 스타일 */
+.info-display {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem !important;
+}
+
+.form-label-custom {
+    display: block;
+    color: var(--accent-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+}
+
+.info-value-readonly {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* 2. 구분선 스타일 */
+.divider-line {
+    border-top: 2px solid rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+    opacity: 0.7;
+}
+
+/* 3. 성공 알림창 스타일 (memberStyle.css의 alert-custom과 짝을 이룸) */
+.alert-success-custom {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+/* 이미지 프리뷰 스타일 */
+.profile-upload-container {
+    position: relative;
+    width: 140px; /* 크기 약간 키움 */
+    height: 140px;
+    margin: 0 auto 2.5rem;
+}
+.profile-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    background: #1e293b;
+    transition: transform 0.3s ease;
+}
+.profile-preview:hover {
+    transform: scale(1.02);
+}
+.upload-icon-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: var(--accent-purple);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 3px solid #0f172a; /* 배경색과 동일하게 하여 분리감 줌 */
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.upload-icon-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    background: #fff;
+    color: var(--accent-purple);
+}
+/* 읽기 전용 정보 박스 스타일 */
+.info-readonly-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 15px;
+    color: #94a3b8;
+    font-size: 0.95rem;
+}
+.delete-account-link {
+    font-size: 0.85rem;
+    color: #ef4444; /* Red color */
+    text-decoration: underline;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+.delete-account-link:hover {
+    color: #f87171;
+    opacity: 1;
 }

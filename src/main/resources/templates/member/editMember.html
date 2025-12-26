@@ -8,12 +8,11 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
 
-<!-- CSS 파일들 -->
 <link href="/css/index.css" rel="stylesheet">
 <link href="/css/memberStyle.css" rel="stylesheet">
-<link href="/css/memberEdit.css" rel="stylesheet">
 </head>
 <body class="login-body">
+<div th:replace="fragments/header :: header"></div>
 <div class="login-wrapper">
     <div class="container">
         <div class="row justify-content-center align-items-center h-100">
@@ -164,6 +163,9 @@
         </div>
     </div>
 </div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

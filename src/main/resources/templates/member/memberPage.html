@@ -5,129 +5,151 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>회원 상세 정보</title>
-    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap"
-          rel="stylesheet">
-    <!-- 커스텀 CSS -->
-    <link rel="stylesheet" th:href="@{/css/memberPage.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
 <body class="dashboard-body">
-<div class="d-flex">
-    <main class="main-content flex-grow-1">
-        <h2 class="page-title mb-4">
-            <i class="bi bi-person-vcard-fill me-2"></i> 회원 상세 정보
-        </h2>
+<div th:replace="fragments/header :: header"></div>
 
-        <!-- 회원이 존재하지 않을 경우 -->
-        <div th:if="${memberNotFound}" class="glass-box text-center py-5">
-            <i class="bi bi-x-circle-fill fs-1 mb-3 text-danger"></i>
-            <h4 class="text-white">회원이 존재하지 않습니다.</h4>
-            <a th:href="${returnUrl}" class="btn btn-outline-light mt-3">목록으로</a>
+<div class="content-wrapper d-flex justify-content-center align-items-center">
+    <div class="container">
+
+        <div class="text-center mb-4 mt-5">
+            <h2 class="page-title">
+                <i class="bi bi-person-vcard-fill me-2"></i>  내 정보
+            </h2>
         </div>
 
-        <!-- 회원 정보 -->
-        <div th:if="${member != null}">
-            <!-- 탈퇴한 회원 안내 -->
-            <div th:if="${member.isDeleted}" class="glass-box text-center py-5">
-                <i class="bi bi-exclamation-triangle-fill fs-1 mb-3 text-warning"></i>
-                <h4 class="text-white">탈퇴한 회원입니다.</h4>
-                <p class="text-muted">해당 회원의 상세 정보는 확인할 수 없습니다.</p>
-                <a th:href="@{/admin/members}" class="btn btn-outline-light mt-3">목록으로</a>
-            </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
 
-            <!-- 정상 회원 상세 정보 -->
-            <div th:unless="${member.isDeleted}" class="glass-box member-info">
-                <div class="row align-items-center"> <div class="col-md-8 border-end border-secondary border-opacity-25">
-                    <div class="mb-3">
-                        <strong class="text-cyan">ID:</strong>
-                        <span class="text-white">[[${member.memberId}]]</span>
+                <div th:if="${memberNotFound}" class="card login-card text-center p-5">
+                    <div class="card-body">
+                        <i class="bi bi-x-circle-fill fs-1 mb-3 text-danger"></i>
+                        <h4 class="text-white">회원이 존재하지 않습니다.</h4>
+                        <a th:href="${returnUrl}" class="btn btn-outline-custom mt-3">
+                            <i class="bi bi-arrow-left me-1"></i> 메인 화면으로 돌아가기
+                        </a>
                     </div>
-                    <div class="mb-3">
-                        <strong class="text-cyan">이름:</strong>
-                        <span class="text-white">[[${member.name}]]</span>
-                    </div>
-                    <div class="mb-3">
-                        <strong class="text-cyan">이메일:</strong>
-                        <span class="text-white">[[${member.email}]]</span>
-                    </div>
-                    <div class="mb-3">
-                        <strong class="text-cyan">연락처:</strong>
-                        <span class="text-white">[[${member.contact}]]</span>
-                    </div>
-
-                    <hr class="my-3 opacity-25">
-
-                    <div class="mb-3">
-                        <strong class="text-cyan">회사명:</strong>
-                        <span class="text-white">[[${member.companyName}]]</span>
-                    </div>
-                    <div>
-                        <strong class="text-cyan">회사 전화번호:</strong>
-                        <span class="text-white">[[${member.companyPhone}]]</span>
-                    </div>
+                    <div class="card-footer-glow"></div>
                 </div>
 
-                    <div class="col-md-4 text-center">
-                        <div class="profile-display-container">
-                            <img th:src="${member.profileImage != null ? '/uploads/' + member.profileImage : '/images/default-profile.png'}"
-                                 class="img-fluid rounded-circle profile-preview-static"
-                                 alt="Profile"
-                                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                <div th:if="${member != null and member.isDeleted}" class="card login-card text-center p-5">
+                    <div class="card-body">
+                        <i class="bi bi-exclamation-triangle-fill fs-1 mb-3 text-warning"></i>
+                        <h4 class="text-white">탈퇴한 회원입니다.</h4>
+                        <p class="text-white-50">해당 회원의 상세 정보는 확인할 수 없습니다.</p>
+                        <a th:href="@{/admin/members}" class="btn btn-outline-custom mt-3">
+                            <i class="bi bi-arrow-left me-1"></i> 뒤로가기
+                        </a>
+                    </div>
+                    <div class="card-footer-glow"></div>
+                </div>
+
+                <div th:if="${member != null and !member.isDeleted}" class="card login-card">
+                    <div class="card-body p-5 mt-2 p-md-3">
+
+                        <div class="row align-items-center">
+                            <div class="col-md-8 member-info-col border-secondary border-opacity-25" style="border-right: 1px solid rgba(255,255,255,0.15);">
+                                <h5 class="text-white-50 mb-3 border-bottom border-secondary border-opacity-25 pb-2">
+                                    <i class="bi bi-person-circle me-2"></i>기본 정보
+                                </h5>
+                                <div class="mb-3">
+                                    <strong class="text-cyan d-inline-block" style="width: 60px;">ID</strong>
+                                    <span class="text-white">[[${member.memberId}]]</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong class="text-cyan d-inline-block" style="width: 60px;">Name</strong>
+                                    <span class="text-white">[[${member.name}]]</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong class="text-cyan d-inline-block" style="width: 60px;">Email</strong>
+                                    <span class="text-white">[[${member.email}]]</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong class="text-cyan d-inline-block" style="width: 60px;">Tel</strong>
+                                    <span class="text-white">[[${member.contact}]]</span>
+                                </div>
+
+                                <h5 class="text-white-50 mb-3 mt-4 border-bottom border-secondary border-opacity-25 pb-2">
+                                    <i class="bi bi-building me-2"></i>회사 정보
+                                </h5>
+                                <div class="mb-3">
+                                    <strong class="text-cyan me-2">Company:</strong>
+                                    <span class="text-white">[[${member.companyName}]]</span>
+                                </div>
+                                <div>
+                                    <strong class="text-cyan me-2">Office:</strong>
+                                    <span class="text-white">[[${member.companyPhone}]]</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 text-center">
+                                <div class="profile-display-container">
+                                    <img th:src="${member.profileImage != null ? '/uploads/' + member.profileImage : '/images/default-profile.png'}"
+                                         class="img-fluid profile-preview-static"
+                                         alt="Profile"
+                                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                                </div>
+                                <div class="mt-3">
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-2">
+                                        [[${member.role}]]
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-5">
+                            <a th:href="${returnUrl}" class="btn btn-outline-custom">
+                                메인으로 <i class="bi bi-arrow-return-left ms-1"></i>
+                            </a>
+                            <button type="button" class="btn btn-login px-4" onclick="openPasswordModal()">
+                                <i class="bi bi-pencil-square me-1"></i> 정보수정
+                            </button>
+                        </div>
+
                     </div>
+                    <div class="card-footer-glow"></div>
                 </div>
 
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-outline-light" onclick="openPasswordModal()">
-                        회원정보수정
-                    </button>
-                    <a th:href="${returnUrl}" class="btn btn-outline-light">목록으로</a>
-                </div>
             </div>
         </div>
-    </main>
+    </div>
 </div>
 
-<div class="modal fade" id="passwordModal" tabindex="-1">
+<div class="modal fade modal-custom" id="passwordModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">비밀번호 확인</h5>
+                <h5 class="modal-title"><i class="bi bi-shield-lock me-2"></i>비밀번호 확인</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body p-4">
+                <p class="text-white-50 small mb-3">개인정보 보호를 위해 비밀번호를 다시 한 번 입력해주세요.</p>
                 <input type="password" id="passwordInput"
-                       class="form-control"
-                       placeholder="비밀번호를 입력하세요">
-                <div id="passwordError" class="text-danger mt-2 d-none">
-                    비밀번호가 일치하지 않습니다.
+                       class="form-control form-control-custom"
+                       placeholder="Enter Password">
+                <div id="passwordError" class="validation-msg text-error mt-2 d-none">
+                    <i class="bi bi-exclamation-triangle-fill"></i> 비밀번호가 일치하지 않습니다.
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button class="btn btn-primary" onclick="checkPassword()">확인</button>
+            <div class="modal-footer border-top-0">
+                <button class="btn btn-outline-custom" data-bs-dismiss="modal">취소</button>
+                <button class="btn btn-login" onclick="checkPassword()">확인</button>
             </div>
         </div>
     </div>
 </div>
-<!-- 페이지 어디든 넣어도 됨, 보통 body 끝 부분 -->
-<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050;">
-    <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body">
-                인증 성공! 페이지로 이동합니다.
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<div th:replace="fragments/footer :: footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
@@ -164,7 +186,7 @@
         const password = passwordInput.value;
 
         // 버튼 요소 선택
-        const modalConfirmBtn = document.querySelector('#passwordModal .btn-primary');
+        const modalConfirmBtn = document.querySelector('#passwordModal .btn-login'); // 클래스명 변경됨
         const mainEditBtn = document.querySelector('button[onclick="openPasswordModal()"]');
 
         // CSRF 토큰 설정
@@ -173,7 +195,7 @@
         const headers = { 'Content-Type': 'application/json' };
         if (token && header) headers[header] = token;
 
-        // [중복 클릭 방지 1] 모달 내 확인 버튼 비활성화
+        // [중복 클릭 방지]
         modalConfirmBtn.disabled = true;
         modalConfirmBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> 확인 중...`;
 
@@ -186,53 +208,53 @@
             .then(data => {
                 if (data.valid) {
                     // [성공 시 처리]
-                    // 1. 모달 닫기
                     const modalEl = document.getElementById('passwordModal');
                     const modalInstance = bootstrap.Modal.getInstance(modalEl);
                     if (modalInstance) modalInstance.hide();
 
-                    // 2. 메인 페이지의 '회원정보수정' 버튼 비활성화 (다중 클릭 방지)
                     if (mainEditBtn) {
                         mainEditBtn.disabled = true;
                         mainEditBtn.innerHTML = `처리 중... <span class="spinner-border spinner-border-sm"></span>`;
                     }
 
-                    // 3. SweetAlert2 성공 알림
+                    // SweetAlert2 테마 커스텀 (Dark)
                     Swal.fire({
                         icon: 'success',
                         title: '인증 성공',
                         text: '잠시 후 수정 페이지로 이동합니다.',
                         timer: 1500,
                         showConfirmButton: false,
-                        background: '#1a1a1a',
+                        background: '#1e293b',
                         color: '#ffffff',
+                        iconColor: '#06b6d4',
                         willClose: () => {
                             window.location.href = '/members/edit';
                         }
                     });
                 } else {
-                    // [실패 시 처리] 버튼 원상복구
+                    // [실패 시 처리]
                     document.getElementById('passwordError').classList.remove('d-none');
                     passwordInput.value = '';
                     passwordInput.focus();
 
                     modalConfirmBtn.disabled = false;
-                    modalConfirmBtn.innerHTML = `확인`;
+                    modalConfirmBtn.innerText = '확인';
                 }
             })
             .catch(err => {
                 console.error("오류 발생:", err);
                 modalConfirmBtn.disabled = false;
-                modalConfirmBtn.innerHTML = `확인`;
+                modalConfirmBtn.innerText = '확인';
 
                 Swal.fire({
                     icon: 'error',
                     title: '통신 오류',
                     text: '서버와 연결할 수 없습니다.',
-                    background: '#1a1a1a',
+                    background: '#1e293b',
                     color: '#ffffff'
                 });
             });
     }
-</script></body>
+</script>
+</body>
 </html>
