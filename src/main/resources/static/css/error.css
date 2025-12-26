@@ -1,0 +1,216 @@
+/* =========================================
+   [StarRoot Error System v2.0]
+   Theme: Advanced Glitch & Retro CRT
+   ========================================= */
+
+:root {
+    --bg-color: #050a10;
+    --cyan: #00f0ff;    /* Cyberpunk Cyan */
+    --red: #ff003c;     /* Cyberpunk Red */
+    --yellow: #fcee0a;  /* Cyberpunk Yellow */
+    --white: #f1f5f9;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--white);
+    font-family: 'Orbitron', sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+}
+
+/* 1. CRT Vignette (모서리 어둡게 처리) */
+body::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 2. Background Grid (배경 모눈종이 효과) */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 3. Scanline Animation (위에서 아래로 훑는 선) */
+.scanline {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 240, 255, 0.1) 51%, transparent 52%);
+    background-size: 100% 4px;
+    animation: scanline-move 6s linear infinite;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+@keyframes scanline-move {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.content-box {
+    text-align: center;
+    z-index: 10;
+    position: relative;
+    padding: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(5, 10, 16, 0.85);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    max-width: 650px;
+    width: 90%;
+    /* 박스 자체에 미세한 떨림 추가 */
+    animation: box-shake 5s infinite;
+}
+
+/* 4. Advanced Glitch Text (핵심!) */
+.glitch-text {
+    font-size: 8rem;
+    font-weight: 900;
+    position: relative;
+    color: var(--white);
+    letter-spacing: 5px;
+    margin-bottom: 0;
+}
+
+/* 가상 요소를 이용해 텍스트를 3개로 복사(원본, Red, Cyan)하여 겹침 */
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text); /* HTML의 data-text 속성 값을 가져옴 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color); /* 배경색으로 덮어서 잘린 느낌 냄 */
+}
+
+/* Cyan Layer */
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--red);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    animation: glitch-anim-1 3s infinite linear alternate-reverse;
+}
+
+/* Red Layer */
+.glitch-text::after {
+    left: -2px;
+    text-shadow: -2px 0 var(--cyan);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+}
+
+/* 모드별 색상 조정 */
+.mode-404 .glitch-text { text-shadow: 4px 4px 0px rgba(0, 240, 255, 0.2); }
+.mode-500 .glitch-text { text-shadow: 4px 4px 0px rgba(255, 0, 60, 0.2); }
+
+.mode-404 .error-title { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+.mode-500 .error-title { color: var(--red); text-shadow: 0 0 10px var(--red); }
+
+.error-title {
+    font-size: 1.8rem;
+    margin-top: -10px;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 700;
+}
+
+.error-desc {
+    font-family: 'Noto Sans KR', monospace;
+    color: #94a3b8;
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    border-left: 2px solid rgba(255,255,255,0.2);
+    padding-left: 15px;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+}
+
+/* 버튼 스타일 (네온 보더) */
+.btn-home {
+    display: inline-block;
+    padding: 15px 40px;
+    font-family: 'Orbitron', sans-serif;
+    text-decoration: none;
+    font-weight: 700;
+    transition: 0.3s;
+    border: 2px solid;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.mode-404 .btn-home {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    background: transparent;
+}
+.mode-404 .btn-home:hover {
+    background: var(--cyan);
+    color: #000;
+    box-shadow: 0 0 30px var(--cyan);
+}
+
+.mode-500 .btn-home {
+    color: var(--red);
+    border-color: var(--red);
+    background: transparent;
+}
+.mode-500 .btn-home:hover {
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 0 30px var(--red);
+}
+
+/* 애니메이션 키프레임 (복잡한 글리치 효과) */
+@keyframes glitch-anim-1 {
+    0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(0); }
+    10% { clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%); transform: translate(-2px, 2px); }
+    20% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(2px, -2px); }
+    30% { clip-path: polygon(0 1%, 100% 1%, 100% 2%, 0 2%); transform: translate(0); }
+    40% { clip-path: polygon(0 33%, 100% 33%, 100% 33%, 0 33%); transform: translate(-1px, 1px); }
+    50% { clip-path: polygon(0 44%, 100% 44%, 100% 44%, 0 44%); transform: translate(0); }
+    60% { clip-path: polygon(0 50%, 100% 50%, 100% 20%, 0 20%); transform: translate(1px, -1px); }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: polygon(0 25%, 100% 25%, 100% 30%, 0 30%); transform: translate(0); }
+    15% { clip-path: polygon(0 3%, 100% 3%, 100% 3%, 0 3%); transform: translate(2px, -2px); }
+    30% { clip-path: polygon(0 5%, 100% 5%, 100% 20%, 0 20%); transform: translate(-2px, 2px); }
+    45% { clip-path: polygon(0 20%, 100% 20%, 100% 20%, 0 20%); transform: translate(0); }
+    60% { clip-path: polygon(0 40%, 100% 40%, 100% 40%, 0 40%); transform: translate(2px, 2px); }
+    100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0); }
+}
+
+@keyframes box-shake {
+    0% { transform: translate(0, 0); }
+    95% { transform: translate(0, 0); }
+    96% { transform: translate(-2px, 1px); }
+    97% { transform: translate(1px, -1px); }
+    98% { transform: translate(-1px, 2px); }
+    99% { transform: translate(2px, 1px); }
+    100% { transform: translate(0, 0); }
+}
