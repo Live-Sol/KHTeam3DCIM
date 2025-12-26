@@ -19,17 +19,14 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     // 1. 상태별로 조회 (관리자용)
     List<Request> findByStatusOrderByReqDateDesc(String status);
-    // 2. 상태별 '개수' 세기 (대시보드용)
+
+    // 2. 상태별 '개수' 세기 (관리자 알림 및 대시보드용)
     long countByStatus(String status);
 
     // 3. 특정 사용자(memberId)가 신청한 내역을 최신순으로 조회 (이용자 이력용)
-    // 💡 주의: Request 엔티티에 private String memberId; 필드가 있어야 합니다.
     List<Request> findByMemberIdOrderByReqDateDesc(String memberId);
 
     //  4. 검색 및 필터 쿼리 (JPQL)
-    // 1. status는 무조건 'WAITING' (대기 목록이니까)
-    // 2. keyword가 비어있으면 무시, 있으면 회사명 or 담당자명에서 검색 (LIKE 검색)
-    // 3. emsStatus가 비어있으면 무시, 있으면 해당 상태만 필터링
     @Query("SELECT r FROM Request r " +
             "WHERE r.status = 'WAITING' " +
             "AND (:keyword IS NULL OR r.companyName LIKE %:keyword% OR r.userName LIKE %:keyword%) " +
@@ -58,7 +55,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     Page<Request> findHiddenRequestsByMemberIdPaged(@Param("memberId") String memberId, Pageable pageable);
 
     // 검색어 (내 신청 내역 중 숨겨지지 않은 것)
-    // ⭐ 시리얼 번호(serialNum)로도 검색이 가능하도록 조건 추가
     @Query("SELECT r FROM Request r WHERE r.memberId = :memberId AND r.isHidden = false " +
             "AND (:keyword IS NULL OR r.vendor LIKE %:keyword% OR r.modelName LIKE %:keyword% OR r.serialNum LIKE %:keyword%)")
     Page<Request> findMyActiveRequestsWithSearch(
@@ -75,4 +71,3 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             Pageable pageable
     );
 }
-

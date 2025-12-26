@@ -46,7 +46,7 @@ public class RequestService {
         return requestRepository.searchWaitingRequests(keyword, emsStatus);
     }
 
-    // 3. [추가] 내 신청 이력 조회 (사용자용)
+    // 3. 내 신청 이력 조회 (사용자용)
     @Transactional(readOnly = true)
     public List<Request> findMyRequests(String memberId) {
         return requestRepository.findByMemberIdOrderByReqDateDesc(memberId);
@@ -81,7 +81,7 @@ public class RequestService {
     }
 
     // [7] 입고 승인 및 장비 등록 로직
-    @Transactional // 데이터 일관성을 위해 추가 권장
+    @Transactional
     public void approveRequest(Long reqId, Long rackId, Integer startUnit) {
         // 1. 신청서 정보 가져오기
         Request request = findById(reqId);
@@ -120,19 +120,18 @@ public class RequestService {
             );
         }
 
-        // ⭐ [추가] 시리얼 번호 생성 (기존 임시값 대신 사용)
-        // 예: StarRoot_오늘날짜_신청ID (예: SR_231224_105)
+        // 시리얼 번호 생성
         String generatedSerial = "SR-" +
                 java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd")) + reqId;
 
-        // 4. 장비 객체 생성 (신청서 데이터를 장비로 이식)
+        // 4. 장비 객체 생성
         Device device = Device.builder()
                 .member(requester)
                 .rack(rack)
                 .category(category)
                 .vendor(request.getVendor())
                 .modelName(request.getModelName())
-                .serialNum(generatedSerial) // ⭐ [수정] 생성한 시리얼 번호 주입
+                .serialNum(generatedSerial)
                 .startUnit(startUnit)
                 .heightUnit(request.getHeightUnit())
                 .powerWatt(request.getPowerWatt())
@@ -152,7 +151,7 @@ public class RequestService {
 
         // 6. 신청서 상태 완료 처리 및 시리얼 번호 기록
         request.setStatus("APPROVED");
-        request.setSerialNum(generatedSerial); // ⭐ [추가] Request 엔티티에도 시리얼 번호 저장
+        request.setSerialNum(generatedSerial);
     }
 
     // 8. 요청 삭제 또는 숨김 처리 (사용자용)
@@ -160,19 +159,18 @@ public class RequestService {
         Request request = findById(id);
 
         if ("APPROVED".equals(request.getStatus())) {
-            // 승인된 건은 숨김 처리 (Entity에 @Data가 있으므로 바로 사용 가능)
             request.setHidden(true);
-            // @Transactional이 있으므로 별도의 save 호출 없이도 반영됨
         } else {
-            // 대기 중/반려 건은 실제 삭제 (기존에 구현된 deleteRequest 활용)
             deleteRequest(id);
         }
     }
+
     // 내 신청 이력 중 숨겨지지 않은 것만 조회
     @Transactional(readOnly = true)
     public List<Request> findActiveRequests(String memberId) {
         return requestRepository.findActiveRequestsByMemberId(memberId);
     }
+
     // 숨김 내역 조회
     @Transactional(readOnly = true)
     public List<Request> findHiddenRequests(String memberId) {
@@ -187,13 +185,8 @@ public class RequestService {
     // [수정] 페이징 + 검색 + 정렬 기능이 통합된 메서드
     @Transactional(readOnly = true)
     public Page<Request> findMyRequestsPaged(String memberId, String keyword, String sort, String sortDir, Pageable pageable) {
-
-        // 1. 정렬(Sort) 객체 동적 생성
-        // 컨트롤러에서 sort 파라미터가 넘어왔을 경우 (예: vendor, startDate 등)
         if (sort != null && !sort.isEmpty()) {
             Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-            // 기존 pageable 정보에 사용자가 선택한 정렬 조건을 덮어씌움
             pageable = PageRequest.of(
                     pageable.getPageNumber(),
                     pageable.getPageSize(),
@@ -201,15 +194,13 @@ public class RequestService {
             );
         }
 
-        // 2. 검색어 가공 (빈 문자열일 경우 null로 처리)
         if (keyword != null && keyword.trim().isEmpty()) {
             keyword = null;
         }
 
-        // 3. 리포지토리 호출 (검색어와 새로운 pageable 전달)
-        // 아래 2번 항목에서 만들 리포지토리 메서드를 호출합니다.
         return requestRepository.findMyActiveRequestsWithSearch(memberId, keyword, pageable);
     }
+
     @Transactional(readOnly = true)
     public Page<Request> findHiddenRequestsPaged(String memberId, Pageable pageable) {
         return requestRepository.findHiddenRequestsByMemberIdPaged(memberId, pageable);
@@ -217,8 +208,6 @@ public class RequestService {
 
     @Transactional(readOnly = true)
     public Page<Request> findHiddenRequestsPaged(String memberId, String keyword, String sort, String sortDir, Pageable pageable) {
-
-        // 1. 정렬 객체 조립
         if (sort != null && !sort.isEmpty()) {
             Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
             pageable = PageRequest.of(
@@ -228,12 +217,15 @@ public class RequestService {
             );
         }
 
-        // 2. 검색어 처리
         if (keyword != null && keyword.trim().isEmpty()) {
             keyword = null;
         }
 
-        // 3. 숨김 내역 전용 검색 리포지토리 호출
         return requestRepository.findMyHiddenRequestsWithSearch(memberId, keyword, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public long countWaitingRequests() {
+        return requestRepository.countByStatus("WAITING");
     }
 }

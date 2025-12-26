@@ -474,3 +474,70 @@ hr { border-color: var(--border-color); opacity: 0.5; }
     box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
     transform: translateY(-2px);
 }
+
+/* =========================================
+   [Admin Dashboard] 입고관리 경고등 아이콘 애니메이션
+   ========================================= */
+
+/* 1. 깜빡이는 경고등 아이콘 스타일 */
+.approval-alert-icon {
+    font-size: 1.2rem; /* 숫자보다 약간 작게 */
+    color: var(--warning); /* 주황색 (admin.css 상단 변수 활용) */
+    animation: alert-blink 0.8s infinite alternate; /* 0.8초 간격으로 무한 반복 */
+    vertical-align: middle;
+}
+
+/* 2. 깜빡임 + 커지는 애니메이션 (심장박동 효과) */
+@keyframes alert-blink {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+        text-shadow: 0 0 0 rgba(245, 158, 11, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.2); /* 1.2배 커짐 */
+        text-shadow: 0 0 15px rgba(245, 158, 11, 1); /* 주황색 네온 빛 */
+    }
+}
+
+/* 3. (선택) 카드 테두리까지 깜빡이게 하려면 이 클래스를 카드 div에 th:classappend 하세요 */
+.card-alert-border {
+    border: 1px solid var(--warning) !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3) !important;
+    animation: border-pulse 1.5s infinite;
+}
+
+@keyframes border-pulse {
+    0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+}
+
+
+/* =========================================
+   [Card Link] Slide Arrow Animation
+   ========================================= */
+.card-link-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 카드를 호버했을 때, 안에 있는 텍스트와 아이콘이 반응 */
+.stat-card:hover .card-link-text {
+    letter-spacing: 1px; /* 글자 간격 살짝 넓어짐 */
+}
+
+.stat-card:hover .card-link-text i {
+    transform: translateX(5px); /* 화살표가 오른쪽으로 이동 */
+    filter: drop-shadow(0 0 5px currentColor); /* 네온 번짐 효과 */
+}
+
+.card-link-text i {
+    transition: transform 0.3s ease;
+}

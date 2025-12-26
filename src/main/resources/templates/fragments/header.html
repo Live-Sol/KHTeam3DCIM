@@ -73,7 +73,6 @@
                         <i class="bi bi-hdd-stack me-2"></i> 장비
                     </a>
                     <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="navbarDropdown4">
-                        <!-- ADMIN은 입고 신청이 필요 없을 수 있으므로 숨김 처리된 로직 유지 -->
                         <li sec:authorize="!hasRole('ADMIN')">
                             <a class="dropdown-item dropdown-item-custom" href="/requests/new">
                                 <i class="bi-plus-circle-dotted me-2 text-success"></i>장비 입고 신청
@@ -89,17 +88,13 @@
                                 <i class="bi-clock-history me-2 text-success"></i>입고 장비 현황
                             </a>
                         </li>
-                        <!-- ADMIN 전용 메뉴가 필요하다면 여기에 추가 -->
                     </ul>
                 </li>
 
                 <!-- 3. 사용자 정보 (비로그인 시 숨김, 로그인 시 노출) -->
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-
                     <a class="nav-link nav-link-custom dropdown-toggle d-flex align-items-center position-relative"
                        href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-
-                        <span id="adminAlertBadge" class="admin-notification-dot"></span>
 
                         <th:block th:if="${#authentication.principal instanceof T(com.example.KHTeam3DCIM.security.CustomUserDetails)}">
                             <img th:if="${#authentication.principal.profileImage != null}"
@@ -111,9 +106,9 @@
                             <div th:unless="${#authentication.principal.profileImage != null}"
                                  class="rounded-circle me-2 d-flex align-items-center justify-content-center"
                                  style="width: 35px; height: 35px;
-                         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                         border: 2px solid var(--accent-cyan);
-                         box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);">
+                 background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                 border: 2px solid var(--accent-cyan);
+                 box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);">
                                 <i class="bi bi-person-fill" style="font-size: 1.2rem; color: var(--accent-cyan);"></i>
                             </div>
                         </th:block>
@@ -128,29 +123,40 @@
                         <span class="fw-bold"
                               style="text-shadow: 0 0 10px rgba(255,255,255,0.2);"
                               th:text="${#authentication.principal instanceof T(com.example.KHTeam3DCIM.security.CustomUserDetails)
-                ? #authentication.principal.name
-                : #authentication.principal.username}">User</span> 님
+                                        ? #authentication.principal.name
+                                        : #authentication.principal.username}">User</span> 님
 
-                    </a> <ul class="dropdown-menu dropdown-menu-custom dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li sec:authorize="hasRole('ADMIN')">
-                        <a class="dropdown-item dropdown-item-custom" th:href="@{/admin}">
-                            <i class="bi bi-speedometer2 me-2 text-danger"></i>
-                            관리자 페이지
-                            <span id="adminMenuBadge" class="badge bg-danger ms-2" style="display:none; font-size:0.7rem;">NEW</span>
-                        </a>
-                    </li>
-                    <li sec:authorize="hasRole('USER')">
-                        <a class="dropdown-item dropdown-item-custom" href="/members/my">
-                            <i class="bi bi-gear me-2 text-info"></i> 내 정보
-                        </a>
-                    </li>
-                    <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
-                    <li>
-                        <a class="dropdown-item dropdown-item-custom" th:href="@{/members/logout}">
-                            <i class="bi bi-box-arrow-right me-2 text-secondary"></i> 로그아웃
-                        </a>
-                    </li>
-                </ul>
+                        <i class="bi bi-circle-fill ms-2 header-alert-icon"
+                           th:if="${globalPendingCount != null and globalPendingCount > 0}"
+                           title="승인 대기중인 요청이 있습니다!"></i>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-custom dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <a class="dropdown-item dropdown-item-custom" th:href="@{/admin}">
+                                <i class="bi bi-house-door me-2 text-danger"></i>
+                                관리자 페이지
+
+                                <span th:if="${globalPendingCount != null and globalPendingCount > 0}"
+                                      class="badge bg-danger ms-2 header-alert-icon text-white"
+                                      style="font-size:0.7rem;">
+                    <i class="bi bi-bell-fill"></i> [[${globalPendingCount}]]
+                </span>
+                            </a>
+                        </li>
+
+                        <li sec:authorize="hasRole('USER')">
+                            <a class="dropdown-item dropdown-item-custom" href="/members/my">
+                                <i class="bi bi-gear me-2 text-info"></i> 내 정보
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
+                        <li>
+                            <a class="dropdown-item dropdown-item-custom" th:href="@{/members/logout}">
+                                <i class="bi bi-box-arrow-right me-2 text-secondary"></i> 로그아웃
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <!-- 4. 로그인/회원가입 (비로그인 시 노출) -->
@@ -168,67 +174,31 @@
         </div>
     </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 1. 현재 주소(URL) 가져오기 (예: /views/servers)
-        const currentPath = window.location.pathname;
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. 현재 주소(URL) 가져오기
+            const currentPath = window.location.pathname;
 
-        // 2. 모든 내비게이션 링크 가져오기
-        const navLinks = document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item');
+            // 2. 모든 내비게이션 링크 가져오기
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item');
 
-        navLinks.forEach(link => {
-            // 링크의 href 속성 가져오기
-            const linkPath = link.getAttribute('href');
-
-            // 3. 현재 주소와 링크 주소가 일치하는지 확인
-            // (주의: 메인 홈 '/' 은 정확히 일치할 때만, 나머지는 포함될 때 처리)
-            if (linkPath === currentPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
-
-                // (1) 해당 링크에 'active' 클래스 추가
-                link.classList.add('active');
-
-                // (2) 만약 이 링크가 드롭다운 메뉴 아이템이라면?
-                // -> 상위 메뉴(EQUIPMENT 등)도 같이 켜줘야 함
-                if (link.classList.contains('dropdown-item')) {
-                    // 가장 가까운 상위 dropdown 부모를 찾음
-                    const parentDropdown = link.closest('.nav-item.dropdown');
-                    if (parentDropdown) {
-                        // 그 부모의 toggle 버튼(상위 메뉴명)을 찾아서 active 추가
-                        const parentLink = parentDropdown.querySelector('.nav-link.dropdown-toggle');
-                        if (parentLink) {
-                            parentLink.classList.add('active');
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                if (linkPath === currentPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                    link.classList.add('active');
+                    if (link.classList.contains('dropdown-item')) {
+                        const parentDropdown = link.closest('.nav-item.dropdown');
+                        if (parentDropdown) {
+                            const parentLink = parentDropdown.querySelector('.nav-link.dropdown-toggle');
+                            if (parentLink) {
+                                parentLink.classList.add('active');
+                            }
                         }
                     }
                 }
-            }
+            });
         });
-    });
-</script>
-
-<script sec:authorize="hasRole('ADMIN')">
-    document.addEventListener("DOMContentLoaded", function() {
-        checkPendingRequests();
-    });
-
-    function checkPendingRequests() {
-        // 1단계에서 만든 API 주소를 호출합니다.
-        fetch('/api/requests/check-pending')
-            .then(response => response.json())
-            .then(hasPending => {
-                if (hasPending) {
-                    // 1. 프로필 아이콘 옆의 빨간 점 표시
-                    const badge = document.getElementById('adminAlertBadge');
-                    if (badge) badge.style.display = 'block';
-
-                    // 2. (선택사항) 드롭다운 메뉴 안의 'NEW' 뱃지 표시
-                    const menuBadge = document.getElementById('adminMenuBadge');
-                    if (menuBadge) menuBadge.style.display = 'inline-block';
-                }
-            })
-            .catch(error => console.error('알림 확인 중 오류:', error));
-    }
-</script>
-
-</nav>
+    </script>
+    </nav>
 </body>
 </html>

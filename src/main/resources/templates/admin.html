@@ -31,11 +31,17 @@
             <!-- 1. 입고 승인 대기 카드 -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-warning mb-3 shadow-sm h-100">
-                    <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 입고 승인 대기</div>
+                    <div class="card-header"><i class="bi bi-hourglass-split me-1"></i> 입고 승인 대기
+                        <span th:if="${pendingRequestCount > 0}" class="approval-alert-icon" title="처리 필요한 요청이 있습니다!">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </span>
+                    </div>
                     <div class="card-body">
                         <h1 class="card-title fw-bold"><span th:text="${pendingRequestCount}">0</span> 건</h1>
                         <p class="card-text">새로운 입고 신청 승인을 기다리고 있습니다.</p>
-                        <a href="/requests" class="btn btn-light btn-sm mt-2 stretched-link">입고 승인 관리로 이동</a>
+                        <a href="/requests" class="card-link-text text-warning stretched-link">
+                            입고 승인 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -47,7 +53,9 @@
                     <div class="card-body">
                         <h1 class="card-title fw-bold"><span th:text="${totalDeviceCount}">0</span> 대</h1>
                         <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
-                        <a href="/devices" class="btn btn-light btn-sm mt-2 stretched-link">장비 관리로 이동</a>
+                        <a href="/devices" class="card-link-text text-info stretched-link">
+                            장비 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -59,7 +67,9 @@
                     <div class="card-body">
                         <h1 class="card-title fw-bold"><span th:text="${totalRackCount}">0</span> 대</h1>
                         <p class="card-text">현재 시스템에 등록된 전체 Rack의 수입니다.</p>
-                        <a href="/racks" class="btn btn-light btn-sm mt-2 stretched-link">Rack 관리로 이동</a>
+                        <a href="/racks" class="card-link-text text-success stretched-link">
+                            랙 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -71,7 +81,9 @@
                     <div class="card-body">
                         <h1 class="card-title fw-bold"><span th:text="${totalMemberCount}">0</span> 명</h1>
                         <p class="card-text">일반 이용자 및 관리자 포함 전체 회원 수입니다.</p>
-                        <a href="/admin/members" class="btn btn-light btn-sm mt-2 stretched-link">회원 관리로 이동</a>
+                        <a href="/admin/members" class="card-link-text text-white stretched-link">
+                            회원 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
