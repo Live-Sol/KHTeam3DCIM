@@ -10,8 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <!-- [통합] admin.css 하나만 사용 -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/deviceList.css}">
 </head>
 <body>
 
@@ -98,8 +98,8 @@
                     <th style="width: 3%">
                         <input type="checkbox" id="selectAll" class="form-check-input">
                     </th>
-                    <th style="width: 12%">신청자</th>
-                    <th style="width: 10%">위치(Rack)</th>
+                    <th style="width: 11%">신청자</th>
+                    <th style="width: 9%">위치(Rack)</th>
                     <th style="width: 10%">장비 종류</th>
                     <th style="width: 15%">제조사/모델</th>
                     <th style="width: 7%">소비전력</th>
@@ -107,25 +107,29 @@
                     <th style="width: 8%">설치위치</th>
                     <th style="width: 10%" class="text-start">계약 (만료일)</th>
                     <th style="width: 8%">상태</th>
-                    <th style="width: 10%">관리</th>
+                    <th style="width: 12%">관리</th>
                 </tr>
                 </thead>
                 <tbody class="text-center">
-                <tr th:each="device : ${devices}">
+                <tr th:each="device : ${devices}"
+                    th:classappend="${device.status == 'DELETED'} ? 'table-secondary opacity-75' : ''">
+
                     <td>
-                        <input type="checkbox" name="deviceIds" th:value="${device.id}" class="form-check-input device-checkbox">
+                        <input type="checkbox" name="deviceIds" th:value="${device.id}" class="form-check-input device-checkbox"
+                               th:disabled="${device.status == 'DELETED'}">
                     </td>
+
                     <td>
-                        <span th:if="${device.member != null}">
-                            <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
-                               class="text-info text-decoration-none"
-                               data-bs-toggle="tooltip"
-                               data-bs-placement="top"
-                               th:title="'시스템 장비 ID: ' + ${device.id}">
-                                <i class="bi bi-person-fill small"></i>
-                                [[${device.member.memberId}]]
-                            </a>
-                        </span>
+            <span th:if="${device.member != null}">
+                <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
+                   class="text-info text-decoration-none"
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top"
+                   th:title="'시스템 장비 ID: ' + ${device.id}">
+                    <i class="bi bi-person-fill small"></i>
+                    [[${device.member.memberId}]]
+                </a>
+            </span>
                         <span th:unless="${device.member != null}" class="text-sub-muted">-</span>
                     </td>
 
@@ -170,17 +174,23 @@
                     </td>
 
                     <td>
-                    <span th:if="${device.status != null}">
-                        <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
-                        <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
-                        <span class="badge bg-secondary" th:if="${device.status == 'OFF'}">OFF</span>
-                        <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'OFF'}">[[${device.status}]]</span>
-                    </span>
-                        <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
+            <span th:if="${device.status == 'DELETED'}" class="badge bg-danger text-white border border-secondary">
+                <i class="bi bi-trash"></i> 삭제 예정
+            </span>
+
+                        <span th:unless="${device.status == 'DELETED'}">
+                <span th:if="${device.status != null}">
+                    <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
+                    <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
+                    <span class="badge bg-secondary" th:if="${device.status == 'OFF'}">OFF</span>
+                    <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'OFF'}">[[${device.status}]]</span>
+                </span>
+                <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
+            </span>
                     </td>
 
                     <td>
-                        <div class="d-flex justify-content-center gap-1">
+                        <div th:if="${device.status != 'DELETED'}" class="d-flex justify-content-center gap-1">
                             <a th:href="@{/devices/{id}/edit(id=${device.id})}" class="btn btn-sm btn-outline-warning">수정</a>
                             <button type="button"
                                     class="btn btn-sm btn-outline-danger"
@@ -188,10 +198,22 @@
                                 삭제
                             </button>
                         </div>
+
+<!--                        <div th:if="${device.status == 'DELETED'}"-->
+<!--                             class="text-center text-danger fw-bold small d-day-display"-->
+<!--                             th:data-deleted-at="${device.deletedAt}">-->
+<!--                            <i class="bi bi-calendar-event"></i> <span class="d-day-text">계산 중...</span>-->
+<!--                        </div>-->
+                        <div th:if="${device.status == 'DELETED'}"
+                             class="text-center text-danger fw-bold small countdown-timer"
+                             th:data-deleted-at="${device.deletedAt}">
+                            <i class="bi bi-stopwatch"></i> <span class="timer-text">계산 중...</span>
+                        </div>
                     </td>
                 </tr>
+
                 <tr th:if="${devices.isEmpty()}">
-                    <td colspan="10" class="text-center py-5 text-sub-muted">등록된 장비가 없습니다.</td>
+                    <td colspan="11" class="text-center py-5 text-sub-muted">등록된 장비가 없습니다.</td>
                 </tr>
                 </tbody>
             </table>
@@ -250,7 +272,6 @@
                 cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Fetch API를 이용한 비동기 전송 예시
                     sendBatchRequest('/devices/batch-update', {
                         ids: selectedIds,
                         emsStatus: emsValue,
@@ -264,13 +285,20 @@
         window.deleteSelected = function() {
             const selectedIds = Array.from(document.querySelectorAll('.device-checkbox:checked')).map(cb => cb.value);
 
+            if (selectedIds.length === 0) {
+                Swal.fire('알림', '삭제할 장비를 선택해주세요.', 'info');
+                return;
+            }
+
             Swal.fire({
-                title: '정말 삭제하시겠습니까?',
-                text: "선택한 장비들이 모두 영구 삭제됩니다!",
-                icon: 'danger',
+                title: '일괄 삭제하시겠습니까?',
+                // [수정] 안내 문구 변경 (영구 삭제 -> 30일 보관)
+                html: `선택한 <b>${selectedIds.length}개</b>의 장비가 삭제 대기 상태로 변경됩니다.<br>보존 기간(30일) 후 자동으로 영구 삭제됩니다.`,
+                icon: 'warning', // danger는 없는 아이콘이라 warning으로 수정 권장
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                confirmButtonText: '삭제'
+                confirmButtonText: '삭제 (휴지통 이동)',
+                cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
                     sendBatchRequest('/devices/batch-delete', { ids: selectedIds });
@@ -280,7 +308,6 @@
 
         // 공통 서버 전송 함수
         function sendBatchRequest(url, data) {
-            // 메타 태그에서 토큰 정보 읽기
             const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
             const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
@@ -288,12 +315,11 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    [header]: token  // CSRF 토큰 헤더 추가
+                    [header]: token
                 },
                 body: JSON.stringify(data)
             }).then(response => {
                 if (response.ok) {
-                    // 성공 시 SweetAlert로 알림 후 페이지 이동/새로고침
                     Swal.fire('성공', '요청이 처리되었습니다.', 'success').then(() => {
                         location.reload();
                     });
@@ -312,7 +338,6 @@
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
 
-        // 컨트롤러의 RedirectAttributes에서 보낸 메시지 읽기
         const successMessage = [[${successMessage}]];
         const errorMessage = [[${errorMessage}]];
 
@@ -323,21 +348,22 @@
             timer: 3000,
             timerProgressBar: true
         });
-
-        // 성공 메시지가 있으면 토스트 띄우기
-        if (successMessage) {
+        // [추가] 삭제 완료 후 새로고침 되었는지 확인하는 로직
+        if (sessionStorage.getItem('deleteComplete') === 'true') {
             Toast.fire({
                 icon: 'success',
-                title: successMessage
+                title: '장비가 영구 삭제되었습니다.'
             });
+            // 알림을 띄운 후에는 저장소에서 기록을 지워야
+            // 나중에 그냥 새로고침 했을 때 또 뜨지 않습니다.
+            sessionStorage.removeItem('deleteComplete');
+        }
+        if (successMessage) {
+            Toast.fire({ icon: 'success', title: successMessage });
         }
 
-        // 에러 메시지가 있으면 토스트 띄우기 (삭제 실패 등 대비)
         if (errorMessage) {
-            Toast.fire({
-                icon: 'error',
-                title: errorMessage
-            });
+            Toast.fire({ icon: 'error', title: errorMessage });
         }
     });
 
@@ -361,7 +387,12 @@
                     input: 'text',
                     inputPlaceholder: '예: 계약 만료, 장비 노후화 등',
                     showCancelButton: true,
-                    confirmButtonText: '확인'
+                    confirmButtonText: '확인',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return '삭제 사유를 반드시 입력해야 합니다!';
+                        }
+                    }
                 }).then((res) => {
                     if (res.isConfirmed && res.value) {
                         location.href = `/devices/${deviceId}/soft-delete?reason=` + encodeURIComponent(res.value);
@@ -384,6 +415,92 @@
             }
         });
     }
+
+    // ===============================================
+    // [TEST 1분 카운트다운 로직]
+    // ===============================================
+    const timerElements = document.querySelectorAll('.countdown-timer');
+
+    timerElements.forEach(el => {
+        const deletedAtStr = el.getAttribute('data-deleted-at');
+        if (!deletedAtStr) return;
+
+        const deletedAt = new Date(deletedAtStr);
+        // 만료 시간 = 삭제 시간 + 60초 (1분)
+        const expireTime = new Date(deletedAt.getTime() + 60 * 1000);
+
+        // [추가] 점 개수를 저장할 변수 (0 ~ 3)
+        let dotCount = 0;
+        // [추가] 새로고침 예약이 중복으로 걸리는 것을 방지하는 플래그
+        let isReloadScheduled = false;
+
+        function updateTimer() {
+            const now = new Date();
+            const diff = expireTime - now;
+            const textSpan = el.querySelector('.timer-text');
+
+            if (diff <= 0) {
+                el.classList.remove('text-danger');
+                el.classList.add('text-secondary');
+
+                // [수정] 1초마다 점 개수 변경 로직 (0 -> 1 -> 2 -> 3 -> 0 ...)
+                // dotCount를 1씩 증가시키고 4로 나눈 나머지를 구함
+                dotCount = (dotCount + 1) % 4;
+                const dots = ".".repeat(dotCount); // 점 개수만큼 문자열 생성
+                textSpan.innerText = "삭제 처리중" + dots;
+
+                // [수정] 10초 뒤 새로고침 (단, 한 번만 예약되도록 설정)
+                if (!isReloadScheduled) {
+                    isReloadScheduled = true; // 예약됨 상태로 변경
+                    setTimeout(() => {
+                        // 1. 브라우저 저장소에 '삭제 완료' 플래그 저장
+                        sessionStorage.setItem('deleteComplete', 'true');
+                        // 2. 페이지 새로고침 (현재 페이지 유지)
+                        location.reload();
+                    }, 10000);
+                }
+                return;
+            }
+
+            const secondsLeft = Math.floor(diff / 1000);
+            textSpan.innerText = `${secondsLeft}초 후 삭제`;
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    });
+
+    // ===============================================
+    // [PROD 30일 D-Day 로직] (활성화됨)
+    // ===============================================
+    // const dDayElements = document.querySelectorAll('.d-day-display');
+    //
+    // dDayElements.forEach(el => {
+    //     const deletedAtStr = el.getAttribute('data-deleted-at');
+    //     if (!deletedAtStr) return;
+    //
+    //     const deletedAt = new Date(deletedAtStr);
+    //     // 만료 시간 = 삭제 시간 + 30일
+    //     // 30일 * 24시간 * 60분 * 60초 * 1000밀리초
+    //     const expireTime = new Date(deletedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+    //
+    //     const now = new Date();
+    //     const diff = expireTime - now;
+    //     const textSpan = el.querySelector('.d-day-text');
+    //
+    //     if (diff <= 0) {
+    //         // 이미 30일이 지난 경우 (스케줄러 동작 전)
+    //         el.classList.remove('text-danger');
+    //         el.classList.add('text-secondary');
+    //         textSpan.innerText = "삭제 예정 (오늘)";
+    //     } else {
+    //         // D-Day 계산 (밀리초 -> 일)
+    //         // 올림(Math.ceil)을 해야 "D-1" (내일 삭제) 등이 정확히 나옵니다.
+    //         const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    //         textSpan.innerText = `D-${daysLeft} 삭제 예정`;
+    //     }
+    // });
+
 </script>
 </body>
 </html>

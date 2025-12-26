@@ -40,16 +40,27 @@
                         <form th:action="@{/members/edit}" th:object="${memberUpdateByUserRequest}" method="post" enctype="multipart/form-data" id="editForm">
 
                             <!-- 1. 프로필 이미지 -->
-                            <div class="profile-upload-container">
-                                <img th:src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
-                                     id="previewImg" class="profile-preview"
-                                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'"> <!-- 이미지 깨질 시 대체 -->
+                            <div class="d-flex justify-content-center mb-4">
+                                <div class="profile-upload-container" style="position: relative; display: inline-block;">
+                                    <img th:src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
+                                         th:data-original-src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
+                                         th:data-default-src="'/images/default-profile.png'"
+                                         id="previewImg" class="profile-preview"
+                                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'"> <!-- 이미지 깨질 시 대체 -->
+                                    <input type="hidden" id="deleteProfileImage" name="deleteProfileImage" value="false">
+                                    <button type="button" id="resetImgBtn" class="upload-icon-btn" title="기본 이미지로 변경"
+                                            style="position: absolute; bottom: 0; left: 0; background-color: #6c757d; border: none; outline: none; cursor: pointer; z-index: 10;">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
 
-                                <label for="profileImage" class="upload-icon-btn" title="이미지 변경">
-                                    <i class="bi bi-camera-fill"></i>
-                                </label>
-                                <!-- 파일 용량 체크를 위해 onchange 이벤트 수정 -->
-                                <input type="file" id="profileImage" th:field="*{profileImage}" style="display: none;" accept="image/*" onchange="previewFile(this)">
+                                    <label for="profileImage" class="upload-icon-btn" title="이미지 변경"
+                                           style="position: absolute; bottom: 0; right: 0;">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </label>
+
+                                    <!-- 파일 용량 체크를 위해 onchange 이벤트 수정 -->
+                                    <input type="file" id="profileImage" th:field="*{profileImage}" style="display: none;" accept="image/*" onchange="previewFile(this)">
+                                </div>
                             </div>
 
                             <!-- 2. 읽기 전용 정보 (스타일 개선) -->
@@ -180,9 +191,49 @@
         const reader = new FileReader();
         reader.addEventListener("load", function () {
             preview.src = reader.result;
+            // [중요] 파일을 새로 선택했으니 "삭제"가 아님! false로 설정
+            if(deleteInput) deleteInput.value = "false";
         }, false);
         reader.readAsDataURL(file);
     }
+    // [추가하신 부분] 이미지 초기화 로직 (그대로 사용 OK)
+    document.addEventListener('DOMContentLoaded', function() {
+        const resetBtn = document.getElementById('resetImgBtn');
+        const preview = document.getElementById('previewImg');
+        const fileInput = document.getElementById('profileImage');
+        const deleteInput = document.getElementById('deleteProfileImage'); // 히든 인풋
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                // 1. HTML에 적어둔 "기본 이미지 경로" 가져오기
+                // ('/images/default-profile.png')
+                const defaultSrc = preview.getAttribute('data-default-src');
+
+                // 2. 화면 이미지를 기본 이미지로 변경
+                if(defaultSrc) {
+                    preview.src = defaultSrc;
+                }
+
+                // 3. 파일 선택된 것 비우기
+                fileInput.value = '';
+
+                // 4. [핵심] 서버에게 "기존 이미지 삭제해줘"라고 신호 보내기
+                if(deleteInput) {
+                    deleteInput.value = "true";
+
+                    // (선택) 사용자에게 알림
+                    Swal.fire({
+                        toast: true,
+                        position: 'top',
+                        icon: 'info',
+                        title: '기본 이미지로 설정되었습니다.',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            });
+        }
+    });
 
     // 2. 폼 제출 시 SweetAlert2 및 중복 클릭 방지 적용
     const editForm = document.getElementById('editForm');

@@ -137,24 +137,47 @@ public class MemberService {
         member.setCompanyName(request.getCompanyName());
         member.setCompanyPhone(request.getCompanyPhone());
 
-        // 3. ⭐️ 프로필 이미지 저장 로직 ⭐️
-        MultipartFile file = request.getProfileImage();
-        if (file != null && !file.isEmpty()) {
+        // 3. ⭐️ 프로필 이미지 처리 로직 (완벽한 디스크 정리 버전) ⭐️
+        // (1) "기존 파일을 지워야 하는 상황"인지 판단
+        // 상황 A: 휴지통 버튼 클릭 (deleteProfileImage == true)
+        // 상황 B: 새 파일 업로드 (file != null)
+        MultipartFile newFile = request.getProfileImage();
+        boolean isDeleteRequested = Boolean.TRUE.equals(request.getDeleteProfileImage());
+        boolean isNewFileUploaded = (newFile != null && !newFile.isEmpty());
+
+        // (2) 상황 A 혹은 B라면 -> 기존 파일 삭제 실행
+        if (isDeleteRequested || isNewFileUploaded) {
+            if (member.getProfileImage() != null) {
+                File oldFile = new File(uploadDir + member.getProfileImage());
+                // 파일이 실제로 존재하면 삭제
+                if (oldFile.exists()) {
+                    oldFile.delete();
+                }
+            }
+        }
+
+        // (3) 상황 A: 휴지통 요청이면 DB를 null로
+        if (isDeleteRequested) {
+            member.setProfileImage(null);
+        }
+
+        // (4) 상황 B: 새 파일 업로드면 파일 저장 & DB 업데이트
+        if (isNewFileUploaded) {
             // 폴더 생성
             File folder = new File(uploadDir);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
-            // 파일명 중복 방지 (UUID 사용)
-            String originalFileName = file.getOriginalFilename();
+            // 파일명 생성 (UUID)
+            String originalFileName = newFile.getOriginalFilename();
             String savedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
 
-            // 파일 저장 (여기서 IOException 발생 가능)
+            // 파일 저장
             File saveFile = new File(uploadDir + savedFileName);
-            file.transferTo(saveFile);
+            newFile.transferTo(saveFile);
 
-            // DB에 파일명 저장
+            // DB 업데이트
             member.setProfileImage(savedFileName);
         }
     }

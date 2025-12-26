@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -235,25 +236,19 @@ public class DeviceService {
     // ==========================================
     // 6. 삭제/수정/전원
     // ==========================================
-//    @Transactional
-//    public void deleteDevice(Long id) {
-//        Device device = deviceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
-//        deviceRepository.delete(device);
-//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-//        auditLogService.saveLog(currentMemberId, "장비 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
-//    }
-    // [물리 삭제] 실제 데이터를 DB에서 삭제
+    // [물리 삭제] 관리자용 강제 삭제 (즉시 DB에서 제거)
     @Transactional
     public void deleteDevice(Long id) {
         Device device = deviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
 
-        deviceRepository.delete(device); // 실제 삭제
+        deviceRepository.delete(device);
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId, "장비 영구 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
     }
-    // [논리 삭제] 상태만 바꾸고 기록 보존
+
+    // [논리 삭제] 상태만 바꾸고 기록 보존 (30일 카운트다운 시작)
     @Transactional
     public void deleteDeviceWithReason(Long id, String reason) {
         Device device = deviceRepository.findById(id)
@@ -262,13 +257,42 @@ public class DeviceService {
         device.setStatus("DELETED");
         device.setDeleteReason(reason);
         device.setRack(null);      // 랙 공간 반납
-        device.setStartUnit(0); // 유닛 위치 반납
+        device.setStartUnit(0);    // 유닛 위치 반납
+        device.setDeletedAt(LocalDateTime.now()); // [핵심] 삭제 시점 기록 (스케줄러가 이 시간을 기준을 30일 계산)
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId,
                 "장비 논리 삭제: " + device.getSerialNum() + " (사유: " + reason + ")",
                 LogType.DEVICE_OPERATION);
     }
+//    // [물리 삭제] 실제 데이터를 DB에서 삭제
+//    @Transactional
+//    public void deleteDevice(Long id) {
+//        Device device = deviceRepository.findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+//
+//        deviceRepository.delete(device); // 실제 삭제
+//
+//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        auditLogService.saveLog(currentMemberId, "장비 영구 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
+//    }
+//    // [논리 삭제] 상태만 바꾸고 기록 보존
+//    @Transactional
+//    public void deleteDeviceWithReason(Long id, String reason) {
+//        Device device = deviceRepository.findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 장비가 존재하지 않습니다."));
+//
+//        device.setStatus("DELETED");
+//        device.setDeleteReason(reason);
+//        device.setRack(null);      // 랙 공간 반납
+//        device.setStartUnit(0); // 유닛 위치 반납
+//        device.setDeletedAt(LocalDateTime.now()); // 삭제 시점 기록 추가
+//
+//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        auditLogService.saveLog(currentMemberId,
+//                "장비 논리 삭제: " + device.getSerialNum() + " (사유: " + reason + ")",
+//                LogType.DEVICE_OPERATION);
+//    }
 
     @Transactional
     public void updateDevice(Long id, Device formDevice, Long rackId, String cateId) { // rackId 파라미터 추가 추천
@@ -411,26 +435,25 @@ public class DeviceService {
         // @Transactional 어노테이션 덕분에 메서드 종료 시
         // Dirty Checking(변경 감지)이 일어나 DB에 자동 반영됩니다.
     }
+    // 일괄 삭제도 '30일 보존 정책'을 따르도록 논리 삭제로 변경
+    @Transactional
+    public void deleteMultipleDevices(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return;
 
-//    @Transactional
-//    public void deleteMultipleDevices(List<Long> ids) {
-//        if (ids == null || ids.isEmpty()) return;
-//
-//        // Batch 삭제를 사용하여 성능 최적화 (한 번의 쿼리로 삭제)
-//        deviceRepository.deleteAllByIdInBatch(ids);
-//    }
-        @Transactional
-        public void deleteMultipleDevices(List<Long> ids) {
-            if (ids == null || ids.isEmpty()) return;
+        List<Device> devices = deviceRepository.findAllById(ids);
 
-            // 로그 기록을 위해 삭제 전 대상 정보 가져오기 (선택사항)
-            int count = ids.size();
-
-            deviceRepository.deleteAllByIdInBatch(ids); // 영구 삭제
-
-            String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-            auditLogService.saveLog(currentMemberId, "장비 " + count + "건 일괄 영구 삭제", LogType.DEVICE_OPERATION);
+        for (Device device : devices) {
+            // 논리 삭제 처리
+            device.setStatus("DELETED");
+            device.setDeleteReason("기타 사유로 일괄 삭제"); // 일괄 삭제는 사유를 고정하거나 별도로 받아야 함
+            device.setRack(null);
+            device.setStartUnit(0);
+            device.setDeletedAt(LocalDateTime.now()); // 현재 시간 기록 -> 30일 뒤 스케줄러가 삭제
         }
+
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        auditLogService.saveLog(currentMemberId, "장비 " + devices.size() + "건 일괄 논리 삭제(보관)", LogType.DEVICE_OPERATION);
+    }
 
     // [사용자용] 페이징 처리된 내 장비 목록
     public Page<Device> getMyDeviceList(String memberId, String keyword, Pageable pageable) {

@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,4 +106,7 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     // 이미 삭제된 장비를 제외하고, 계약 정보가 있는 장비만 조회
     @Query("SELECT d FROM Device d WHERE d.status != 'DELETED' AND d.contractDate IS NOT NULL")
     List<Device> findAllActiveDevices();
+
+    // 상태가 'DELETED' 이면서 삭제 시간이 특정 시점(threshold) 이전인 장비들 조회
+    List<Device> findByStatusAndDeletedAtBefore(String status, LocalDateTime threshold);
 }

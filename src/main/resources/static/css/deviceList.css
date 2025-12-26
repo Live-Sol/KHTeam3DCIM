@@ -1,0 +1,20 @@
+/* [기존] 1분 카운트다운용 (주석 처리하거나 삭제) */
+
+.countdown-timer {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+
+/* [신규] 30일 D-Day용 (클래스명 변경: d-day-display) */
+.d-day-display {
+    font-family: 'Orbitron', sans-serif; /* 디지털 숫자 느낌 유지 */
+    letter-spacing: 0.5px;
+    font-weight: 700; /* 좀 더 굵게 강조 */
+    color: #dc3545;   /* 빨간색 (Bootstrap text-danger와 동일) */
+}
+
+/* (선택사항) D-Day 텍스트 옆의 숫자 부분만 더 강조하고 싶다면 */
+.d-day-display .d-day-text {
+    font-size: 0.95rem;
+}

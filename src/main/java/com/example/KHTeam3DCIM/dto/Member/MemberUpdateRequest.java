@@ -42,4 +42,6 @@ public class MemberUpdateRequest {
 
     // 6. 프로필 이미지 파일
     private MultipartFile profileImage;
+    // [추가] 프로필 이미지 삭제 여부 확인 필드
+    private Boolean deleteProfileImage;
 }

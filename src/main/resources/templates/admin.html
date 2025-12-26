@@ -111,7 +111,7 @@
 
                         <td>
                         <span class="badge"
-                              th:classappend="${log.actor == 'admin'} ? 'bg-danger' : 'bg-secondary'"
+                              th:classappend="${log.actor == 'admin' ? 'bg-danger' : (log.actor == 'SYSTEM' ? 'bg-info' : 'bg-secondary')}"
                               th:text="${log.actor}">
                             변경자(NULL)
                         </span>

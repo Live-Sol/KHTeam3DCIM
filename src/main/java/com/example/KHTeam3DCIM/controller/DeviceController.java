@@ -219,20 +219,9 @@ public class DeviceController {
         }
     }
 
-    // ==========================================
-    // 4. 장비 삭제
-    // ==========================================
-//    @GetMapping("/devices/{id}/delete")
-//    public String delete(@PathVariable Long id, RedirectAttributes rttr) {
-//        try {
-//            deviceService.deleteDevice(id);
-//            rttr.addFlashAttribute("successMessage", "장비가 목록에서 성공적으로 삭제되었습니다.");
-//        } catch (Exception e) {
-//            // 삭제 실패 시 에러 메시지 전달
-//            rttr.addFlashAttribute("errorMessage", "장비 삭제 중 오류가 발생했습니다: " + e.getMessage());
-//        }
-//        return "redirect:/devices";
-//    }
+// ==========================================
+// 4. 장비 삭제
+// ==========================================
     // [물리 삭제 요청 처리]
     @GetMapping("/devices/{id}/hard-delete")
     public String hardDelete(@PathVariable Long id, RedirectAttributes rttr) {
@@ -244,22 +233,6 @@ public class DeviceController {
         }
         return "redirect:/devices";
     }
-    //    @PostMapping("/devices/{id}/delete-with-reason")
-//    @ResponseBody
-//    public ResponseEntity<?> deleteWithReason(@PathVariable Long id,
-//                                              @RequestBody Map<String, String> payload) {
-//        try {
-//            String reason = payload.get("reason");
-//            if (reason == null || reason.trim().isEmpty()) {
-//                return ResponseEntity.badRequest().body("삭제 사유를 입력해주세요.");
-//            }
-//
-//            deviceService.deleteDeviceWithReason(id, reason);
-//            return ResponseEntity.ok().build();
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError().body(e.getMessage());
-//        }
-//    }
     // [논리 삭제 요청 처리]
     @GetMapping("/devices/{id}/soft-delete")
     public String softDelete(@PathVariable Long id, @RequestParam String reason, RedirectAttributes rttr) {
@@ -423,19 +396,21 @@ public class DeviceController {
 //        deviceService.deleteMultipleDevices(ids);
 //        return ResponseEntity.ok().build();
 //    }
-        @PostMapping("/devices/batch-delete")
-        @ResponseBody
-        public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
-            try {
-                List<Long> ids = payload.get("ids");
-                if (ids == null || ids.isEmpty()) return ResponseEntity.badRequest().body("삭제할 장비를 선택해주세요.");
+    @PostMapping("/devices/batch-delete")
+    @ResponseBody
+    public ResponseEntity<?> batchDelete(@RequestBody Map<String, List<Long>> payload) {
+        try {
+            List<Long> ids = payload.get("ids");
+            if (ids == null || ids.isEmpty()) return ResponseEntity.badRequest().body("삭제할 장비를 선택해주세요.");
 
-                deviceService.deleteMultipleDevices(ids); // 물리 삭제 실행
-                return ResponseEntity.ok().build();
-            } catch (Exception e) {
-                return ResponseEntity.internalServerError().body("일괄 삭제 중 오류 발생: " + e.getMessage());
-            }
+            // [수정됨] 기존 주석 "물리 삭제 실행" -> "일괄 논리 삭제 실행 (30일 보관)"
+            deviceService.deleteMultipleDevices(ids);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("일괄 삭제 중 오류 발생: " + e.getMessage());
         }
+    }
 
     // ==========================================
     // 9. [사용자용] 나의 입고 장비 현황 페이지
