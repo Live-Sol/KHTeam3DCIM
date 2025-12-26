@@ -120,6 +120,10 @@ body {
     color: var(--text-sub) !important;
     font-size: 0.85rem;
 }
+/* 텍스트 강조 색상 조정 (네온 시안 -> 일반 Info 색상) */
+.text-info {
+    color: #3b82f6 !important; /* Bootstrap Primary/Info Blue */
+}
 
 /* 아이콘 회전 애니메이션 */
 @keyframes spin {

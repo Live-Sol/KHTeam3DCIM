@@ -6,6 +6,7 @@ import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
+import com.example.KHTeam3DCIM.repository.RequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ public class DeviceService {
     private final CategoryRepository categoryRepository;
     private final AuditLogService auditLogService;
     private final EnvironmentService envService; // 장비가 변경될 때 환경 정보도 업데이트되도록 장비 저장/삭제 후 호출
+    private final RequestRepository requestRepository;
 
     // ==========================================
     // 1. 장비 등록하기
@@ -239,9 +241,20 @@ public class DeviceService {
     // [물리 삭제] 관리자용 강제 삭제 (즉시 DB에서 제거)
     @Transactional
     public void deleteDevice(Long id) {
+        // 1. 장비 조회
         Device device = deviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
+        // 2. [수정됨] 시리얼 번호로 연결된 입고 신청서 찾기
+        if (device.getSerialNum() != null) {
+            Request request = requestRepository.findBySerialNum(device.getSerialNum());
 
+            if (request != null) {
+                request.setStatus("DELETED");
+                request.setDeleteReason("관리자에 의한 삭제(문의는 1:1)");
+                // Request에는 device 연관관계가 없으므로 setDevice(null)은 필요 없음
+            }
+        }
+        // 3. 장비 삭제
         deviceRepository.delete(device);
 
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -260,39 +273,21 @@ public class DeviceService {
         device.setStartUnit(0);    // 유닛 위치 반납
         device.setDeletedAt(LocalDateTime.now()); // [핵심] 삭제 시점 기록 (스케줄러가 이 시간을 기준을 30일 계산)
 
+        // 3. [수정됨] 시리얼 번호로 연결된 입고 신청서 찾아서 상태 변경
+        if (device.getSerialNum() != null) {
+            Request request = requestRepository.findBySerialNum(device.getSerialNum());
+
+            if (request != null) {
+                request.setStatus("DELETED"); // 혹은 "DELETED"
+                request.setDeleteReason(reason);
+            }
+        }
+
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
         auditLogService.saveLog(currentMemberId,
                 "장비 논리 삭제: " + device.getSerialNum() + " (사유: " + reason + ")",
                 LogType.DEVICE_OPERATION);
     }
-//    // [물리 삭제] 실제 데이터를 DB에서 삭제
-//    @Transactional
-//    public void deleteDevice(Long id) {
-//        Device device = deviceRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("없는 장비입니다."));
-//
-//        deviceRepository.delete(device); // 실제 삭제
-//
-//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-//        auditLogService.saveLog(currentMemberId, "장비 영구 삭제: " + device.getSerialNum(), LogType.DEVICE_OPERATION);
-//    }
-//    // [논리 삭제] 상태만 바꾸고 기록 보존
-//    @Transactional
-//    public void deleteDeviceWithReason(Long id, String reason) {
-//        Device device = deviceRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 장비가 존재하지 않습니다."));
-//
-//        device.setStatus("DELETED");
-//        device.setDeleteReason(reason);
-//        device.setRack(null);      // 랙 공간 반납
-//        device.setStartUnit(0); // 유닛 위치 반납
-//        device.setDeletedAt(LocalDateTime.now()); // 삭제 시점 기록 추가
-//
-//        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-//        auditLogService.saveLog(currentMemberId,
-//                "장비 논리 삭제: " + device.getSerialNum() + " (사유: " + reason + ")",
-//                LogType.DEVICE_OPERATION);
-//    }
 
     @Transactional
     public void updateDevice(Long id, Device formDevice, Long rackId, String cateId) { // rackId 파라미터 추가 추천

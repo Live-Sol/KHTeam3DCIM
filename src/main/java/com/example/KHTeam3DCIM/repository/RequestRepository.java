@@ -70,4 +70,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    // 만약 연관관계 없이 시리얼 번호로만 연결되어 있다면
+    Request findBySerialNum(String serialNum);
 }

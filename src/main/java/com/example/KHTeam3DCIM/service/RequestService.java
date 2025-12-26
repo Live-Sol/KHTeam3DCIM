@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class RequestService {
     private final MemberRepository memberRepository;
     private final RackRepository rackRepository;
     private final CategoryRepository categoryRepository;
+    private final AuditLogService auditLogService;
 
     // 1. 신청서 저장
     public void saveRequest(RequestDTO dto) {
@@ -152,6 +154,11 @@ public class RequestService {
         // 6. 신청서 상태 완료 처리 및 시리얼 번호 기록
         request.setStatus("APPROVED");
         request.setSerialNum(generatedSerial);
+
+        // 7. 로그 기록 추가
+        String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
+        auditLogService.saveLog(currentMemberId,"입고 승인 및 장비 등록: " + generatedSerial,LogType.DEVICE_OPERATION);
+
     }
 
     // 8. 요청 삭제 또는 숨김 처리 (사용자용)

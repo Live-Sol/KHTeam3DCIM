@@ -56,12 +56,12 @@
                         <span th:text="${rack.rackName}" class="fw-bold text-white">[위치 코드]</span>
                     </td>
 
-                    <td th:text="${rack.locationDesc}" class="text-sub-muted">[건물내 위치]</td>
+                    <td th:text="${rack.locationDesc}" class="fw-bold text-white">[건물내 위치]</td>
 
                     <td>
                         <div th:with="percent=${rack.totalUnit > 0 ? ((rack.usedUnit * 100.0) / rack.totalUnit) : 0}">
                             <div class="d-flex justify-content-between mb-1">
-                                <small class="text-sub-muted">사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
+                                <small class="fw-bold text-white">사용: [[${rack.usedUnit}]] / [[${rack.totalUnit}]] U</small>
                                 <small class="fw-bold text-white">[[${#numbers.formatDecimal(percent, 0, 0)}]]%</small>
                             </div>
                             <div class="progress" style="height: 8px; background-color: #0f172a; border-radius: 10px;">

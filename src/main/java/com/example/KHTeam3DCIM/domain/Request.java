@@ -89,4 +89,8 @@ public class Request {
     // 승인 완료 시 부여된 장비의 시리얼 번호를 저장
     @Column(name = "SERIAL_NUM", length = 100)
     private String serialNum;
+
+    // 관리자 삭제 사유 필드 (DB 컬럼 추가 필요)
+    @Column(length = 500)
+    private String deleteReason;
 }

@@ -120,16 +120,16 @@
                     </td>
 
                     <td>
-            <span th:if="${device.member != null}">
-                <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
-                   class="text-info text-decoration-none"
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top"
-                   th:title="'시스템 장비 ID: ' + ${device.id}">
-                    <i class="bi bi-person-fill small"></i>
-                    [[${device.member.memberId}]]
-                </a>
-            </span>
+                        <span th:if="${device.member != null}">
+                            <a th:href="@{/admin/members/{mId}(mId=${device.member.memberId})}"
+                               class="text-info text-decoration-none"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               th:title="'시스템 장비 ID: ' + ${device.id}">
+                                <i class="bi bi-person-fill small"></i>
+                                [[${device.member.memberId}]]
+                            </a>
+                        </span>
                         <span th:unless="${device.member != null}" class="text-sub-muted">-</span>
                     </td>
 
@@ -174,19 +174,19 @@
                     </td>
 
                     <td>
-            <span th:if="${device.status == 'DELETED'}" class="badge bg-danger text-white border border-secondary">
-                <i class="bi bi-trash"></i> 삭제 예정
-            </span>
+                        <span th:if="${device.status == 'DELETED'}" class="badge bg-danger text-white border border-secondary">
+                            <i class="bi bi-trash"></i> 삭제 예정
+                        </span>
 
                         <span th:unless="${device.status == 'DELETED'}">
-                <span th:if="${device.status != null}">
-                    <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
-                    <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
-                    <span class="badge bg-secondary" th:if="${device.status == 'OFF'}">OFF</span>
-                    <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'OFF'}">[[${device.status}]]</span>
-                </span>
-                <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
-            </span>
+                            <span th:if="${device.status != null}">
+                                <span class="badge bg-success" th:if="${device.status == 'RUNNING'}">RUNNING</span>
+                                <span class="badge bg-danger" th:if="${device.status == 'ERROR'}">ERROR</span>
+                                <span class="badge bg-secondary" th:if="${device.status == 'OFF'}">OFF</span>
+                                <span class="badge bg-info" th:unless="${device.status == 'RUNNING' or device.status == 'ERROR' or device.status == 'OFF'}">[[${device.status}]]</span>
+                            </span>
+                            <span th:unless="${device.status != null}" class="badge bg-warning text-dark">UNKNOWN</span>
+                        </span>
                     </td>
 
                     <td>
@@ -198,7 +198,6 @@
                                 삭제
                             </button>
                         </div>
-
 <!--                        <div th:if="${device.status == 'DELETED'}"-->
 <!--                             class="text-center text-danger fw-bold small d-day-display"-->
 <!--                             th:data-deleted-at="${device.deletedAt}">-->

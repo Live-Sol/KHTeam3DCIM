@@ -113,6 +113,7 @@ public class Device {
     @Column(name = "EMS_STATUS", length = 10)
     private String emsStatus;       // EMS 감시 상태 (ON/OFF)
     // 관리자 삭제 사유 필드 (DB 컬럼 추가 필요)
+    @Column(length = 500)
     private String deleteReason;
     // 삭제된 시점 기록
     private LocalDateTime deletedAt;

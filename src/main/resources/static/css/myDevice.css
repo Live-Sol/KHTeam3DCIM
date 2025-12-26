@@ -1,146 +1,93 @@
 /* =========================================
-   [StarRoot Device Status System]
-   Theme: Cyber Tech & Deep Space (Dark Mode)
+   [Device Status Page]
    Usage: my-devices.html
+   Style: Follows myRequestList.css (Admin Dashboard Theme)
    ========================================= */
 
-:root {
-    --primary-bg: #0f172a;       /* 짙은 우주색 */
-    --panel-bg: #1e293b;         /* 컨테이너 배경 */
-    --header-bg: #334155;        /* 테이블 헤더 */
-    --accent-cyan: #06b6d4;      /* 네온 시안 */
-    --accent-purple: #8b5cf6;    /* 네온 퍼플 */
-    --text-main: #f1f5f9;        /* 메인 텍스트 */
-    --text-sub: #94a3b8;         /* 보조 텍스트 */
-    --border-color: rgba(255, 255, 255, 0.1);
+/* 1. Layout & Text Overrides */
+/* 메인 컨텐츠 패딩은 myRequestList.css에서 상속받으므로 별도 지정 불필요 */
+/* body 배경 설정 제거 -> myRequestList.css의 --dark-bg가 적용됨 */
 
-    /* Status Colors */
-    --running-green: #34d399;
-    --off-gray: #94a3b8;
-    --deleted-red: #f87171;
-}
+/* 2. Table Adjustments (기존 Admin Table 스타일 유지 및 보완) */
+/* myRequestList.css에 정의된 .admin-table 스타일을 그대로 사용 */
+/* 여기서는 장비 현황 페이지에만 필요한 너비 조정이나 정렬만 추가 */
 
-/* 1. Layout & Typography */
-.main-content {
-    padding: 32px 50px;
-}
-
-.font-orbitron {
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1px;
-}
-
-/* 2. Table Design (Glassmorphism 적용) */
 .table-container {
-    background: var(--panel-bg);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    /* myRequestList.css와 동일한 배경색 적용 */
+    background-color: var(--panel-bg, #1e293b) !important;
 }
 
-.admin-table {
-    margin-bottom: 0 !important;
-    color: var(--text-main) !important;
-}
+/* 3. Status Badges (Flat Style로 통일) */
+/* 기존 네온 효과 제거 -> 기본 Bootstrap 색상과 유사하게 조정 */
 
-.admin-table thead th {
-    background-color: var(--header-bg) !important;
-    color: #ffffff !important;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
-    padding: 18px !important;
-    border: none !important;
-}
-
-.admin-table tbody td {
-    padding: 16px !important;
-    vertical-align: middle;
-    border-bottom: 1px solid var(--border-color) !important;
-    background-color: transparent !important;
-}
-
-.admin-table tbody tr:hover {
-    background-color: rgba(6, 182, 212, 0.05) !important; /* 시안색 호버 효과 */
-}
-
-/* 3. Device Status Badges */
 .status-badge {
-    min-width: 100px;
-    padding: 8px 12px;
-    font-weight: 700;
-    border-radius: 6px;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-}
-
-/* Running: 네온 그린 글로우 */
-.bg-success.status-badge {
-    background: rgba(52, 211, 153, 0.15) !important;
-    color: var(--running-green) !important;
-    border: 1px solid rgba(52, 211, 153, 0.3);
-    box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
-}
-
-/* Off: 무채색 회색 */
-.bg-secondary.status-badge {
-    background: rgba(148, 163, 184, 0.15) !important;
-    color: var(--off-gray) !important;
-    border: 1px solid rgba(148, 163, 184, 0.3);
-}
-
-/* Deleted: 네온 레드 글로우 */
-.bg-danger.status-badge {
-    background: rgba(248, 113, 113, 0.15) !important;
-    color: var(--deleted-red) !important;
-    border: 1px solid rgba(248, 113, 113, 0.3);
-    box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
-}
-
-/* 4. Form Controls (Search Bar) */
-.custom-select, .custom-form-control {
-    background-color: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid var(--border-color) !important;
-    color: #fff !important;
-    border-radius: 8px;
-}
-
-.custom-select:focus, .custom-form-control:focus {
-    border-color: var(--accent-cyan) !important;
-    box-shadow: 0 0 0 0.25rem rgba(6, 182, 212, 0.2);
-}
-
-/* 5. Buttons */
-.custom-btn-primary {
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-    border: none;
-    color: #fff !important;
-    font-family: 'Orbitron', sans-serif;
+    min-width: 80px;
+    padding: 6px 10px;
     font-weight: 600;
-    padding: 8px 20px;
-    transition: all 0.3s;
-}
-
-.custom-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
-}
-
-.custom-btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    color: var(--text-main) !important;
-}
-
-/* 6. Utility */
-.text-sub-muted {
-    color: var(--text-sub) !important;
+    border-radius: 4px;
     font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.alert-danger {
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.2);
-    color: var(--deleted-red);
+/* Running (Green) */
+.bg-success.status-badge {
+    background-color: #22c55e !important;
+    color: #fff !important;
+    border: none;
+    box-shadow: none;
 }
+
+/* Off (Gray) */
+.bg-secondary.status-badge {
+    background-color: #64748b !important;
+    color: #fff !important;
+    border: none;
+}
+
+/* Deleted (Red/Danger) */
+.bg-danger.status-badge {
+    background-color: #ef4444 !important;
+    color: #fff !important;
+    border: none;
+    box-shadow: none;
+}
+
+/* 4. Modal Styles (Flat Dark Theme) */
+/* 모달도 우주 배경 느낌을 빼고 깔끔한 다크 테마로 변경 */
+.modal-content {
+    background-color: #1e293b !important; /* Panel BG Color */
+    border: 1px solid #374151;
+    color: #e5e7eb;
+}
+
+.modal-header {
+    border-bottom: 1px solid #374151 !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #374151 !important;
+}
+
+/* 모달 내부 입력창 스타일 (읽기 전용) */
+.modal-body .form-control {
+    background-color: #0f172a !important; /* Dark BG */
+    border: 1px solid #374151;
+    color: #e5e7eb;
+}
+
+/* 텍스트 강조 색상 조정 (네온 시안 -> 일반 Info 색상) */
+.text-info {
+    color: #3b82f6 !important; /* Bootstrap Primary/Info Blue */
+}
+
+/* 5. Utility */
+/* 만료일 경고 텍스트 */
+.text-danger.fw-bold {
+    color: #ef4444 !important;
+}
+
+/* 폰트 강제 설정 제거 */
+/* myDevice.css에서 font-orbitron 등을 강제하지 않으므로,
+   HTML body에 적용된 Noto Sans KR이 자연스럽게 적용됩니다. */
