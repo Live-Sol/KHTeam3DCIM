@@ -37,6 +37,10 @@ public class Request {
     @Column(name = "CONTACT")
     private String contact;       // 담당자 직통 번호
 
+    // [추가됨] 담당자 이메일 필드 추가
+    @Column(name = "EMAIL", length = 100)
+    private String email;
+
     // 2. 장비 정보
     @Column(name = "CATE_ID")
     private String cateId;      // 장비 종류
@@ -50,7 +54,6 @@ public class Request {
     @Column(name = "HEIGHT_UNIT", nullable = false)
     private Integer heightUnit; // 2U, 4U, 6U 등
 
-    // ⭐ [추가] 신청 단계에서도 전력량과 EMS 여부를 받습니다.
     @Column(name = "POWER_WATT")
     private Integer powerWatt;      // 예상 소비 전력
 
@@ -90,7 +93,6 @@ public class Request {
     @Column(name = "SERIAL_NUM", length = 100)
     private String serialNum;
 
-    // 관리자 삭제 사유 필드 (DB 컬럼 추가 필요)
     @Column(length = 500)
     private String deleteReason;
 }

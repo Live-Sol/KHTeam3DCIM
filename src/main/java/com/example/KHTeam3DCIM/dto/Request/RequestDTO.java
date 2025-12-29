@@ -23,8 +23,12 @@ public class RequestDTO {
     @NotBlank(message = "담당자 성함은 필수 입력 항목입니다.")
     private String userName;
 
+    // [추가됨] 담당자 이메일
+    @NotBlank(message = "담당자 이메일은 필수 입력 항목입니다.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
+    private String email;
+
     @NotBlank(message = "담당자 연락처는 필수 입력 항목입니다.")
-    // 정규식 보완: 하이픈이 있든 없든 처리 가능하도록 혹은 입력 폼과 맞춤
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "올바른 전화번호 형식(010-0000-0000)이어야 합니다.")
     private String contact;
 
@@ -47,7 +51,7 @@ public class RequestDTO {
     @PositiveOrZero(message = "소비 전력은 0 이상의 숫자여야 합니다.")
     private Integer powerWatt;
 
-    private String emsStatus = "OFF"; // 기본값 설정
+    private String emsStatus = "OFF";
 
     // 3. 입고 계약 정보
     @NotBlank(message = "입고 목적을 입력해주세요.")
@@ -55,15 +59,13 @@ public class RequestDTO {
 
     @NotNull(message = "입고 희망일을 선택해주세요.")
     @FutureOrPresent(message = "입고 희망일은 오늘 이후여야 합니다.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd") // HTML date input과 매핑
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @NotNull(message = "계약 기간을 선택해주세요.")
     private Integer termMonth;
 
-    // ⭐ [추가] 신청자 아이디 (이력 조회용)
     private String memberId;
-
 
     public Request toEntity() {
         return Request.builder()
@@ -71,6 +73,7 @@ public class RequestDTO {
                 .companyName(this.companyName)
                 .companyPhone(this.companyPhone)
                 .userName(this.userName)
+                .email(this.email) // [추가됨] DTO의 이메일을 Entity로 전달
                 .contact(this.contact)
                 .cateId(this.cateId)
                 .vendor(this.vendor)
@@ -78,7 +81,7 @@ public class RequestDTO {
                 .heightUnit(this.heightUnit)
                 .powerWatt(this.powerWatt)
                 .emsStatus(this.emsStatus != null ? this.emsStatus : "OFF")
-                .status("WAITING") // 초기 상태값 강제 설정
+                .status("WAITING")
                 .purpose(this.purpose)
                 .startDate(this.startDate)
                 .termMonth(this.termMonth)

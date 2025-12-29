@@ -52,6 +52,7 @@ public class RequestController {
                 dto.setCompanyPhone(member.getCompanyPhone());
                 dto.setUserName(member.getName());
                 dto.setContact(member.getContact());
+                dto.setEmail(member.getEmail()); // [추가됨] 이메일 자동 채우기
             } catch (Exception e) {
                 // 회원 정보 로드 실패 시 로그만 남기고 빈 폼 제공
             }

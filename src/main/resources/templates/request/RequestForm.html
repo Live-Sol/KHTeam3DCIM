@@ -21,6 +21,8 @@
             <div class="card-body p-4 p-md-5">
                 <form th:action="@{/requests/new}" th:object="${requestDTO}" method="post">
                     <h5 class="section-title border-bottom pb-2 mb-4">신청자 정보</h5>
+
+                    <!-- 1. 회사 정보 (기존 유지) -->
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">회사명</label>
@@ -36,7 +38,8 @@
                         </div>
                     </div>
 
-                    <div class="row mb-5">
+                    <!-- 2. 담당자 이름 & 연락처 (좌우 배치) -->
+                    <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label text-sub">담당자 성함</label>
                             <input type="text" th:field="*{userName}" class="form-control custom-input"
@@ -48,6 +51,16 @@
                             <input type="text" th:field="*{contact}" class="form-control custom-input"
                                    th:classappend="${#fields.hasErrors('contact')} ? 'is-invalid'" placeholder="예: 010-0000-0000">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 담당자 이메일 (전체 너비 사용) -->
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <label class="form-label text-sub">담당자 이메일</label>
+                            <input type="email" th:field="*{email}" class="form-control custom-input"
+                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="예: user@example.com">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
                     </div>
 

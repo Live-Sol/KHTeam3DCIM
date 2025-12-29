@@ -121,8 +121,19 @@
                         <div>
                             <span class="badge bg-dark custom-badge me-1">대기 중</span>
                             <strong>No. [[${req.id}]]</strong>
-                            <!-- 요청 페이지에서 회원 상세 보기 -->
-                            <a th:href="@{/requests/members/{memberId}(memberId=${req.memberId})}" class="text-info">
+
+                            <!-- [수정됨] 회원 상세 정보 모달 트리거 -->
+                            <!-- 페이지 이동(@{...}) 대신 href="#" 및 data 속성 사용 -->
+                            <a href="#" class="text-info"
+                               data-bs-toggle="modal"
+                               data-bs-target="#memberDetailModal"
+                               th:data-id="${req.memberId}"
+                               th:data-name="${req.userName}"
+                               th:data-company="${req.companyName}"
+                               th:data-cphone="${req.companyPhone}"
+                               th:data-contact="${req.contact}"
+                               th:data-email="${req.email}"
+                               data-role="USER"> <!-- 수정됨: th:data-role="${req.role}" 삭제하고 고정값 'USER' 사용 -->
                                 <i class="bi bi-search"></i> [[${req.memberId}]]
                             </a>
                         </div>
@@ -176,7 +187,60 @@
     </main>
 </div>
 
-<!-- 반려 모달 -->
+<!-- [추가됨] 회원 상세 정보 Modal (findMembersAdmin.html과 동일한 구조) -->
+<div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title ps-2 text-white" id="memberDetailModalLabel">
+                    <i class="bi bi-person-vcard-fill me-2"></i>회원 상세 정보
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body pt-4 px-4 pb-2">
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">ID:</strong>
+                    <span id="modalId" class="text-white fs-5 fw-bold align-middle"></span>
+                    <span id="modalRole" class="badge ms-2 align-middle"></span>
+                </div>
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">이름:</strong>
+                    <span id="modalName" class="text-white"></span>
+                </div>
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">이메일:</strong>
+                    <span id="modalEmail" class="text-white"></span>
+                </div>
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">연락처:</strong>
+                    <span id="modalContact" class="text-white"></span>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">회사명:</strong>
+                    <span id="modalCompany" class="text-white"></span>
+                </div>
+
+                <div class="member-detail-row">
+                    <strong class="text-cyan-label">회사 전화번호:</strong>
+                    <span id="modalCPhone" class="text-white"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0 pb-4 pe-4">
+                <button type="button" class="btn-glass-close" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 반려 모달 (기존 코드 유지) -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -225,12 +289,53 @@
             }
         });
 
-        // 2. 서버 메시지 확인 및 Toast 출력
         const successMessage = [[${successMessage}]];
         const errorMessage = [[${errorMessage}]];
 
         if (successMessage) Toast.fire({ icon: 'success', title: successMessage });
         if (errorMessage) Toast.fire({ icon: 'error', title: errorMessage });
+
+        // ---------------------------------------------------------
+        // [기능 0] 회원 상세 정보 모달 데이터 바인딩 (추가됨)
+        // ---------------------------------------------------------
+        const memberDetailModal = document.getElementById('memberDetailModal');
+        if (memberDetailModal) {
+            memberDetailModal.addEventListener('show.bs.modal', event => {
+                // 클릭된 링크(버튼) 요소 가져오기
+                const button = event.relatedTarget;
+
+                // data-* 속성 값 읽기
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const company = button.getAttribute('data-company');
+                const cphone = button.getAttribute('data-cphone');
+                const email = button.getAttribute('data-email');
+                const contact = button.getAttribute('data-contact');
+                const role = button.getAttribute('data-role');
+
+                // 모달 내부 요소에 값 넣기
+                document.getElementById('modalId').textContent = id;
+                document.getElementById('modalName').textContent = name;
+                document.getElementById('modalCompany').textContent = company;
+                document.getElementById('modalCPhone').textContent = cphone;
+                document.getElementById('modalEmail').textContent = email ? email : '-'; // 값이 없으면 '-' 표시
+                document.getElementById('modalContact').textContent = contact;
+
+                // 역할 배지 스타일링
+                const roleBadge = document.getElementById('modalRole');
+                if (role) {
+                    roleBadge.textContent = role;
+                    if (role === 'ADMIN') {
+                        roleBadge.className = 'badge bg-danger ms-2 align-middle';
+                    } else {
+                        roleBadge.className = 'badge bg-secondary ms-2 align-middle';
+                    }
+                } else {
+                    roleBadge.textContent = 'USER'; // 값이 없으면 기본값
+                    roleBadge.className = 'badge bg-secondary ms-2 align-middle';
+                }
+            });
+        }
 
 
         // ---------------------------------------------------------
@@ -308,14 +413,14 @@
 
         approveBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
-                e.preventDefault(); // 바로 이동하는 것을 막음
+                e.preventDefault();
 
-                const targetUrl = this.getAttribute('href'); // 이동하려던 주소 저장
+                const targetUrl = this.getAttribute('href');
 
                 Swal.fire({
                     title: '입고 승인 진행',
                     text: "해당 요청을 승인하고 랙(Rack) 배정 단계로 이동하시겠습니까?",
-                    icon: 'question', // 물음표 아이콘
+                    icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#0d6efd',
                     cancelButtonColor: '#6c757d',
@@ -323,7 +428,6 @@
                     cancelButtonText: '취소'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // 사용자가 확인을 누르면 페이지 이동
                         window.location.href = targetUrl;
                     }
                 });
