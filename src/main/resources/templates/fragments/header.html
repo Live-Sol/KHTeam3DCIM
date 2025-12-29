@@ -182,6 +182,7 @@
             // 2. 모든 내비게이션 링크 가져오기
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link, .dropdown-item');
 
+            // 3. 현재 주소와 일치하는 링크에 'active' 클래스 추가
             navLinks.forEach(link => {
                 const linkPath = link.getAttribute('href');
                 if (linkPath === currentPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {

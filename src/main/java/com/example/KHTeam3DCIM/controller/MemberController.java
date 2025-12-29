@@ -6,6 +6,7 @@ import com.example.KHTeam3DCIM.repository.MemberRepository;
 import com.example.KHTeam3DCIM.security.CustomUserDetails;
 import com.example.KHTeam3DCIM.service.MailService;
 import com.example.KHTeam3DCIM.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest; // 추가됨
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -109,7 +110,7 @@ public class MemberController {
         return "member/editMember";
     }
 
-    // POST: 회원 수정 처리 (이미지 업로드 포함)
+    // POST: 회원 수정 처리
     @PostMapping("/edit")
     public String updateMemberUser(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -158,52 +159,46 @@ public class MemberController {
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
-    @GetMapping("/delete")
-    public String deleteUserForm(Model model) {
-        String loginId = getLoggedInUserId();
-        if (loginId.equals("anonymousUser")) {
+    // [수정됨] 회원 탈퇴 처리 (Soft Delete)
+    // 기존의 @GetMapping("/delete")는 삭제하고 POST 방식으로 처리합니다.
+    @PostMapping("/withdraw")
+    public String withdrawMember(@AuthenticationPrincipal UserDetails userDetails,
+                                 HttpServletRequest request,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (userDetails == null) {
             return "redirect:/members/login";
         }
-        Member member = memberService.findMember(loginId);
-        model.addAttribute("member", member);
-        return "member/deleteMember";
-    }
 
-    @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> deleteMember(@PathVariable String memberId, @RequestBody Map<String, String> body) {
-        String loggedInId = getLoggedInUserId();
-        String password = body.get("password");
-
-        if (loggedInId.equals("anonymousUser") || !loggedInId.equals(memberId)) {
-            return ResponseEntity.status(403).body(Map.of("message", "권한이 없거나 로그인 세션이 만료되었습니다."));
-        }
+        String memberId = userDetails.getUsername();
 
         try {
-            memberService.deleteMemberWithPassword(memberId, password);
-            SecurityContextHolder.getContext().setAuthentication(null);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            // 서비스 호출 (Soft Delete)
+            memberService.withdrawMember(memberId);
+
+            // 로그아웃 처리
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            SecurityContextHolder.clearContext();
+
+            redirectAttributes.addFlashAttribute("message", "회원 탈퇴가 완료되었습니다. 그동안 이용해주셔서 감사합니다.");
+            return "redirect:/"; // 메인 페이지로 이동 (url 파라미터 대신 FlashAttribute 사용)
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "탈퇴 처리 중 오류가 발생했습니다.");
+            return "redirect:/members/edit";
         }
     }
 
-    private String getLoggedInUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            return "anonymousUser";
-        }
-        if (authentication.getPrincipal() instanceof UserDetails) {
-            return ((UserDetails) authentication.getPrincipal()).getUsername();
-        }
-        return authentication.getName();
-    }
-
+    // 비밀번호 찾기 등 기타 메서드들...
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
         return "member/forgot_password";
     }
 
-    // ⭐️ 1. 인증번호 발송 API (안전한 예외 처리)
     @PostMapping("/send-verification-code")
     @ResponseBody
     public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> request, HttpSession session) {
@@ -211,14 +206,10 @@ public class MemberController {
         String email = request.get("email");
 
         try {
-            // 회원 조회 시 회원이 없으면 RuntimeException 발생
             Member member = memberService.findMember(memberId);
-
             if (!member.getEmail().equals(email)) {
                 return ResponseEntity.badRequest().body(Map.of("message", "입력하신 아이디의 이메일 정보와 일치하지 않습니다."));
             }
-
-            // 인증번호 생성 및 발송
             String code = String.valueOf(new Random().nextInt(900000) + 100000);
             mailService.sendEmail(email, code);
 
@@ -228,16 +219,13 @@ public class MemberController {
             return ResponseEntity.ok(Map.of("message", "인증번호가 발송되었습니다. 이메일을 확인해주세요."));
 
         } catch (RuntimeException e) {
-            // 회원 없음 에러 처리
             return ResponseEntity.badRequest().body(Map.of("message", "존재하지 않는 회원 아이디입니다."));
         } catch (Exception e) {
-            // 메일 서버 오류 등
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body(Map.of("message", "메일 발송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."));
+            return ResponseEntity.internalServerError().body(Map.of("message", "메일 발송 중 오류가 발생했습니다."));
         }
     }
 
-    // 2. 인증번호 확인 API
     @PostMapping("/verify-code")
     @ResponseBody
     public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> request, HttpSession session) {
@@ -252,7 +240,6 @@ public class MemberController {
         }
     }
 
-    // 3. 비밀번호 재설정
     @PostMapping("/forgot-password")
     public String resetPassword(@ModelAttribute MemberPasswordResetRequest request,
                                 HttpSession session, Model model) {
@@ -267,7 +254,6 @@ public class MemberController {
 
         try {
             memberService.resetPassword(request);
-
             session.removeAttribute("verificationCode");
             session.removeAttribute("isVerified");
             session.removeAttribute("verifiedMemberId");
@@ -279,28 +265,24 @@ public class MemberController {
             return "member/forgot_password";
         }
     }
-    // 내정보 페이지
+
     @GetMapping("/my")
     public String mypage(@AuthenticationPrincipal CustomUserDetails user, Model model) {
         String memberId = user.getMember().getMemberId();
         Member member = memberService.findMember(memberId);
         model.addAttribute("member", member);
-        model.addAttribute("returnUrl", "/"); // 메인으로
-
+        model.addAttribute("returnUrl", "/");
         return "member/memberPage";
     }
-    // 내정보 → 회원정보수정 이동 전 비밀번호 입력
+
     @PostMapping("/check-password")
     @ResponseBody
     public Map<String, Boolean> checkPassword(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal CustomUserDetails user) {
-
         String inputPassword = request.get("password");
         String savedPassword = user.getPassword();
-
         boolean matches = passwordEncoder.matches(inputPassword, savedPassword);
-
         return Map.of("valid", matches);
     }
 }

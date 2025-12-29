@@ -42,7 +42,7 @@ public class KhTeam3DcimApplication {
     public void initializeData() { // 메서드 이름을 좀 더 포괄적으로 변경했습니다 (Users -> Data)
 
         // ==========================================
-        // 1. 카테고리 초기 데이터 생성 (요청하신 부분)
+        // 1. 카테고리 초기 데이터 생성
         // ==========================================
         if (categoryRepository.count() == 0) { // 데이터가 하나도 없을 때만 실행
             categoryRepository.saveAll(Arrays.asList(
@@ -53,7 +53,7 @@ public class KhTeam3DcimApplication {
             ));
             System.out.println("⭐ 초기 카테고리 데이터(SVR, NET, STO, UPS) 생성 완료");
         } else {
-            // 혹시 특정 데이터가 빠져있을 수 있으니 개별 체크도 가능 (선택 사항)
+            // 혹시 특정 데이터가 빠져있을 수 있으니 개별 체크도 가능
             if(!categoryRepository.existsById("SVR")) categoryRepository.save(new Category("SVR", "Server"));
             if(!categoryRepository.existsById("NET")) categoryRepository.save(new Category("NET", "Network/Switch"));
             if(!categoryRepository.existsById("STO")) categoryRepository.save(new Category("STO", "Storage"));

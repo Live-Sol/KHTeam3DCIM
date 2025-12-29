@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title th:text="|${memberId} 님의 정보 수정|">회원 정보 수정</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Meta Tags -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-<link href="/css/index.css" rel="stylesheet">
-<link href="/css/memberStyle.css" rel="stylesheet">
+    <title th:text="|${memberId} 님의 정보 수정|">회원 정보 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link href="/css/index.css" rel="stylesheet">
+    <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
 <body class="login-body">
 <div th:replace="fragments/header :: header"></div>
@@ -37,6 +41,8 @@
                         </div>
 
                         <form th:action="@{/members/edit}" th:object="${memberUpdateByUserRequest}" method="post" enctype="multipart/form-data" id="editForm">
+                            <!-- ... (기존 폼 내용 생략: 프로필 이미지, 입력 필드 등 위와 동일) ... -->
+                            <!-- 여기는 기존 내용 유지하고 버튼 부분만 확인하면 됩니다 -->
 
                             <!-- 1. 프로필 이미지 -->
                             <div class="d-flex justify-content-center mb-4">
@@ -45,24 +51,21 @@
                                          th:data-original-src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
                                          th:data-default-src="'/images/default-profile.png'"
                                          id="previewImg" class="profile-preview"
-                                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'"> <!-- 이미지 깨질 시 대체 -->
+                                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                                     <input type="hidden" id="deleteProfileImage" name="deleteProfileImage" value="false">
                                     <button type="button" id="resetImgBtn" class="upload-icon-btn" title="기본 이미지로 변경"
                                             style="position: absolute; bottom: 0; left: 0; background-color: #6c757d; border: none; outline: none; cursor: pointer; z-index: 10;">
                                         <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
-
                                     <label for="profileImage" class="upload-icon-btn" title="이미지 변경"
                                            style="position: absolute; bottom: 0; right: 0;">
                                         <i class="bi bi-camera-fill"></i>
                                     </label>
-
-                                    <!-- 파일 용량 체크를 위해 onchange 이벤트 수정 -->
                                     <input type="file" id="profileImage" th:field="*{profileImage}" style="display: none;" accept="image/*" onchange="previewFile(this)">
                                 </div>
                             </div>
 
-                            <!-- 2. 읽기 전용 정보 (스타일 개선) -->
+                            <!-- 2. 읽기 전용 정보 -->
                             <div class="row mb-4 g-3">
                                 <div class="col-md-6">
                                     <label class="text-white-50 small mb-1 ms-1">User ID</label>
@@ -106,7 +109,6 @@
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyName" th:field="*{companyName}" placeholder="Company" required>
                                         <label for="companyName"><i class="bi bi-building me-2"></i>회사명</label>
-                                        <!-- 회사명 에러 메시지 -->
                                         <div class="validation-msg text-error" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
                                     </div>
                                 </div>
@@ -114,19 +116,17 @@
                                     <div class="form-floating">
                                         <input type="text" class="form-control form-control-custom" id="companyPhone" th:field="*{companyPhone}" placeholder="Tel" required>
                                         <label for="companyPhone"><i class="bi bi-telephone me-2"></i>회사 대표번호</label>
-                                        <!-- 회사번호 에러 메시지 -->
                                         <div class="validation-msg text-error" th:if="${#fields.hasErrors('companyPhone')}" th:errors="*{companyPhone}"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 4. 비밀번호 변경 섹션 (확인 필드 추가) -->
+                            <!-- 4. 비밀번호 변경 섹션 -->
                             <div class="mb-4">
                                 <div class="form-floating mb-2">
                                     <input type="password" class="form-control form-control-custom" id="newPassword" th:field="*{newPassword}" placeholder="New Password" autocomplete="new-password">
                                     <label for="newPassword"><i class="bi bi-key me-2"></i>새 비밀번호 (변경 시에만 입력)</label>
                                 </div>
-                                <!-- [추가됨] 비밀번호 확인 필드 -->
                                 <div class="form-floating">
                                     <input type="password" class="form-control form-control-custom" id="confirmPassword" placeholder="Confirm Password">
                                     <label for="confirmPassword"><i class="bi bi-check-all me-2"></i>비밀번호 확인</label>
@@ -147,9 +147,9 @@
                                 </a>
                             </div>
 
-                            <!-- [추가됨] 회원 탈퇴 링크 -->
+                            <!-- 회원 탈퇴 링크 (ID 부여) -->
                             <div class="text-center mt-4">
-                                <a th:href="@{/members/delete}" class="delete-account-link">
+                                <a href="#" id="deleteAccountLink" class="delete-account-link">
                                     회원 탈퇴하기
                                 </a>
                             </div>
@@ -167,11 +167,10 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // 1. 이미지 미리보기 & 용량 체크
+    // 1. 이미지 미리보기 & 초기화 로직 (기존과 동일)
     function previewFile(input) {
         const preview = document.getElementById('previewImg');
         const file = input.files[0];
@@ -179,13 +178,7 @@
 
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
-            Swal.fire({
-                icon: 'error',
-                title: '용량 초과',
-                text: '이미지 파일 크기는 10MB를 초과할 수 없습니다.',
-                background: '#1a1a1a',
-                color: '#ffffff'
-            });
+            Swal.fire({ icon: 'error', title: '용량 초과', text: '이미지 파일 크기는 10MB를 초과할 수 없습니다.', background: '#1a1a1a', color: '#ffffff' });
             input.value = "";
             return;
         }
@@ -193,56 +186,35 @@
         const reader = new FileReader();
         reader.addEventListener("load", function () {
             preview.src = reader.result;
-            // [중요] 파일을 새로 선택했으니 "삭제"가 아님! false로 설정
+            const deleteInput = document.getElementById('deleteProfileImage');
             if(deleteInput) deleteInput.value = "false";
         }, false);
         reader.readAsDataURL(file);
     }
-    // [추가하신 부분] 이미지 초기화 로직 (그대로 사용 OK)
+
     document.addEventListener('DOMContentLoaded', function() {
         const resetBtn = document.getElementById('resetImgBtn');
         const preview = document.getElementById('previewImg');
         const fileInput = document.getElementById('profileImage');
-        const deleteInput = document.getElementById('deleteProfileImage'); // 히든 인풋
+        const deleteInput = document.getElementById('deleteProfileImage');
 
         if (resetBtn) {
             resetBtn.addEventListener('click', function() {
-                // 1. HTML에 적어둔 "기본 이미지 경로" 가져오기
-                // ('/images/default-profile.png')
                 const defaultSrc = preview.getAttribute('data-default-src');
-
-                // 2. 화면 이미지를 기본 이미지로 변경
-                if(defaultSrc) {
-                    preview.src = defaultSrc;
-                }
-
-                // 3. 파일 선택된 것 비우기
+                if(defaultSrc) preview.src = defaultSrc;
                 fileInput.value = '';
-
-                // 4. [핵심] 서버에게 "기존 이미지 삭제해줘"라고 신호 보내기
                 if(deleteInput) {
                     deleteInput.value = "true";
-
-                    // (선택) 사용자에게 알림
-                    Swal.fire({
-                        toast: true,
-                        position: 'top',
-                        icon: 'info',
-                        title: '기본 이미지로 설정되었습니다.',
-                        showConfirmButton: false,
-                        timer: 1000
-                    });
+                    Swal.fire({ toast: true, position: 'top', icon: 'info', title: '기본 이미지로 설정되었습니다.', showConfirmButton: false, timer: 1000 });
                 }
             });
         }
     });
 
-    // 2. 폼 제출 시 SweetAlert2 및 중복 클릭 방지 적용
+    // 2. 폼 제출 시 유효성 검사 (기존과 동일)
     const editForm = document.getElementById('editForm');
-
     editForm.addEventListener('submit', function(e) {
         e.preventDefault();
-
         const form = this;
         const submitBtn = form.querySelector('button[type="submit"]');
         const newPw = document.getElementById('newPassword').value;
@@ -270,38 +242,51 @@
             color: '#ffffff'
         }).then((result) => {
             if (result.isConfirmed) {
-                // [중복 클릭 방지 처리]
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `처리 중... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
-
                 form.submit();
             }
         });
     });
 
-    // 3. 회원 탈퇴 시 SweetAlert2 확인창 적용
-    const deleteLink = document.querySelector('.delete-account-link');
+    // 3. [수정됨] 회원 탈퇴 로직 (POST 요청으로 변경)
+    const deleteLink = document.getElementById('deleteAccountLink');
     if (deleteLink) {
         deleteLink.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetUrl = this.getAttribute('href');
+
+            // CSRF 토큰 가져오기
+            const token = document.querySelector('meta[name="_csrf"]')?.content;
 
             Swal.fire({
                 title: '정말로 탈퇴하시겠습니까?',
-                text: "탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.",
+                html: "탈퇴하시면 로그인이 제한됩니다.<br>계속하시겠습니까?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: '탈퇴하기',
+                confirmButtonText: '네, 탈퇴합니다',
                 cancelButtonText: '취소',
                 background: '#1a1a1a',
-                color: '#ffffff'
+                color: '#ffffff',
+                focusCancel: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.style.pointerEvents = 'none';
-                    this.innerText = '탈퇴 처리 중...';
-                    window.location.href = targetUrl;
+                    // 가상의 Form 생성하여 POST 요청 전송
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/members/withdraw';
+
+                    if (token) {
+                        const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = '_csrf';
+                        hiddenField.value = token;
+                        form.appendChild(hiddenField);
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             });
         });
