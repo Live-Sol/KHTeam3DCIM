@@ -41,6 +41,8 @@ public class SecurityConfig {
                                 "/members/signup",                    // 회원가입 페이지
                                 "/members/check-id",                  // 회원가입 아이디 중복 확인 API
                                 "/members/login",                     // 로그인 페이지
+                                "/members/find-id",                   // [추가됨] 아이디 찾기 페이지
+                                "/members/find-id/check",             // [추가됨] 아이디 찾기 확인 API
                                 "/members/forgot-password",           // 비밀번호 찾기 페이지
                                 "/members/send-verification-code",    // 인증 코드 발송 API
                                 "/members/verify-code",               // 인증 코드 검증 API

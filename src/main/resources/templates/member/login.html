@@ -71,24 +71,30 @@
                             </div>
                         </form>
 
-                        <!-- Footer Links -->
-                        <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
-                            <!-- 비밀번호 찾기 -->
-                            <p class="text-white-50 small mb-2">
-                                비밀번호를 잊으셨나요?
-                                <a th:href="@{/members/forgot-password}" class="link-cyan fw-bold ms-1">비밀번호 찾으러가기</a>
-                            </p>
+                        <!-- Footer Links (Type A 적용 구간) -->
+                        <div class="text-center mt-5 pt-4 border-top border-secondary border-opacity-25">
 
-                            <!-- 회원가입 링크 -->
-                            <p class="text-white-50 small mb-2">
-                                회원가입이 필요하신가요?
-                                <a th:href="@{/members/signup}" class="link-cyan fw-bold ms-1">회원가입</a>
-                            </p>
+                            <!-- 1. 계정 찾기 그룹 (가로 배치) -->
+                            <div class="d-flex justify-content-center align-items-center mb-3">
+                                <a th:href="@{/members/find-id}" class="footer-link-sub">아이디 찾기</a>
+                                <span class="footer-divider mx-2"></span>
+                                <a th:href="@{/members/forgot-password}" class="footer-link-sub">비밀번호 찾기</a>
+                            </div>
 
-                            <!-- 홈으로 돌아가기 -->
-                            <a th:href="@{/}" class="link-cyan fw-bold">
-                                <i class="bi bi-house-door me-2"></i>메인으로 돌아가기
-                            </a>
+                            <!-- 2. 회원가입 강조 -->
+                            <div class="mb-4">
+                                <span class="text-white-50 small me-2">아직 회원이 아니신가요?</span>
+                                <a th:href="@{/members/signup}" class="link-cyan fw-bold text-decoration-none small" style="letter-spacing: 0.5px;">
+                                    회원가입 하기
+                                </a>
+                            </div>
+
+                            <!-- 3. 메인으로 (투명도 조절로 시각적 위계 낮춤) -->
+                            <div>
+                                <a th:href="@{/}" class="text-white-50 text-decoration-none small opacity-75 hover-opacity-100 d-inline-flex align-items-center">
+                                    <i class="bi bi-arrow-left me-1"></i> 메인으로 돌아가기
+                                </a>
+                            </div>
                         </div>
 
                     </div>

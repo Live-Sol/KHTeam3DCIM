@@ -57,7 +57,7 @@ public class MemberController {
                                RedirectAttributes rtt) {
         try {
             memberService.addMember(member);
-//            model.addAttribute("message", "회원가입 성공");
+            // model.addAttribute("message", "회원가입 성공");
             // [변경] 리다이렉트 후에도 유지되는 데이터 전달 (FlashAttribute)
             rtt.addFlashAttribute("signupSuccess", true);
             return "redirect:/members/login";
@@ -77,7 +77,10 @@ public class MemberController {
 
     // 로그인 페이지로 이동
     @GetMapping("/login")
-    public String loginForm(@RequestParam(value = "error", required = false) String error, Model model) {
+    public String loginForm(@RequestParam(value = "error", required = false) String error, Model model, HttpServletRequest request) {
+        // [Fix] 세션 강제 생성: CSRF 토큰 생성을 위해 세션이 필요할 수 있음
+        HttpSession session = request.getSession(true);
+
         if (error != null) {
             model.addAttribute("error", "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
@@ -287,5 +290,30 @@ public class MemberController {
         String savedPassword = user.getPassword();
         boolean matches = passwordEncoder.matches(inputPassword, savedPassword);
         return Map.of("valid", matches);
+    }
+
+    // 아이디 찾기 페이지 이동
+    @GetMapping("/find-id")
+    public String findIdForm() {
+        return "member/find_id";
+    }
+
+    // [추가할 코드] 아이디 찾기 실명 확인 API
+    @PostMapping("/find-id/check")
+    @ResponseBody
+    public ResponseEntity<?> findIdCheck(@RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String phone = request.get("phone");
+
+        try {
+            // 서비스 호출하여 아이디 찾기
+            String foundId = memberService.findMemberIdByNameAndContact(name, phone);
+
+            // 성공 시 아이디와 함께 응답
+            return ResponseEntity.ok(Map.of("message", "사용자 확인 완료", "memberId", foundId));
+        } catch (IllegalArgumentException e) {
+            // 실패 시 에러 메시지 응답
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 }

@@ -2,17 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <!--
+       [보안] CSRF Meta Tag
+       - AJAX(비동기) 통신 시 헤더에 포함시킬 CSRF 토큰과 헤더 이름을 메타 태그로 미리 렌더링합니다.
+       - Spring Security는 POST 요청 시 이 토큰이 없으면 요청을 거부합니다.
+    -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>회원 상세 정보</title>
+
+    <title>내 정보</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-
     <link href="/css/index.css" rel="stylesheet">
     <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
 <body class="dashboard-body">
+
+<!-- 헤더 프래그먼트 삽입 -->
 <div th:replace="fragments/header :: header"></div>
 
 <div class="content-wrapper d-flex justify-content-center align-items-center">
@@ -20,13 +27,17 @@
 
         <div class="text-center mb-4 mt-5">
             <h2 class="page-title">
-                <i class="bi bi-person-vcard-fill me-2"></i>  내 정보
+                <i class="bi bi-person-vcard-fill me-2"></i> 내 정보
             </h2>
         </div>
 
         <div class="row justify-content-center">
             <div class="col-lg-8">
 
+                <!--
+                   [Case 1] 회원이 DB에 없는 경우
+                   - 비정상적인 접근이거나 삭제된 데이터일 때 에러 화면을 표시합니다.
+                -->
                 <div th:if="${memberNotFound}" class="card login-card text-center p-5">
                     <div class="card-body">
                         <i class="bi bi-x-circle-fill fs-1 mb-3 text-danger"></i>
@@ -38,6 +49,11 @@
                     <div class="card-footer-glow"></div>
                 </div>
 
+                <!--
+                   [Case 2] 탈퇴한 회원 (Soft Deleted)
+                   - isDeleted 플래그가 true인 경우, 개인정보 보호를 위해 상세 내용을 숨깁니다.
+                   - 데이터는 DB에 남아있더라도(Soft Delete), UI상으로는 접근 불가를 명확히 합니다.
+                -->
                 <div th:if="${member != null and member.isDeleted}" class="card login-card text-center p-5">
                     <div class="card-body">
                         <i class="bi bi-exclamation-triangle-fill fs-1 mb-3 text-warning"></i>
@@ -50,14 +66,20 @@
                     <div class="card-footer-glow"></div>
                 </div>
 
+                <!--
+                   [Case 3] 정상 회원 (정보 출력)
+                   - 회원이 존재하고 탈퇴하지 않은 경우에만 이 블록이 렌더링됩니다.
+                -->
                 <div th:if="${member != null and !member.isDeleted}" class="card login-card">
                     <div class="card-body p-5 mt-2 p-md-3">
 
                         <div class="row align-items-center">
+                            <!-- 좌측: 텍스트 정보 -->
                             <div class="col-md-8 member-info-col border-secondary border-opacity-25" style="border-right: 1px solid rgba(255,255,255,0.15);">
                                 <h5 class="text-white-50 mb-3 border-bottom border-secondary border-opacity-25 pb-2">
                                     <i class="bi bi-person-circle me-2"></i>기본 정보
                                 </h5>
+                                <!-- Thymeleaf Inline Expressions [[...]] 사용: HTML 태그 사이에 변수 값을 안전하게 출력 -->
                                 <div class="mb-3">
                                     <strong class="text-cyan d-inline-block" style="width: 60px;">ID</strong>
                                     <span class="text-white">[[${member.memberId}]]</span>
@@ -88,8 +110,14 @@
                                 </div>
                             </div>
 
+                            <!-- 우측: 프로필 이미지 및 역할 -->
                             <div class="col-md-4 text-center">
                                 <div class="profile-display-container">
+                                    <!--
+                                       [이미지 처리 로직]
+                                       - 삼항 연산자를 사용하여 프로필 이미지가 null이면 기본 이미지를 출력합니다.
+                                       - onerror: 이미지가 깨졌거나 로드 실패 시 플랫아이콘 기본 이미지로 대체합니다.
+                                    -->
                                     <img th:src="${member.profileImage != null ? '/uploads/' + member.profileImage : '/images/default-profile.png'}"
                                          class="img-fluid profile-preview-static"
                                          alt="Profile"
@@ -103,10 +131,16 @@
                             </div>
                         </div>
 
+                        <!-- 버튼 영역 -->
                         <div class="d-flex justify-content-end gap-2 mt-5">
                             <a th:href="${returnUrl}" class="btn btn-outline-custom">
                                 메인으로 <i class="bi bi-arrow-return-left ms-1"></i>
                             </a>
+                            <!--
+                               [보안] 정보 수정 버튼
+                               - 바로 수정 페이지로 이동하지 않고, openPasswordModal() 함수를 호출하여
+                                 비밀번호 재확인 절차를 거칩니다.
+                            -->
                             <button type="button" class="btn btn-login px-4" onclick="openPasswordModal()">
                                 <i class="bi bi-pencil-square me-1"></i> 정보수정
                             </button>
@@ -121,6 +155,10 @@
     </div>
 </div>
 
+<!--
+   [모달] 비밀번호 재확인 창 (Bootstrap Modal)
+   - 수정 페이지 접근 권한을 확인하기 위한 2차 인증 수단입니다.
+-->
 <div class="modal fade modal-custom" id="passwordModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -134,6 +172,7 @@
                 <input type="password" id="passwordInput"
                        class="form-control form-control-custom"
                        placeholder="Enter Password">
+                <!-- 에러 메시지 (초기엔 d-none으로 숨김) -->
                 <div id="passwordError" class="validation-msg text-error mt-2 d-none">
                     <i class="bi bi-exclamation-triangle-fill"></i> 비밀번호가 일치하지 않습니다.
                 </div>
@@ -150,11 +189,13 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2: 기본 alert보다 예쁜 알림창 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
     /**
      * 비밀번호 확인 모달창 열기
+     * - 입력 필드 초기화 및 포커스 설정
      */
     function openPasswordModal() {
         document.getElementById('passwordInput').value = '';
@@ -164,13 +205,14 @@
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
 
+        // 모달이 완전히 떴을 때 입력창에 포커스를 줍니다 (UX 향상)
         modalElement.addEventListener('shown.bs.modal', () => {
             document.getElementById('passwordInput').focus();
         }, { once: true });
     }
 
     /**
-     * 엔터키 입력 이벤트
+     * 엔터키 입력 시 자동 제출 이벤트
      */
     document.getElementById('passwordInput').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') {
@@ -179,26 +221,29 @@
     });
 
     /**
-     * 서버에 비밀번호 검증 요청 및 상태 관리
+     * [핵심] 서버에 비밀번호 검증 요청 (AJAX)
+     * - 페이지 새로고침 없이 JSON 데이터를 주고받아 사용자 경험을 해치지 않습니다.
      */
     function checkPassword() {
         const passwordInput = document.getElementById('passwordInput');
         const password = passwordInput.value;
 
-        // 버튼 요소 선택
-        const modalConfirmBtn = document.querySelector('#passwordModal .btn-login'); // 클래스명 변경됨
+        // 버튼 상태 변경 (로딩 중 표시)
+        const modalConfirmBtn = document.querySelector('#passwordModal .btn-login');
         const mainEditBtn = document.querySelector('button[onclick="openPasswordModal()"]');
 
-        // CSRF 토큰 설정
+        // [보안] CSRF 토큰 추출 (Meta 태그에서)
         const token = document.querySelector('meta[name="_csrf"]')?.content;
         const header = document.querySelector('meta[name="_csrf_header"]')?.content;
-        const headers = { 'Content-Type': 'application/json' };
-        if (token && header) headers[header] = token;
 
-        // [중복 클릭 방지]
+        const headers = { 'Content-Type': 'application/json' };
+        if (token && header) headers[header] = token; // 헤더에 토큰 추가
+
+        // 중복 클릭 방지 처리
         modalConfirmBtn.disabled = true;
         modalConfirmBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> 확인 중...`;
 
+        // Fetch API 호출 (POST /members/check-password)
         fetch('/members/check-password', {
             method: 'POST',
             headers: headers,
@@ -207,7 +252,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.valid) {
-                    // [성공 시 처리]
+                    // [성공] 모달 닫기 및 SweetAlert 표시 후 페이지 이동
                     const modalEl = document.getElementById('passwordModal');
                     const modalInstance = bootstrap.Modal.getInstance(modalEl);
                     if (modalInstance) modalInstance.hide();
@@ -217,7 +262,6 @@
                         mainEditBtn.innerHTML = `처리 중... <span class="spinner-border spinner-border-sm"></span>`;
                     }
 
-                    // SweetAlert2 테마 커스텀 (Dark)
                     Swal.fire({
                         icon: 'success',
                         title: '인증 성공',
@@ -228,11 +272,11 @@
                         color: '#ffffff',
                         iconColor: '#06b6d4',
                         willClose: () => {
-                            window.location.href = '/members/edit';
+                            window.location.href = '/members/edit'; // 수정 페이지로 리다이렉트
                         }
                     });
                 } else {
-                    // [실패 시 처리]
+                    // [실패] 에러 메시지 표시 및 입력창 초기화
                     document.getElementById('passwordError').classList.remove('d-none');
                     passwordInput.value = '';
                     passwordInput.focus();

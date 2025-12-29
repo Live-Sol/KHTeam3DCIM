@@ -1,25 +1,36 @@
-<!--
-    th:fragment="slide"
-    [수정 사항]
-    1. <h1> 태그에 class="hero-title" 추가 -> CSS의 그라데이션/폰트 효과 적용
-    2. <p> 태그에 class="hero-desc" 추가 -> 글씨 크기 키움
--->
 <div th:fragment="slide" id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000"
      xmlns:th="http://www.w3.org/1999/xhtml">
 
-    <!-- 인디케이터 (하단 점) -->
+    <!-- 1. 하단 인디케이터 (Indicators) -->
+    <!-- 슬라이드 개수만큼 버튼을 배치하여 현재 위치를 표시 -->
     <div class="carousel-indicators">
-        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
-        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="3"></button>
+        <!-- class="active": 첫 번째 슬라이드가 기본으로 선택된 상태임을 명시 -->
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
     </div>
 
+    <!-- 2. 슬라이드 아이템 래퍼 (Wrapper) -->
     <div class="carousel-inner">
-        <!-- 슬라이드 1 -->
+
+        <!-- [Slide 1: 메인 비전] -->
         <div class="carousel-item active">
-            <img src="images/main/Server1.png" alt="Data Center">
+            <!--
+               [디자인 포인트: 이미지 처리]
+               - CSS (.carousel-item img)에서 filter: brightness(0.6)를 적용하여
+                 이미지를 어둡게 처리했습니다. 이는 위에 올라가는 흰색 텍스트의 가독성을 높이기 위함입니다.
+            -->
+            <img src="images/main/Server1.png" class="d-block w-100" alt="Data Center Main View">
+
+            <!--
+               [디자인 포인트: 텍스트 오버레이 (Overlay)]
+               - .hero-caption 클래스는 CSS에서 position: absolute; top: 50%; left: 50%;
+                 transform: translate(-50%, -50%); 속성을 가집니다.
+               - 이를 통해 이미지 정중앙에 텍스트를 배치하는 'Centering 기법'을 사용했습니다.
+            -->
             <div class="hero-caption">
+                <!-- .hero-title: Orbitron 폰트와 그라데이션 텍스트 효과 적용 -->
                 <h1 class="hero-title">StarRoot DCIM Solution</h1>
                 <p class="hero-desc">
                     지능형 데이터센터 통합 관리 시스템에 오신 것을 환영합니다.<br>
@@ -27,22 +38,28 @@
                 </p>
             </div>
         </div>
-        <!-- 슬라이드 2 -->
+
+        <!-- [Slide 2: 입고 신청 (CTA 버튼 포함)] -->
         <div class="carousel-item">
-            <img src="images/main/Server2.png" alt="Server Room">
+            <img src="images/main/Server2.png" class="d-block w-100" alt="Server Room Rack">
             <div class="hero-caption">
                 <h1 class="hero-title">Reservation for Server</h1>
                 <p class="hero-desc">
                     Server, Network, Storage, UPS 등<br>
                     쉽고 간편하게 귀사의 장비를 맡겨 보세요.
                 </p>
-                <!-- 버튼 디자인은 index.css의 .hero-caption .btn 에서 관리됨 -->
+                <!--
+                   [UX 포인트: Call To Action (CTA)]
+                   - 단순히 정보만 보여주는 것이 아니라, 사용자의 행동(입고 신청)을 유도하는 버튼 배치
+                   - .btn-lg, .rounded-pill 등을 사용해 클릭하기 쉬운 디자인 적용
+                -->
                 <a href="/requests/new" class="btn btn-lg mt-4 px-5 rounded-pill">장비 입고 신청하러 가기</a>
             </div>
         </div>
-        <!-- 슬라이드 3 -->
+
+        <!-- [Slide 3: 에너지 관리 (PUE)] -->
         <div class="carousel-item">
-            <img src="images/main/Server3.png" alt="Dashboard">
+            <img src="images/main/Server3.png" class="d-block w-100" alt="Dashboard Monitoring">
             <div class="hero-caption">
                 <h1 class="hero-title">Smart Energy Management</h1>
                 <p class="hero-desc">
@@ -51,9 +68,10 @@
                 </p>
             </div>
         </div>
-        <!-- 슬라이드 4 -->
+
+        <!-- [Slide 4: 보안] -->
         <div class="carousel-item">
-            <img src="images/main/Server4.png" alt="Security">
+            <img src="images/main/Server4.png" class="d-block w-100" alt="Security Control">
             <div class="hero-caption">
                 <h1 class="hero-title">Secure & Reliable</h1>
                 <p class="hero-desc">
@@ -64,11 +82,14 @@
         </div>
     </div>
 
-    <!-- 좌우 컨트롤 버튼 -->
+    <!-- 3. 좌우 컨트롤러 (Controls) -->
+    <!-- 사용자가 수동으로 슬라이드를 넘길 수 있는 네비게이션 버튼 -->
     <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
     </button>
 </div>

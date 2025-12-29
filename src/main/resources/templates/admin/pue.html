@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>PUE 모니터링</title>
+
+    <!-- Chart.js 로드 (하단 트렌드 그래프용) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
+    <!-- 스타일 시트 (부트스트랩 + 커스텀) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
@@ -13,7 +17,10 @@
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 
     <style>
-        /* 1. 네온 게이지 스타일 */
+        /* [기술 포인트 1] CSS Conic Gradient를 활용한 커스텀 게이지 */
+        /* 무거운 JS 차트 라이브러리 없이, CSS 그라데이션과 마스킹 기법만으로
+           고성능의 원형 게이지를 구현했습니다. --gauge-percent 변수만 JS로 조절하면 됩니다. */
+
         .gauge-container {
             position: relative;
             width: 250px;
@@ -24,25 +31,26 @@
             margin-bottom: 20px;
         }
 
-        /* 돌아가는 원형 그라데이션 (PUE 수치 시각화) */
+        /* 돌아가는 원형 그라데이션 */
         .gauge-ring {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 50%;
+            /* 원뿔형 그라데이션으로 게이지 채움 효과 구현 */
             background: conic-gradient(
                 var(--gauge-color) var(--gauge-percent),
                 rgba(255,255,255,0.05) 0%
             );
-            /* 가운데 구멍 뚫기 (도넛 모양) */
+            /* Masking: 가운데 구멍을 뚫어 도넛 모양으로 만듦 */
             mask: radial-gradient(transparent 65%, black 66%);
             -webkit-mask: radial-gradient(transparent 65%, black 66%);
 
-            transition: all 1s ease-out;
+            transition: all 1s ease-out; /* 부드러운 값 변경 애니메이션 */
             box-shadow: 0 0 20px var(--gauge-color-dim);
         }
 
-        /* 가운데 숫자 */
+        /* 가운데 숫자 텍스트 (사이버틱한 느낌) */
         .pue-value-box {
             font-family: 'Orbitron', sans-serif;
             font-size: 4rem;
@@ -52,7 +60,8 @@
             text-shadow: 0 0 15px var(--gauge-color);
         }
 
-        /* 맥박 뛰는 효과 (살아있는 느낌) */
+        /* [기술 포인트 2] 심장 박동(Pulse) 애니메이션 */
+        /* 데이터센터가 '살아있다'는 느낌을 주기 위해 중요 수치에 호흡하는 듯한 효과 부여 */
         @keyframes pulse-text {
             0% { transform: scale(1); text-shadow: 0 0 10px var(--gauge-color); }
             50% { transform: scale(1.02); text-shadow: 0 0 20px var(--gauge-color), 0 0 30px var(--gauge-color); }
@@ -62,7 +71,7 @@
             animation: pulse-text 2s infinite ease-in-out;
         }
 
-        /* 2. 카드 호버 효과 */
+        /* 카드 호버 효과 */
         .energy-card {
             background-color: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(255,255,255,0.05);
@@ -74,7 +83,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* 3. 전기가 흐르는 프로그레스 바 */
+        /* 프로그레스 바 스트라이프 애니메이션 (전기가 흐르는 느낌) */
         .progress-bar-animated-stripe {
             background-image: linear-gradient(
                 45deg,
@@ -91,13 +100,13 @@
         }
 
 
-        /* [신규] 중앙 숫자 양옆 이웃 텍스트 스타일 */
+        /* 중앙 숫자 양옆의 보조 텍스트 (Good/Bad 기준 표시) */
         .pue-display-wrapper {
             position: absolute;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px; /* 숫자와 이웃 텍스트 사이 간격 */
+            gap: 15px;
             z-index: 2;
             width: 100%;
         }
@@ -106,7 +115,7 @@
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 0.8rem;
             line-height: 1.2;
-            color: rgba(255, 255, 255, 0.4); /* 기본 반투명 */
+            color: rgba(255, 255, 255, 0.4);
             text-align: center;
             font-weight: 300;
             transition: all 0.3s;
@@ -121,7 +130,8 @@
         .neighbor-left { text-align: right; }
         .neighbor-right { text-align: left; }
 
-        /* [신규] 상태 배지 스타일 (4개 나열용) */
+        /* [기술 포인트 3] 상태 단계 배지 (Status Scale) */
+        /* PUE 값의 좋고 나쁨을 시각적으로 단계별로 보여주는 UI */
         .status-scale-container {
             display: flex;
             justify-content: center;
@@ -134,26 +144,18 @@
             font-size: 0.85rem;
             padding: 8px 16px;
             border-radius: 50px;
-            background-color: rgba(255, 255, 255, 0.05); /* 기본 비활성 배경 */
-            color: rgba(255, 255, 255, 0.3); /* 기본 비활성 텍스트 */
+            background-color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             font-weight: 500;
             transition: all 0.3s ease;
         }
 
-        /* 활성화 상태 (Active) - 각 단계별 색상 */
-        .status-step.active-excellent {
-            background-color: #22c55e; color: #000; box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
-        }
-        .status-step.active-good {
-            background-color: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
-        }
-        .status-step.active-average {
-            background-color: #facc15; color: #000; box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
-        }
-        .status-step.active-poor {
-            background-color: #f87171; color: #fff; box-shadow: 0 0 15px rgba(248, 113, 113, 0.6); border-color: transparent; transform: scale(1.1); font-weight: 800;
-        }
+        /* 활성화 상태 (Active) - Thymeleaf 조건부 클래스로 적용됨 */
+        .status-step.active-excellent { background-color: #22c55e; color: #000; box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); transform: scale(1.1); font-weight: 800; border-color: transparent;}
+        .status-step.active-good { background-color: #38bdf8; color: #000; box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); transform: scale(1.1); font-weight: 800; border-color: transparent;}
+        .status-step.active-average { background-color: #facc15; color: #000; box-shadow: 0 0 15px rgba(250, 204, 21, 0.6); transform: scale(1.1); font-weight: 800; border-color: transparent;}
+        .status-step.active-poor { background-color: #f87171; color: #fff; box-shadow: 0 0 15px rgba(248, 113, 113, 0.6); transform: scale(1.1); font-weight: 800; border-color: transparent;}
     </style>
 </head>
 <body>
@@ -172,12 +174,18 @@
 
         <div class="row g-4">
 
+            <!-- 1. 메인 게이지 섹션 -->
             <div class="col-lg-6">
                 <div class="card custom-card-dark shadow border-0 position-relative overflow-hidden mb-4">
                     <div class="card-body text-center d-flex flex-column justify-content-center align-items-center p-4">
                         <h5 class="text-white-50 text-uppercase letter-spacing-2 mb-2">실시간 전력 효율 지수(PUE) 모니터링 </h5>
                         <h6 class="text-white-50 mb-4">Real-time PUE Efficiency</h6>
 
+                        <!--
+                           [기술 포인트 4] Thymeleaf 변수를 CSS 변수로 주입
+                           서버에서 계산된 PUE 값과 색상 코드를 style 태그의 --CSS-VARIABLE에 직접 주입하여
+                           자바스크립트 없이도 페이지 로딩 시점에 정확한 그래프를 그립니다.
+                        -->
                         <div class="gauge-container"
                              th:with="percent=${(env.currentPue - 1.0) / 1.0 * 100},
                                      pueColor=${env.currentPue <= 1.35 ? '#22c55e' : (env.currentPue <= 1.5 ? '#38bdf8' : (env.currentPue <= 1.65 ? '#facc15' : '#f87171'))}"
@@ -185,6 +193,7 @@
                             <div class="gauge-ring"></div>
 
                             <div class="pue-display-wrapper">
+                                <!-- 왼쪽: 이전 단계 기준값 표시 -->
                                 <div class="pue-neighbor neighbor-left me-5">
                                     <span th:if="${env.currentPue <= 1.35}" class="text-info">Good<br><strong>1.35</strong></span>
                                     <span th:if="${env.currentPue > 1.35 && env.currentPue <= 1.5}" class="text-warning">Average<br><strong>1.50</strong></span>
@@ -192,10 +201,12 @@
                                     <span th:if="${env.currentPue > 1.65}"></span>
                                 </div>
 
+                                <!-- 중앙: 현재 PUE 값 (맥박 애니메이션 적용) -->
                                 <div id="pueValueDisplay" class="pue-value-box pue-pulse ms-5 me-5"
                                      th:text="${env.currentPue}" style="color: var(--gauge-color);">1.52
                                 </div>
 
+                                <!-- 오른쪽: 다음 단계 기준값 표시 -->
                                 <div class="pue-neighbor neighbor-right ms-5">
                                     <span th:if="${env.currentPue <= 1.35}"></span>
                                     <span th:if="${env.currentPue > 1.35 && env.currentPue <= 1.5}" class="text-success" style="opacity: 0.8">Excellent<br><strong>1.35</strong></span>
@@ -205,6 +216,7 @@
                             </div>
                         </div>
 
+                        <!-- 하단 상태 단계 표시기 (현재 상태에 불이 들어옴) -->
                         <div class="status-scale-container">
                             <div class="status-step"
                                  th:classappend="${env.currentPue > 1.65} ? 'active-poor' : ''">
@@ -229,6 +241,7 @@
                     </div>
                 </div>
 
+                <!-- 실시간 PUE 트렌드 그래프 -->
                 <div class="card custom-card-dark shadow border-0">
                     <div class="card-header bg-transparent border-0 text-white-50">
                         <i class="bi bi-graph-up"></i> 실시간 PUE 변화 (PUE History)
@@ -239,8 +252,10 @@
                 </div>
             </div>
 
+            <!-- 2. 세부 전력 데이터 섹션 -->
             <div class="col-lg-6">
                 <div class="row g-4">
+                    <!-- 총 시설 전력 -->
                     <div class="col-12">
                         <div class="card energy-card shadow-sm p-4">
                             <div class="d-flex justify-content-between align-items-center">
@@ -260,6 +275,7 @@
                         </div>
                     </div>
 
+                    <!-- IT 장비 전력 -->
                     <div class="col-12">
                         <div class="card energy-card shadow-sm p-4">
                             <div class="d-flex justify-content-between align-items-center">
@@ -279,15 +295,18 @@
                         </div>
                     </div>
 
+                    <!-- 에너지 소비 비율 프로그레스 바 -->
                     <div class="col-12">
                         <div class="card custom-card-dark p-4 h-100">
                             <h6 class="text-white-50 mb-3">에너지 소비 비율 (Energy Breakdown)</h6>
 
                             <div class="progress" style="height: 35px; background-color: #1e293b; border-radius: 8px; overflow: hidden;">
+                                <!-- IT Load (Blue) -->
                                 <div class="progress-bar bg-primary progress-bar-animated-stripe" role="progressbar"
                                      th:style="'width: ' + (${env.totalItLoad} * 100 / ${env.totalFacilityLoad}) + '%'"
                                      th:text="'IT Load (' + ${#numbers.formatInteger(env.totalItLoad * 100 / env.totalFacilityLoad, 0)} + '%)'">
                                 </div>
+                                <!-- Cooling/Etc (Warning) -->
                                 <div class="progress-bar bg-warning progress-bar-animated-stripe" role="progressbar"
                                      th:style="'width: ' + (100 - (${env.totalItLoad} * 100 / ${env.totalFacilityLoad})) + '%'"
                                      th:text="'Cooling/Etc'">
@@ -304,6 +323,7 @@
                             </div>
                             <hr class="border-secondary my-4">
 
+                            <!-- PUE 설명 -->
                             <div class="mt-4 pt-3 border-top border-secondary">
                                 <p class="text-white-50 small mb-0">
                                     <i class="bi bi-info-circle me-1"></i>
@@ -324,11 +344,14 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener("DOMContentLoaded", function() {
+        // [기술 포인트 5] 데이터 시뮬레이션 (Frontend Simulation)
+        // 차트 초기화 및 실시간 데이터 변동 효과를 구현합니다.
+
         const ctx = document.getElementById('pueChart').getContext('2d');
         const currentPue = [[${env.currentPue}]];
 
         // 더미 데이터 생성 (최근 1시간 변화량 시뮬레이션)
-        // 실제로는 DB에서 List<Double> 형태로 받아와야 하지만, 지금은 시각적 효과를 위해 난수 생성
+        // 실제로는 DB에서 List<Double> 형태로 받아와야 하지만, 시각적 효과를 위해 난수로 생성했습니다.
         const labels = ['50m', '40m', '30m', '20m', '10m', 'Now'];
         const dataPoints = [
             currentPue + 0.05,
@@ -377,29 +400,26 @@
             }
         });
 
-        // [신규 기능] PUE 숫자 실시간 변동 시뮬레이션 (4초 간격)
+        // [기술 포인트 6] PUE 숫자 실시간 변동 효과
+        // 정적인 숫자가 아니라, 살아서 움직이는 듯한 미세한 변동(Noise)을 줍니다.
         const pueDisplay = document.getElementById('pueValueDisplay');
-
-        // 초기값 (서버에서 받은 값)을 기준으로 시작
         let currentPueVal = parseFloat(pueDisplay.innerText);
 
         setInterval(() => {
-            // -0.01 ~ +0.01 사이의 난수 생성
+            // -0.01 ~ +0.01 사이의 아주 작은 난수 생성
             const noise = (Math.random() * 0.02) - 0.01;
 
             // 값 업데이트
             currentPueVal += noise;
-
-            // 소수점 2자리로 고정하여 화면 표시
             pueDisplay.innerText = currentPueVal.toFixed(2);
 
-            // (선택사항) 값이 변할 때 텍스트 그림자 효과를 강하게 줬다 빼기
+            // (선택사항) 값이 변할 때 텍스트 그림자 효과를 '반짝'이게 함
             pueDisplay.style.textShadow = "0 0 25px var(--gauge-color)";
             setTimeout(() => {
                 pueDisplay.style.textShadow = "0 0 15px var(--gauge-color)";
             }, 500);
 
-        }, 4000); // 4000ms = 4초
+        }, 4000); // 4초마다 갱신
     });
     /*]]>*/
 </script>

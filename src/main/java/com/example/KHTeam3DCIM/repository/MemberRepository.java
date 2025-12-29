@@ -22,4 +22,7 @@ public interface MemberRepository extends JpaRepository<Member,String> {
     // 전체 회원을 Role을 기준으로 오름차순(Asc) 정렬하여 조회
     List<Member> findAllByOrderByRoleAsc();
 
+    // 이름과 연락처로 회원 찾기 (아이디 찾기용)
+    Optional<Member> findByNameAndContact(String name, String contact);
+
 }

@@ -6,58 +6,80 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-
     <link href="/css/index.css" rel="stylesheet">
     <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
 <body class="login-body">
 
-<!-- 1. 네비게이션 헤더 -->
+<!-- 1. 네비게이션 헤더 (모듈화된 프래그먼트 사용) -->
 <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- 2. 회원가입 메인 섹션 -->
+<!-- 2. 회원가입 메인 컨테이너 -->
 <div class="login-wrapper">
     <div class="container">
+        <!-- 반응형 그리드: 화면 중앙 정렬 -->
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
 
-                <!-- Glassmorphism Card -->
+                <!-- [디자인] Glassmorphism 카드 UI 적용 -->
                 <div class="card login-card">
                     <div class="card-body p-5">
 
-                        <!-- Title -->
+                        <!-- 타이틀 영역 -->
                         <div class="text-center mb-5">
                             <h2 class="login-title">STAR-ROOT<br>SIGNUP</h2>
                             <p class="text-white-50 small">StarRoot에 접속하여 다양한 서비스를 누려보세요.</p>
                         </div>
 
-                        <!-- 에러 메시지 -->
+                        <!--
+                           [서버 응답 메시지]
+                           - Controller에서 유효성 검사 실패 시 'error' 모델 속성에 메시지를 담아 보냅니다.
+                           - th:if="${error}": 에러가 있을 때만 이 알림창을 렌더링합니다.
+                        -->
                         <div th:if="${error}" class="alert alert-custom mb-4" role="alert">
                             <i class="bi bi-exclamation-octagon-fill me-2"></i>
                             <span th:text="${error}">회원가입 중 문제가 발생했습니다.</span>
                         </div>
 
+                        <!--
+                           [회원가입 폼]
+                           - action: /members (POST) -> MemberController.createMember() 메서드와 매핑됨
+                           - id="signupForm": 자바스크립트에서 유효성 검사(Validation)를 제어하기 위해 사용
+                        -->
                         <form id="signupForm" th:action="@{/members}" method="POST">
+
+                            <!--
+                               [보안] CSRF (Cross-Site Request Forgery) 토큰
+                               - Spring Security 사용 시 POST 요청에는 반드시 CSRF 토큰이 포함되어야 합니다.
+                               - 이 토큰이 없으면 403 Forbidden 에러가 발생하여 가입이 차단됩니다.
+                            -->
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-                            <!-- 섹션 1: 계정 정보 -->
+                            <!-- =============================================
+                                 SECTION 1: 계정 정보 (Account Info)
+                                 - MemberCreateRequest DTO의 memberId, password 필드와 매핑
+                            ============================================= -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4">
                                 <i class="bi bi-shield-lock me-2"></i>계정 정보
                             </h6>
 
-                            <!-- 아이디 + 중복확인 -->
+                            <!-- 1. 아이디 입력 및 중복 확인 -->
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <div class="input-group">
                                         <div class="form-floating flex-grow-1">
-                                            <input type="text" class="form-control form-control-custom rounded-end-0" id="memberId" name="memberId" placeholder="User ID" required>
+                                            <!-- name="memberId": DTO의 memberId 필드에 자동 바인딩 -->
+                                            <input type="text" class="form-control form-control-custom rounded-end-0"
+                                                   id="memberId" name="memberId" placeholder="User ID" required>
                                             <label for="memberId">아이디</label>
                                         </div>
+                                        <!-- type="button": 폼 제출(submit)을 방지하고 AJAX 함수만 실행하기 위함 -->
                                         <button type="button" class="btn btn-check-custom px-4" id="checkIdBtn">
                                             <i class="bi bi-check2-circle me-1"></i> Check
                                         </button>
                                     </div>
-                                    <!-- 메시지 영역 -->
+
+                                    <!-- 실시간 유효성 검사 피드백 메시지 (JS로 display 제어) -->
                                     <div id="memberIdPatternError" class="validation-msg text-error" style="display:none;">
                                         <i class="bi bi-x-circle"></i> 영문자와 숫자만 사용하여 4~20자여야 합니다.
                                     </div>
@@ -70,11 +92,13 @@
                                 </div>
                             </div>
 
-                            <!-- 비밀번호 & 확인 (2단 배열) -->
+                            <!-- 2. 비밀번호 및 확인 -->
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
-                                        <input type="password" class="form-control form-control-custom" id="password" name="password" placeholder="Password" required>
+                                        <!-- name="password": DTO의 password 필드에 바인딩 -->
+                                        <input type="password" class="form-control form-control-custom"
+                                               id="password" name="password" placeholder="Password" required>
                                         <label for="password">비밀번호</label>
                                     </div>
                                     <div id="passwordError" class="validation-msg text-error" style="display:none;">
@@ -83,7 +107,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="password" class="form-control form-control-custom" id="passwordConfirm" placeholder="passwordConfirm" required>
+                                        <!-- 확인용 필드는 서버로 전송할 필요 없으므로 name 속성 제외 가능하지만, JS 검증용으로 사용 -->
+                                        <input type="password" class="form-control form-control-custom"
+                                               id="passwordConfirm" placeholder="passwordConfirm" required>
                                         <label for="passwordConfirm">비밀번호 재확인</label>
                                     </div>
                                     <div id="passwordConfirmError" class="validation-msg text-error" style="display:none;">
@@ -92,16 +118,20 @@
                                 </div>
                             </div>
 
-                            <!-- 섹션 2: 담당자 정보 -->
+                            <!-- =============================================
+                                 SECTION 2: 담당자 정보 (Contact Info)
+                                 - MemberCreateRequest DTO의 name, contact, email 필드와 매핑
+                            ============================================= -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4 mt-2">
                                 <i class="bi bi-person-vcard me-2"></i>담당자 정보
                             </h6>
 
-                            <!-- 이름 & 연락처 -->
+                            <!-- 3. 이름 및 연락처 -->
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control form-control-custom" id="name" name="name" placeholder="Name" required>
+                                        <input type="text" class="form-control form-control-custom"
+                                               id="name" name="name" placeholder="Name" required>
                                         <label for="name">담당자 성함</label>
                                     </div>
                                     <div id="nameError" class="validation-msg text-error" style="display:none;">
@@ -110,19 +140,21 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control form-control-custom" id="contact" name="contact" placeholder="010-0000-0000" required>
+                                        <input type="text" class="form-control form-control-custom"
+                                               id="contact" name="contact" placeholder="010-0000-0000" required>
                                         <label for="contact">예: 010-0000-0000</label>
                                     </div>
                                     <div id="contactError" class="validation-msg text-error" style="display:none;">
-                                        <i class="bi bi-x-circle"></i> 형식이 올바르지 않습니다.
+                                        <i class="bi bi-x-circle"></i> 번호 형식 (000-0000-0000)
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 이메일 -->
+                            <!-- 4. 이메일 -->
                             <div class="mb-4">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="Email" required>
+                                    <input type="email" class="form-control form-control-custom"
+                                           id="email" name="email" placeholder="Email" required>
                                     <label for="email">예: KHcompany@example.com</label>
                                 </div>
                                 <div id="emailError" class="validation-msg text-error" style="display:none;">
@@ -130,15 +162,20 @@
                                 </div>
                             </div>
 
-                            <!-- 섹션 3: 회사 정보 -->
+                            <!-- =============================================
+                                 SECTION 3: 기업 정보 (Company Info)
+                                 - MemberCreateRequest DTO의 companyName, companyPhone 필드와 매핑
+                            ============================================= -->
                             <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4 mt-2">
                                 <i class="bi bi-building me-2"></i>기업 정보
                             </h6>
 
+                            <!-- 5. 회사명 및 대표전화 -->
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-4 mb-md-0">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control form-control-custom" id="companyName" name="companyName" placeholder="Company Name" required>
+                                        <input type="text" class="form-control form-control-custom"
+                                               id="companyName" name="companyName" placeholder="Company Name" required>
                                         <label for="companyName">예: KH컴퍼니</label>
                                     </div>
                                     <div id="companyNameError" class="validation-msg text-error" style="display:none;">
@@ -147,24 +184,31 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control form-control-custom" id="companyPhone" name="companyPhone" placeholder="052-000-0000" required>
+                                        <input type="text" class="form-control form-control-custom"
+                                               id="companyPhone" name="companyPhone" placeholder="052-000-0000" required>
                                         <label for="companyPhone">예: 052-000-0000</label>
                                     </div>
                                     <div id="companyPhoneError" class="validation-msg text-error" style="display:none;">
-                                        <i class="bi bi-x-circle"></i> 번호 형식이 올바르지 않습니다.
+                                        <i class="bi bi-x-circle"></i> 번호 형식 (000-000-0000)
                                     </div>
                                 </div>
                             </div>
 
+                            <!--
+                               [히든 필드] 기본 권한 설정
+                               - 회원가입 시 기본적으로 'USER' 권한을 부여합니다.
+                               - 백엔드 로직에서도 처리 가능하지만 명시적으로 전송합니다.
+                            -->
                             <input type="hidden" name="role" value="USER">
 
-                            <!-- Submit Button -->
+                            <!-- 제출 버튼 -->
                             <div class="d-grid gap-2 mt-5">
                                 <button type="submit" class="btn btn-login btn-lg">
-                                    회원가입 <i class="bi bi-arrow-right-short"></i>
+                                    회원가입 완료 <i class="bi bi-arrow-right-short"></i>
                                 </button>
                             </div>
 
+                            <!-- 하단 링크 -->
                             <div class="text-center mt-3">
                                 <p class="text-white-50 small">
                                     이미 계정이 있으신가요? <a th:href="@{/members/login}" class="link-cyan fw-bold">로그인</a>
@@ -173,7 +217,7 @@
                         </form>
                     </div>
 
-                    <!-- Decorative Element -->
+                    <!-- 장식용 하단 발광 효과 -->
                     <div class="card-footer-glow"></div>
                 </div>
 
@@ -182,51 +226,62 @@
     </div>
 </div>
 
-<!-- 3. 푸터 -->
+<!-- 3. 푸터 (프래그먼트 사용) -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
-<!-- 4. 기능 스크립트 (기존 로직 유지) -->
+<!--
+    [기능 스크립트]
+    - 클라이언트 사이드 유효성 검사 (Regex)
+    - AJAX 아이디 중복 확인
+    - 폼 제출 차단 (유효성 검사 실패 시)
+-->
 <script>
-    /* ======================
-       공통 변수
-    ====================== */
+    /* =========================================
+       1. 변수 및 DOM 요소 캐싱
+       ========================================= */
     const memberIdInput = document.getElementById('memberId');
     const memberIdPatternError = document.getElementById('memberIdPatternError');
     const memberIdCheckError = document.getElementById('memberIdCheckError');
     const memberIdCheckSuccess = document.getElementById('memberIdCheckSuccess');
     const checkIdBtn = document.getElementById('checkIdBtn');
 
+    // 중복 확인 통과 여부를 저장하는 상태 변수
     let isMemberIdAvailable = false;
 
-    /* ======================
-       아이디 변경 시 중복확인 무효화
-    ====================== */
+    /* =========================================
+       2. 아이디 입력 변경 감지
+       - 사용자가 아이디를 수정하면 기존 중복 확인 결과는 무효화되어야 함.
+       ========================================= */
     memberIdInput.addEventListener('input', function () {
-        isMemberIdAvailable = false;
+        isMemberIdAvailable = false; // 상태 초기화
         memberIdCheckSuccess.style.display = 'none';
         memberIdCheckError.style.display = 'none';
         memberIdPatternError.style.display = 'none';
     });
 
-    /* ======================
-       아이디 중복 검사 (버튼 클릭)
-    ====================== */
+    /* =========================================
+       3. 아이디 중복 확인 (AJAX Fetch API)
+       - 백엔드 엔드포인트: /members/check-id?memberId=...
+       - HTTP Method: GET
+       - 응답 형식: JSON { "available": true/false }
+       ========================================= */
     checkIdBtn.addEventListener('click', function () {
         const memberId = memberIdInput.value.trim();
-        const pattern = /^[a-zA-Z0-9]{4,20}$/;
+        const pattern = /^[a-zA-Z0-9]{4,20}$/; // 1차 정규식 검사 (영문, 숫자 4~20자)
 
+        // 패턴 불일치 시 서버 요청 없이 즉시 에러 표시
         if (!pattern.test(memberId)) {
-            memberIdPatternError.style.display = 'flex'; // flex로 변경 (아이콘 정렬)
+            memberIdPatternError.style.display = 'flex'; // 아이콘 정렬을 위해 flex 사용
             memberIdInput.focus();
             memberIdCheckSuccess.style.display = 'none';
             memberIdCheckError.style.display = 'none';
             return;
         }
 
+        // 패턴 통과 시 에러 숨김
         memberIdPatternError.style.display = 'none';
-        memberIdCheckError.style.display = 'none';
 
-        // Fetch API
+        // 비동기 통신 시작
         fetch(`/members/check-id?memberId=${memberId}`)
             .then(res => {
                 if (!res.ok) {
@@ -235,10 +290,11 @@
                 return res.json();
             })
             .then(data => {
+                // MemberController의 반환값에 따라 UI 업데이트
                 if (data.available) {
                     memberIdCheckSuccess.style.display = 'flex';
                     memberIdCheckError.style.display = 'none';
-                    isMemberIdAvailable = true;
+                    isMemberIdAvailable = true; // 가입 가능 상태로 변경
                 } else {
                     memberIdCheckError.style.display = 'flex';
                     memberIdCheckSuccess.style.display = 'none';
@@ -248,36 +304,27 @@
             .catch(error => {
                 console.error("아이디 중복 검사 중 오류 발생:", error);
                 alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-                memberIdCheckError.style.display = 'flex';
-                memberIdCheckSuccess.style.display = 'none';
                 isMemberIdAvailable = false;
             });
     });
 
-    /* =====================
-       폼 제출 시 최종 검증
-    ====================== */
+    /* =========================================
+       4. 폼 제출 시 최종 유효성 검사 (Interceptor)
+       - submit 이벤트를 가로채서 모든 필드를 검사합니다.
+       - 하나라도 실패하면 event.preventDefault()로 제출을 막습니다.
+       ========================================= */
     document.getElementById('signupForm').addEventListener('submit', function(event) {
-        let valid = true;
+        let valid = true; // 최종 유효성 상태
 
-        /* 1. 아이디 (패턴 + 중복 확인) */
-        const memberId = memberIdInput.value.trim();
-        const memberIdPattern = /^[a-zA-Z0-9]{4,20}$/;
-
-        if (!memberIdPattern.test(memberId)) {
-            memberIdPatternError.style.display = 'flex';
+        // (1) 아이디 중복 확인 여부 체크
+        // 정규식은 통과했더라도 중복 확인 버튼을 안 눌렀으면 차단
+        if (!isMemberIdAvailable) {
+            alert("아이디 중복 확인을 완료해주세요.");
             if (valid) memberIdInput.focus();
             valid = false;
-        } else {
-            memberIdPatternError.style.display = 'none';
-            if (!isMemberIdAvailable) {
-                alert("아이디 중복 확인을 완료해주세요.");
-                if (valid) memberIdInput.focus();
-                valid = false;
-            }
         }
 
-        /* 2. 비밀번호 */
+        // (2) 비밀번호 유효성 (영문+숫자 5~20자)
         const password = document.getElementById('password').value;
         const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{5,20}$/;
         const passwordError = document.getElementById('passwordError');
@@ -290,7 +337,7 @@
             passwordError.style.display = 'none';
         }
 
-        /* 3. 비밀번호 확인 */
+        // (3) 비밀번호 재확인 일치 여부
         const passwordConfirm = document.getElementById('passwordConfirm').value;
         const passwordConfirmError = document.getElementById('passwordConfirmError');
 
@@ -302,7 +349,7 @@
             passwordConfirmError.style.display = 'none';
         }
 
-        /* 4. 이름 */
+        // (4) 이름 유효성 (한글/영문 2~10자)
         const name = document.getElementById('name').value.trim();
         const namePattern = /^[a-zA-Z가-힣]{2,10}$/;
         const nameError = document.getElementById('nameError');
@@ -315,7 +362,8 @@
             nameError.style.display = 'none';
         }
 
-        /* 5. 담당자 번호 */
+        // (5) 담당자 연락처 유효성 (000-0000-0000)
+        // \d{2,3}: 02 또는 010 등, \d{3,4}: 중간번호, \d{4}: 뒷번호
         const phonePattern = /^\d{2,3}-\d{3,4}-\d{4}$/;
         const contact = document.getElementById('contact').value.trim();
         const contactError = document.getElementById('contactError');
@@ -328,7 +376,7 @@
             contactError.style.display = 'none';
         }
 
-        /* 6. 이메일 */
+        // (6) 이메일 유효성
         const email = document.getElementById('email').value.trim();
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const emailError = document.getElementById('emailError');
@@ -341,7 +389,7 @@
             emailError.style.display = 'none';
         }
 
-        /* 7. 회사명 */
+        // (7) 회사명 유효성 (2~30자, 특수문자 제한)
         const companyName = document.getElementById('companyName').value.trim();
         const companyNamePattern = /^[a-zA-Z0-9가-힣\s]{2,30}$/;
         const companyNameError = document.getElementById('companyNameError');
@@ -354,7 +402,7 @@
             companyNameError.style.display = 'none';
         }
 
-        /* 8. 회사 대표 번호 */
+        // (8) 회사 대표 번호 유효성
         const companyPhone = document.getElementById('companyPhone').value.trim();
         const companyPhoneError = document.getElementById('companyPhoneError');
 
@@ -366,6 +414,7 @@
             companyPhoneError.style.display = 'none';
         }
 
+        // 유효성 검사 중 하나라도 실패했다면 폼 제출 중단
         if (!valid) {
             event.preventDefault();
         }

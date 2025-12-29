@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- CSRF Meta Tags -->
+    <!--
+       [보안] CSRF Meta Tags
+       - 탈퇴(Withdraw) 요청 시 자바스크립트로 동적 폼을 생성할 때 이 토큰이 필요합니다.
+    -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
@@ -11,12 +14,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-
     <link href="/css/index.css" rel="stylesheet">
     <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
 <body class="login-body">
 <div th:replace="fragments/header :: header"></div>
+
 <div class="login-wrapper">
     <div class="container">
         <div class="row justify-content-center align-items-center h-100">
@@ -30,7 +33,7 @@
                             <p class="text-white-50 small" th:text="|${memberId} 님의 정보를 수정합니다.|"></p>
                         </div>
 
-                        <!-- 성공/실패 메시지 -->
+                        <!-- 성공/실패 메시지 피드백 (Flash Attribute) -->
                         <div th:if="${successMessage}" class="alert alert-success-custom mb-4" role="alert">
                             <i class="bi bi-check-circle-fill me-2"></i>
                             <span th:text="${successMessage}">정보가 수정되었습니다.</span>
@@ -40,23 +43,33 @@
                             <span th:text="${error}">오류가 발생했습니다.</span>
                         </div>
 
+                        <!--
+                           [Form 설정]
+                           - th:object: Controller에서 넘겨준 DTO 객체와 바인딩합니다.
+                           - enctype="multipart/form-data": 프로필 이미지 파일 업로드를 위해 필수입니다.
+                        -->
                         <form th:action="@{/members/edit}" th:object="${memberUpdateByUserRequest}" method="post" enctype="multipart/form-data" id="editForm">
-                            <!-- ... (기존 폼 내용 생략: 프로필 이미지, 입력 필드 등 위와 동일) ... -->
-                            <!-- 여기는 기존 내용 유지하고 버튼 부분만 확인하면 됩니다 -->
 
-                            <!-- 1. 프로필 이미지 -->
+                            <!-- 1. 프로필 이미지 업로드 영역 -->
                             <div class="d-flex justify-content-center mb-4">
                                 <div class="profile-upload-container" style="position: relative; display: inline-block;">
+                                    <!-- 현재 이미지 또는 기본 이미지 표시 -->
                                     <img th:src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
                                          th:data-original-src="${profileImage != null ? '/uploads/' + profileImage : '/images/default-profile.png'}"
                                          th:data-default-src="'/images/default-profile.png'"
                                          id="previewImg" class="profile-preview"
                                          onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+
+                                    <!-- 이미지 삭제 여부를 전송하는 히든 필드 -->
                                     <input type="hidden" id="deleteProfileImage" name="deleteProfileImage" value="false">
+
+                                    <!-- 이미지 초기화 버튼 (JS 동작) -->
                                     <button type="button" id="resetImgBtn" class="upload-icon-btn" title="기본 이미지로 변경"
                                             style="position: absolute; bottom: 0; left: 0; background-color: #6c757d; border: none; outline: none; cursor: pointer; z-index: 10;">
                                         <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
+
+                                    <!-- 파일 선택 버튼 (라벨이 input을 트리거함) -->
                                     <label for="profileImage" class="upload-icon-btn" title="이미지 변경"
                                            style="position: absolute; bottom: 0; right: 0;">
                                         <i class="bi bi-camera-fill"></i>
@@ -65,7 +78,7 @@
                                 </div>
                             </div>
 
-                            <!-- 2. 읽기 전용 정보 -->
+                            <!-- 2. 읽기 전용 정보 (수정 불가) -->
                             <div class="row mb-4 g-3">
                                 <div class="col-md-6">
                                     <label class="text-white-50 small mb-1 ms-1">User ID</label>
@@ -86,17 +99,20 @@
 
                             <hr class="divider-line my-4">
 
-                            <!-- 3. 수정 가능 정보 -->
+                            <!-- 3. 수정 가능 정보 (DTO 필드 바인딩: th:field="*{fieldName}") -->
                             <div class="row g-2 mb-4">
                                 <div class="col-md-6">
                                     <div class="form-floating">
+                                        <!-- 연락처 수정 -->
                                         <input type="text" class="form-control form-control-custom" id="contact" th:field="*{contact}" placeholder="Contact" required>
                                         <label for="contact"><i class="bi bi-phone me-2"></i>연락처</label>
+                                        <!-- 서버 사이드 유효성 검사 에러 표시 -->
                                         <div class="validation-msg text-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
+                                        <!-- 이메일 수정 -->
                                         <input type="email" class="form-control form-control-custom" id="email" th:field="*{email}" placeholder="Email" required>
                                         <label for="email"><i class="bi bi-envelope me-2"></i>이메일</label>
                                         <div class="validation-msg text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
@@ -121,7 +137,7 @@
                                 </div>
                             </div>
 
-                            <!-- 4. 비밀번호 변경 섹션 -->
+                            <!-- 4. 비밀번호 변경 섹션 (선택 사항) -->
                             <div class="mb-4">
                                 <div class="form-floating mb-2">
                                     <input type="password" class="form-control form-control-custom" id="newPassword" th:field="*{newPassword}" placeholder="New Password" autocomplete="new-password">
@@ -131,6 +147,7 @@
                                     <input type="password" class="form-control form-control-custom" id="confirmPassword" placeholder="Confirm Password">
                                     <label for="confirmPassword"><i class="bi bi-check-all me-2"></i>비밀번호 확인</label>
                                 </div>
+                                <!-- 클라이언트 측 일치 여부 확인 메시지 -->
                                 <div id="passwordMatchError" class="validation-msg text-error mt-2" style="display:none;">
                                     <i class="bi bi-x-circle"></i> 비밀번호가 일치하지 않습니다.
                                 </div>
@@ -147,7 +164,7 @@
                                 </a>
                             </div>
 
-                            <!-- 회원 탈퇴 링크 (ID 부여) -->
+                            <!-- 회원 탈퇴 링크 -->
                             <div class="text-center mt-4">
                                 <a href="#" id="deleteAccountLink" class="delete-account-link">
                                     회원 탈퇴하기
@@ -167,15 +184,21 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2: 고급 알림창 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // 1. 이미지 미리보기 & 초기화 로직 (기존과 동일)
+    /**
+     * 1. 이미지 미리보기 로직 (FileReader API)
+     * - 서버에 업로드하기 전, 브라우저에서 즉시 이미지를 읽어 미리보기를 제공합니다.
+     * - 빠른 피드백을 통해 UX를 향상시킵니다.
+     */
     function previewFile(input) {
         const preview = document.getElementById('previewImg');
         const file = input.files[0];
         if (!file) return;
 
+        // 용량 제한 (10MB) - 클라이언트 측 방어
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             Swal.fire({ icon: 'error', title: '용량 초과', text: '이미지 파일 크기는 10MB를 초과할 수 없습니다.', background: '#1a1a1a', color: '#ffffff' });
@@ -185,13 +208,14 @@
 
         const reader = new FileReader();
         reader.addEventListener("load", function () {
-            preview.src = reader.result;
+            preview.src = reader.result; // Base64 인코딩된 이미지 데이터
             const deleteInput = document.getElementById('deleteProfileImage');
-            if(deleteInput) deleteInput.value = "false";
+            if(deleteInput) deleteInput.value = "false"; // 새 이미지 선택 시 삭제 플래그 해제
         }, false);
         reader.readAsDataURL(file);
     }
 
+    // 초기화 버튼 리스너
     document.addEventListener('DOMContentLoaded', function() {
         const resetBtn = document.getElementById('resetImgBtn');
         const preview = document.getElementById('previewImg');
@@ -202,25 +226,29 @@
             resetBtn.addEventListener('click', function() {
                 const defaultSrc = preview.getAttribute('data-default-src');
                 if(defaultSrc) preview.src = defaultSrc;
-                fileInput.value = '';
+                fileInput.value = ''; // 파일 선택 초기화
                 if(deleteInput) {
-                    deleteInput.value = "true";
+                    deleteInput.value = "true"; // 삭제 플래그 설정 -> 서버에서 파일 삭제 처리
                     Swal.fire({ toast: true, position: 'top', icon: 'info', title: '기본 이미지로 설정되었습니다.', showConfirmButton: false, timer: 1000 });
                 }
             });
         }
     });
 
-    // 2. 폼 제출 시 유효성 검사 (기존과 동일)
+    /**
+     * 2. 폼 제출 전 클라이언트 유효성 검사
+     * - 비밀번호 일치 여부를 확인하고, 확인 창(SweetAlert)을 띄웁니다.
+     */
     const editForm = document.getElementById('editForm');
     editForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+        e.preventDefault(); // 기본 제출 동작 막기
         const form = this;
         const submitBtn = form.querySelector('button[type="submit"]');
         const newPw = document.getElementById('newPassword').value;
         const confirmPw = document.getElementById('confirmPassword').value;
         const errorMsg = document.getElementById('passwordMatchError');
 
+        // 비밀번호 일치 검사
         if (newPw && newPw !== confirmPw) {
             errorMsg.style.display = 'block';
             document.getElementById('confirmPassword').focus();
@@ -229,6 +257,7 @@
             errorMsg.style.display = 'none';
         }
 
+        // 최종 확인창
         Swal.fire({
             title: '정보를 수정하시겠습니까?',
             text: "입력하신 정보로 회원 정보가 갱신됩니다.",
@@ -244,18 +273,22 @@
             if (result.isConfirmed) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `처리 중... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
-                form.submit();
+                form.submit(); // 확인 시 실제 제출
             }
         });
     });
 
-    // 3. [수정됨] 회원 탈퇴 로직 (POST 요청으로 변경)
+    /**
+     * 3. [보안 핵심] 회원 탈퇴 로직 (Dynamic Form Submission)
+     * - GET 요청(링크 이동)은 CSRF 공격에 취약하므로, 반드시 POST 요청으로 처리해야 합니다.
+     * - 자바스크립트로 동적으로 <form>을 생성하여 CSRF 토큰과 함께 전송합니다.
+     */
     const deleteLink = document.getElementById('deleteAccountLink');
     if (deleteLink) {
         deleteLink.addEventListener('click', function(e) {
             e.preventDefault();
 
-            // CSRF 토큰 가져오기
+            // 메타 태그에서 CSRF 토큰 값 획득
             const token = document.querySelector('meta[name="_csrf"]')?.content;
 
             Swal.fire({
@@ -277,6 +310,7 @@
                     form.method = 'POST';
                     form.action = '/members/withdraw';
 
+                    // CSRF 토큰을 hidden input으로 추가
                     if (token) {
                         const hiddenField = document.createElement('input');
                         hiddenField.type = 'hidden';

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>StarRoot - Find ID</title>
+    <!-- CSRF 토큰 설정을 위한 메타 태그 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link href="/css/index.css" rel="stylesheet">
+
+    <link href="/css/memberStyle.css" rel="stylesheet">
+</head>
+<body class="login-body">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="login-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+
+                <div class="card login-card">
+                    <div class="card-body p-5">
+
+                        <div class="text-center mb-5">
+                            <h2 class="login-title">STAR-ROOT<br>FIND ID</h2>
+                            <p class="text-white-50 small">등록된 담당자 정보로 아이디를 찾습니다.</p>
+                        </div>
+
+                        <form id="findIdForm" onsubmit="return false;">
+
+                            <h6 class="text-white-50 border-bottom border-secondary border-opacity-25 pb-2 mb-4">
+                                <i class="bi bi-phone-vibrate me-2"></i>휴대폰 인증
+                            </h6>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control form-control-custom" id="userName" placeholder="Name">
+                                <label for="userName">담당자 성함</label>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="form-floating flex-grow-1">
+                                    <input type="text" class="form-control form-control-custom rounded-end-0" id="userPhone" placeholder="Phone" maxlength="13">
+                                    <label for="userPhone">휴대폰 번호 (- 제외)</label>
+                                </div>
+                                <!-- onclick 함수명 requestAuth -->
+                                <button type="button" class="btn btn-check-custom px-3" id="sendAuthBtn" onclick="requestAuth()">
+                                    <i class="bi bi-send me-1"></i> 인증번호
+                                </button>
+                            </div>
+
+                            <div id="verifySection" style="display:none;" class="mb-4 animate-fade-in">
+                                <div class="input-group">
+                                    <div class="form-floating flex-grow-1">
+                                        <input type="text" class="form-control form-control-custom rounded-end-0" id="authCode" placeholder="Code" maxlength="6">
+                                        <label for="authCode">인증번호 6자리</label>
+                                    </div>
+                                    <!-- onclick 함수명 checkAuth -->
+                                    <button type="button" class="btn btn-primary px-4" id="verifyBtn" onclick="checkAuth()">
+                                        확인
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-white-50 ms-1" id="timerMsg">남은 시간: <span class="text-warning">03:00</span></small>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-5 pt-3 border-top border-secondary border-opacity-25">
+                                <p class="text-white-50 small mb-2">
+                                    비밀번호가 기억나지 않으세요?
+                                    <a th:href="@{/members/forgot-password}" class="link-cyan fw-bold ms-1">비밀번호 찾기</a>
+                                </p>
+                                <a th:href="@{/members/login}" class="link-cyan small">
+                                    <i class="bi bi-arrow-left"></i> 로그인 페이지로 돌아가기
+                                </a>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="card-footer-glow"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 결과 모달 -->
+<div class="modal fade modal-custom" id="resultModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title ps-2"><i class="bi bi-check-circle-fill text-success me-2"></i>아이디 찾기 성공</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-center p-5">
+                <p class="text-white-50 mb-4">회원님의 정보와 일치하는 아이디입니다.</p>
+
+                <div class="p-4 rounded-3 border border-info border-opacity-25" style="background: rgba(6, 182, 212, 0.1);">
+                    <!-- 아이디가 들어갈 곳 -->
+                    <h3 class="text-white fw-bold mb-0" id="foundIdText" style="letter-spacing: 2px; text-shadow: 0 0 10px rgba(6,182,212,0.5);">
+                        user01
+                    </h3>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 justify-content-center pb-4 gap-2">
+                <a th:href="@{/members/login}" class="btn btn-login px-4">
+                    로그인 하러가기 <i class="bi bi-box-arrow-in-right ms-1"></i>
+                </a>
+                <a th:href="@{/members/forgot-password}" class="btn btn-outline-custom px-4">
+                    비밀번호 찾기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    let foundMemberId = ""; // 서버에서 찾은 아이디를 임시 저장할 변수
+
+    // 1. 휴대폰 번호 자동 하이픈 (-) 추가
+    const phoneInput = document.getElementById('userPhone');
+    phoneInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value
+            .replace(/[^0-9]/g, '')
+            .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+    });
+
+    // 2. 서버에 실명 확인 요청 Real Request
+    function requestAuth() {
+        const name = document.getElementById('userName').value;
+        const phone = document.getElementById('userPhone').value;
+        const btn = document.getElementById('sendAuthBtn');
+
+        if(!name || phone.length < 12) {
+            Swal.fire({
+                icon: 'warning',
+                title: '입력 확인',
+                text: '이름과 휴대폰 번호를 정확히 입력해주세요.',
+                background: '#1e293b', color: '#fff'
+            });
+            return;
+        }
+
+        // CSRF 토큰 가져오기 (헤더에 추가용)
+        const token = document.querySelector('meta[name="_csrf"]')?.content;
+        const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (token && header) headers[header] = token;
+
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> 확인 중`;
+
+        // 서버 API 호출
+        fetch('/members/find-id/check', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ name: name, phone: phone })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('일치하는 회원 정보가 없습니다.');
+            return res.json();
+        })
+        .then(data => {
+            // 성공 시: 아이디 저장해두고 인증번호 입력창 보여주기
+            // (실제 인증번호 발송은 생략하고 UI만 보여줌)
+            foundMemberId = data.memberId;
+
+            btn.innerHTML = `<i class="bi bi-check-lg"></i> 재발송`;
+            btn.disabled = false;
+
+            document.getElementById('verifySection').style.display = 'block';
+            document.getElementById('authCode').focus();
+
+            Swal.fire({
+                toast: true, position: 'top', icon: 'success',
+                title: '인증번호가 발송되었습니다. (테스트: 123456)',
+                showConfirmButton: false, timer: 3000,
+                background: '#1e293b', color: '#fff'
+            });
+        })
+        .catch(err => {
+            btn.innerHTML = `<i class="bi bi-send me-1"></i> 인증번호`;
+            btn.disabled = false;
+            Swal.fire({
+                icon: 'error', title: '찾기 실패', text: err.message || '오류가 발생했습니다.',
+                background: '#1e293b', color: '#fff'
+            });
+        });
+    }
+
+    // 3. 인증번호 확인 (여기는 보여주기식이므로 프론트에서 처리)
+    function checkAuth() {
+        const code = document.getElementById('authCode').value;
+        const btn = document.getElementById('verifyBtn');
+
+        if(code.length < 6) {
+            Swal.fire({
+                icon: 'warning', text: '인증번호 6자리를 입력해주세요.',
+                background: '#1e293b', color: '#fff'
+            });
+            return;
+        }
+
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+
+        // 1초 지연 후 모달 띄우기
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            // 저장해둔 아이디를 모달에 넣고 띄우기
+            document.getElementById('foundIdText').innerText = foundMemberId;
+            const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+            resultModal.show();
+
+        }, 1000);
+    }
+</script>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+</body>
+</html>

@@ -225,4 +225,15 @@ public class MemberService {
         member.setPassword(passwordEncoder.encode(request.getNewPassword()));
         auditLogService.saveLog(member.getMemberId(), "비밀번호 재설정", LogType.MEMBER_MANAGEMENT);
     }
+
+    // 아이디 찾기 서비스 로직
+    @Transactional(readOnly = true)
+    public String findMemberIdByNameAndContact(String name, String contact) {
+        // DB에서 이름과 연락처로 조회
+        Member member = memberRepository.findByNameAndContact(name, contact)
+                .orElseThrow(() -> new IllegalArgumentException("일치하는 회원 정보가 없습니다."));
+
+        // 아이디 반환
+        return member.getMemberId();
+    }
 }

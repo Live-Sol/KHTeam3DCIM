@@ -11,6 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
+/**
+ * [발표 포인트: DCIM 시뮬레이션 엔진]
+ * 이 서비스는 단순한 데이터 저장을 넘어, 물리적인 데이터센터 환경을 소프트웨어로 시뮬레이션합니다.
+ * IT 장비의 부하량, 팬 속도, 냉방 효율(PUE) 간의 상관관계를 수식화하여 구현했습니다.
+ */
 @Service
 @RequiredArgsConstructor
 public class EnvironmentService {
@@ -18,6 +24,13 @@ public class EnvironmentService {
     private final DcimEnvironmentRepository envRepository;
     private final DeviceRepository deviceRepository;
 
+
+    /**
+     * [기술적 의도: Singleton 패턴과 유사한 데이터 관리]
+     * 환경 설정 값(온도, 습도, PUE 등)은 시스템 전역에 '단 하나'만 존재해야 합니다.
+     * 따라서 ID를 1L로 고정하고, 데이터가 없으면 초기값을 생성(Lazy Initialization)하는 전략을 사용했습니다.
+     * 이는 불필요한 데이터 파편화를 막고 관리의 일관성을 유지합니다.
+     */
     // 1. 현재 환경 상태 가져오기 (없으면 기본값 생성)
     @Transactional
     public DcimEnvironment getEnvironment() {
@@ -37,62 +50,70 @@ public class EnvironmentService {
     }
 
     // 2. 쿨링 설정 조절 (관리자용)
+    // 관리자 페이지에서 팬 속도나 목표 온도를 변경할 때 호출됩니다.
     @Transactional
     public void updateCoolingSettings(Double targetTemp, Integer fanSpeed, String mode) {
         DcimEnvironment env = getEnvironment();
+        // Dirty Checking: JPA의 영속성 컨텍스트가 변경을 감지하여 자동으로 update 쿼리를 날립니다.
         if(targetTemp != null) env.setTargetTemp(targetTemp);
         if(fanSpeed != null) env.setFanSpeed(fanSpeed);
         if(mode != null) env.setCoolingMode(mode);
 
-        // 설정 변경 시 즉시 시뮬레이션 한 번 돌리기
+        // 설정 변경 즉시 시뮬레이션 로직을 태워, 변경된 값이 PUE나 온도에 바로 반영되도록 합니다. (반응성 향상)
         calculateSimulation(env);
     }
 
+
+    /**
+     * [발표 포인트: 물리 환경 시뮬레이션 알고리즘 (Core Logic)]
+     * 실제 센서가 없는 개발 환경에서도 리얼한 데이터를 보여주기 위해
+     * '팬 속도', 'IT 부하' 등의 변수를 기반으로 온도와 PUE를 역산출하는 로직입니다.
+     */
     // ⭐ 3. 시뮬레이션 핵심 로직 (PUE & 온도 계산) ⭐
     // 이 메서드는 대시보드 새로고침 할 때나 설정 변경 시 호출됩니다.
     @Transactional
     public DcimEnvironment calculateSimulation(DcimEnvironment env) {
         if (env == null) env = getEnvironment();
 
-        // (1) IT 장비 총 부하 계산 (DB에 있는 모든 RUNNING 장비의 Watt 합계)
-        // 편의상 모든 장비의 합으로 하거나, 추후 status='RUNNING' 조건 추가 가능
+        // 1. IT 장비 부하 집계 (Aggregation)
+        // Java Stream API를 사용하여 리스트 순회 성능을 최적화하고 코드를 간결하게 작성했습니다.
+        // 실제로는 수천 개의 장비가 있을 수 있으므로, DB단에서 SUM() 쿼리를 쓰는 것이 좋지만
+        // 현재는 로직의 유연성을 위해 애플리케이션 레벨에서 처리했습니다.
         List<Device> devices = deviceRepository.findAll();
         long itLoadSum = devices.stream()
-                .mapToLong(d -> d.getPowerWatt() != null ? d.getPowerWatt() : 0) // null이면 0 처리
+                .mapToLong(d -> d.getPowerWatt() != null ? d.getPowerWatt() : 0)
                 .sum();
+        if (itLoadSum == 0) itLoadSum = 1000; // Divide By Zero 방지 및 기본 부하 설정
 
-        // 장비가 하나도 없으면 기본값 설정 (0으로 나누기 방지)
-        if (itLoadSum == 0) itLoadSum = 1000; // 기본 1kW 가정
-
-        // (2) 쿨링 부하 시뮬레이션 (상상력 발휘!)
-        // 공식: 팬 속도가 빠를수록 전기를 많이 먹음. 온도를 낮추려면 전기를 많이 먹음.
-        // Cooling_Watt = (기본운영전력) + (팬속도 가중치)
+        // 2. 쿨링 부하 계산 (Physics Algorithm)
+        // "팬 속도가 빠르면(냉각 강화) -> 전력 소모가 늘어난다"는 물리 법칙을 수식화했습니다.
+        // Cooling Load = (기본 IT 부하의 30%) + (팬 속도에 따른 가변 부하)
         double coolingLoad = (itLoadSum * 0.3) + (env.getFanSpeed() * 50);
 
-        // (3) 기타 시설 부하 (조명, 보안 등 - IT부하의 10% 가정)
+        // 3. 기타 시설 부하
         double otherLoad = itLoadSum * 0.1;
 
-        // (4) 총 시설 전력 = IT + Cooling + Other
+        // 4. PUE(Power Usage Effectiveness) 계산
+        // 데이터센터 효율 지표 공식: PUE = (Total Facility Power) / (IT Equipment Power)
+        // 1.0에 가까울수록 효율적이며, 이 시스템의 핵심 KPI입니다.
         long totalLoad = (long) (itLoadSum + coolingLoad + otherLoad);
-
-        // (5) PUE 계산 = Total / IT
         double pue = (double) totalLoad / itLoadSum;
-        // 소수점 둘째 자리까지 자르기
-        pue = Math.round(pue * 100.0) / 100.0;
+        pue = Math.round(pue * 100.0) / 100.0; // 소수점 절삭
 
-        // (6) 실내 온도 시뮬레이션
-        // IT부하가 높으면 온도가 오르고, 팬속도가 높으면 온도가 내려감
-        // 현재온도 = 목표온도 + (IT부하 계수) - (팬속도 계수)
+        // 5. 온도 시뮬레이션 (Feedback Loop)
+        // 목표 온도, 현재 부하(발열), 팬 속도(냉각)의 상관관계를 반영하여 현재 온도를 도출합니다.
+        // 공식: 목표온도 + (발열 계수) - (냉각 계수) + 랜덤 노이즈(현실성 부여)
         double simulatedTemp = env.getTargetTemp() + (itLoadSum * 0.0001) - (env.getFanSpeed() * 0.05);
-        // -0.5 ~ +0.5 사이의 랜덤 노이즈 추가 (센서 오차/환경 변수 시뮬레이션)
+
+        // 현실적인 범위(Clamp) 설정: 온도가 비정상적으로 튀는 것을 방지
         double noise = (Math.random() - 0.5);
         simulatedTemp += noise;
-        // 현실적인 범위 제한 (18도 ~ 35도)
+
         if(simulatedTemp < 18.0) simulatedTemp = 18.0;
         if(simulatedTemp > 35.0) simulatedTemp = 35.0;
         simulatedTemp = Math.round(simulatedTemp * 10.0) / 10.0;
 
-        // (7) 결과 저장
+        // 6. 결과 반영
         env.setTotalItLoad(itLoadSum);
         env.setTotalFacilityLoad(totalLoad);
         env.setCurrentPue(pue);

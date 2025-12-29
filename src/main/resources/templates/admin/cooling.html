@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>냉방 관리</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- [기술 포인트 1] 데이터 시각화 라이브러리 (Chart.js) -->
+    <!-- 서버에서 받은 온도 데이터를 시계열(Time-series) 그래프로 표현하기 위해 사용합니다.
+         가볍고 반응형(Responsive) 지원이 뛰어나 대시보드에 적합합니다. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+
     <style>
-        /* 쿨링 페이지 전용 스타일 */
+        /* [기술 포인트 2] CSS 애니메이션을 활용한 직관적 피드백 (Visual Feedback) */
+        /* 단순히 숫자만 보여주는 것이 아니라, 팬이 실제로 도는 애니메이션을 통해
+           시스템이 '작동 중'임을 직관적으로 전달합니다. JS로 animation-duration을 조절합니다. */
+
         .temp-display {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron', sans-serif; /* 디지털 계기판 느낌의 폰트 */
             font-size: 4rem;
             font-weight: 800;
             color: #fff;
-            text-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.6); /* 네온 글로우 효과 */
         }
         .fan-container {
             width: 150px;
@@ -27,9 +34,9 @@
 
         .fan-icon {
             font-size: 5rem;
-            color: #22d3ee; /* Cyan 색상 */
+            color: #22d3ee; /* Cyan 테마 컬러 */
             z-index: 2;
-            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8)); /* 네온 효과 */
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));
         }
 
         /* 팬 주위를 감싸는 링 */
@@ -37,24 +44,29 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border: 4px solid rgba(34, 211, 238, 0.1); /* 흐릿한 배경 링 */
-            border-top: 4px solid #22d3ee; /* 진한 링 (돌아가는 느낌) */
+            border: 4px solid rgba(34, 211, 238, 0.1); /* 배경 링 (흐릿함) */
+            border-top: 4px solid #22d3ee; /* 실제 돌아가는 링 (진함) */
             border-radius: 50%;
-            animation: spin-ring 2s linear infinite; /* 링도 천천히 돔 */
+
+            /* [디테일] 입체감을 위해 팬(spin)과 링(spin-ring)을 서로 반대 방향으로 회전시킵니다. */
+            animation: spin-ring 2s linear infinite;
             box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), inset 0 0 15px rgba(34, 211, 238, 0.2);
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes spin-ring { 100% { transform: rotate(-360deg); } } /* 팬과 반대 방향으로 회전 */
+        @keyframes spin-ring { 100% { transform: rotate(-360deg); } } /* 반시계 방향 */
 
+        /* JS에서 이 클래스를 토글하여 애니메이션 제어 */
         .fan-spinning { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
 
+<!-- 헤더 프래그먼트 포함 -->
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="d-flex">
+    <!-- 사이드바 프래그먼트 포함 -->
     <div th:replace="fragments/sidebar :: sidebar"></div>
 
     <main class="main-content flex-grow-1">
@@ -65,6 +77,7 @@
         </h2>
 
         <div class="row g-4">
+            <!-- 1. 현재 온도 표시 카드 -->
             <div class="col-md-6">
                 <div class="card custom-card-dark h-100 shadow">
                     <div class="card-header bg-transparent border-0 text-center pt-4">
@@ -72,11 +85,13 @@
                     </div>
                     <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
                         <div class="temp-display">
+                            <!-- Thymeleaf로 서버 데이터 바인딩 -->
                             <span id="currentTempDisplay" th:text="${env.currentTemp}">25.5</span><span style="font-size:2rem">°C</span>
                         </div>
                         <p class="text-white mt-3">
                             적정 유지 범위: <span class="text-success fw-bold">18°C ~ 27°C</span>
                         </p>
+                        <!-- 상태에 따라 JS로 클래스(색상)가 변하는 알림 박스 -->
                         <div id="tempAlertBox" class="alert alert-success mt-3 w-75">
                             <i class="bi bi-check-circle-fill"></i> 상태 쾌적함
                         </div>
@@ -84,6 +99,7 @@
                 </div>
             </div>
 
+            <!-- 2. 팬 가동 현황 (애니메이션) -->
             <div class="col-md-6">
                 <div class="card custom-card-dark h-100 shadow">
                     <div class="card-header bg-transparent border-0 text-center pt-4">
@@ -101,6 +117,7 @@
                 </div>
             </div>
 
+            <!-- 3. 실시간 온도 그래프 (Chart.js) -->
             <div class="col-lg-6">
                 <div class="card custom-card-dark shadow h-100">
                     <div class="card-header bg-transparent border-0 text-white">
@@ -114,18 +131,26 @@
                 </div>
             </div>
 
+            <!-- 4. 제어 패널 (설정 폼) -->
             <div class="col-lg-6">
                 <div class="card custom-card-dark shadow border-info h-100">
                     <div class="card-header bg-info bg-opacity-10 border-info text-white">
                         <i class="bi bi-sliders"></i> 환경 설정 (Settings)
                     </div>
                     <div class="card-body p-4 d-flex flex-column justify-content-center">
+
+                        <!-- [기술 포인트 3] 데이터 동기화 및 전송 전략 -->
+                        <!-- 사용자는 예쁜 UI(Range Slider)를 조작하지만, 실제 전송은 form submit 시 이루어집니다.
+                             Hidden Input을 사용하여 UI 상태와 전송 데이터를 분리/동기화했습니다. -->
                         <form action="/admin/cooling/update" method="post" id="coolingForm">
+                            <!-- CSRF 토큰 (Spring Security 보안) -->
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
+                            <!-- [핵심] 실제 서버로 날아가는 팬 속도 값 -->
                             <input type="hidden" name="fanSpeed" id="hiddenFanSpeed" th:value="${env.fanSpeed}">
 
                             <div class="row g-3">
+                                <!-- 목표 온도 설정 -->
                                 <div class="col-12">
                                     <label class="form-label text-white small">목표 온도 (°C)</label>
                                     <div class="input-group">
@@ -140,15 +165,18 @@
 
                                 <hr class="border-secondary my-2 opacity-50">
 
+                                <!-- 팬 속도 슬라이더 (UI용) -->
                                 <div class="col-12">
                                     <div class="d-flex justify-content-between">
                                         <label class="form-label text-white small">팬 속도 제어</label>
                                         <span class="text-info fw-bold small"><span id="rangeVal" th:text="${env.fanSpeed}">50</span>%</span>
                                     </div>
+                                    <!-- oninput 이벤트로 즉각적인 UI 반응성 확보 -->
                                     <input type="range" class="form-range" id="visibleFanRange" min="0" max="100"
                                            th:value="${env.fanSpeed}">
                                 </div>
 
+                                <!-- 운전 모드 선택 (라디오 버튼) -->
                                 <div class="col-12">
                                     <label class="form-label text-white small d-block">운전 모드</label>
                                     <div class="btn-group w-100" role="group">
@@ -181,45 +209,46 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
-    // [신규] 온도만 설정하는 함수 (폼을 서브밋하거나 fetch로 별도 처리 가능)
-    // 여기서는 간단하게 폼을 서브밋하되, 사용자 경험상 분리된 느낌을 줌
+    // 폼 개별 전송을 위한 헬퍼 함수
     function submitTempOnly() {
-        // 필요하다면 여기서 유효성 검사 수행
         document.getElementById('coolingForm').submit();
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         // --------------------------------------------------------
-        // 1. 요소 선택
+        // 1. DOM 요소 선택 (캐싱하여 성능 최적화)
         // --------------------------------------------------------
         const fanSpeedElem = document.getElementById('fanSpeedDisplay');
         const fanIcon = document.getElementById('fanIcon');
         const tempElem = document.getElementById('currentTempDisplay');
         const alertBox = document.getElementById('tempAlertBox');
 
-        // [수정됨] 설정 카드 내 요소 선택
-        const visibleFanRange = document.getElementById('visibleFanRange'); // 눈에 보이는 슬라이더
-        const hiddenFanInput = document.getElementById('hiddenFanSpeed');   // [핵심] 서버 전송용 숨겨진 input
+        const visibleFanRange = document.getElementById('visibleFanRange'); // UI 슬라이더
+        const hiddenFanInput = document.getElementById('hiddenFanSpeed');   // 서버 전송값
         const rangeVal = document.getElementById('rangeVal');
         const modeRadios = document.querySelectorAll('input[name="coolingMode"]');
 
         let autoInterval = null;
 
         // --------------------------------------------------------
-        // 2. 공통 UI 업데이트 로직
+        // 2. 공통 UI 업데이트 로직 (함수 재사용성 극대화)
         // --------------------------------------------------------
+
+        // 팬 회전 속도 애니메이션 제어
         function updateFanAnimation(speed) {
             speed = parseInt(speed);
             if(speed > 0) {
                 fanIcon.classList.add('fan-spinning');
-                if(speed > 70) fanIcon.style.animationDuration = '0.2s';
-                else if(speed > 30) fanIcon.style.animationDuration = '1s';
-                else fanIcon.style.animationDuration = '3s';
+                // 속도 구간별로 CSS animation-duration을 동적으로 변경하여 리얼함 부여
+                if(speed > 70) fanIcon.style.animationDuration = '0.2s'; // 고속
+                else if(speed > 30) fanIcon.style.animationDuration = '1s'; // 중속
+                else fanIcon.style.animationDuration = '3s'; // 저속
             } else {
                 fanIcon.classList.remove('fan-spinning');
             }
         }
 
+        // 온도 상태에 따른 경고창 UI 변경
         function updateTempAlert(temp) {
             if(temp > 30) {
                 alertBox.className = 'alert alert-danger mt-3 w-75';
@@ -233,70 +262,75 @@
             }
         }
 
-        // [핵심] 팬 속도 설정 통합 함수
-        // 슬라이더(UI)와 Hidden Input(서버값)을 동시에 변경함
+        // [기술 포인트 4] 통합 제어 함수 (Unified Control Flow)
+        // 슬라이더 조작, 오토 모드 랜덤값, 초기 로딩 등 어디서 호출하든
+        // UI 업데이트와 서버 전송 값 동기화를 한 곳에서 처리하여 '단일 진실 공급원(SSOT)' 원칙 준수
         function setSystemFanSpeed(val) {
-            // 1. UI 업데이트
+            // 1. UI 업데이트 (사용자 피드백)
             visibleFanRange.value = val;
             rangeVal.innerText = val;
             fanSpeedElem.innerText = val;
             updateFanAnimation(val);
 
-            // 2. [중요] 서버 전송용 값 업데이트 (이게 있어야 에러가 안 남)
+            // 2. 서버 전송 데이터 동기화 (핵심)
             hiddenFanInput.value = val;
         }
 
         // --------------------------------------------------------
-        // 3. 운전 모드 로직 (AUTO / MANUAL / ECO)
+        // 3. 운전 모드별 로직 (Strategy Pattern in JS)
         // --------------------------------------------------------
         function changeMode(mode) {
+            // 기존 오토 모드 타이머 제거 (메모리 누수 방지)
             if (autoInterval) {
                 clearInterval(autoInterval);
                 autoInterval = null;
             }
 
             if (mode === 'AUTO') {
-                visibleFanRange.disabled = true; // 슬라이더 잠금
+                // AUTO: 사용자가 직접 조작 불가능하게 막고, 알고리즘(여기선 랜덤)에 의해 자동 제어
+                visibleFanRange.disabled = true;
                 simulateAutoLogic();
                 autoInterval = setInterval(simulateAutoLogic, 2000);
             }
             else if (mode === 'MANUAL') {
-                visibleFanRange.disabled = false; // 슬라이더 잠금 해제
-                // 매뉴얼 모드로 전환 시 현재 슬라이더 값을 그대로 유지하거나 동기화
-                setSystemFanSpeed(visibleFanRange.value);
+                // MANUAL: 사용자에게 제어권 부여
+                visibleFanRange.disabled = false;
+                setSystemFanSpeed(visibleFanRange.value); // 현재 값으로 상태 갱신
             }
             else if (mode === 'ECO') {
-                visibleFanRange.disabled = true; // 슬라이더 잠금
-                setSystemFanSpeed(30); // 30% 고정
+                // ECO: 에너지 절약을 위해 최소값 강제 고정
+                visibleFanRange.disabled = true;
+                setSystemFanSpeed(30);
             }
         }
 
+        // 클라이언트 측 데모 시뮬레이션 함수
         function simulateAutoLogic() {
             const randomSpeed = Math.floor(Math.random() * 101);
             setSystemFanSpeed(randomSpeed);
         }
 
-        // 이벤트 리스너: 모드 변경
+        // 이벤트 리스너 등록
         modeRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 changeMode(e.target.value);
             });
         });
 
-        // 이벤트 리스너: 수동 슬라이더 조작
         visibleFanRange.addEventListener('input', (e) => {
             setSystemFanSpeed(e.target.value);
         });
 
         // --------------------------------------------------------
-        // 4. 초기화 및 차트 (기존 유지)
+        // 4. 차트 및 초기화 (Real-time Visualization)
         // --------------------------------------------------------
         const ctx = document.getElementById('tempChart').getContext('2d');
         let currentTemp = parseFloat(tempElem.innerText);
 
-        // 차트 설정 (생략 가능, 위와 동일) ...
         const labels = ['12s', '10s', '8s', '6s', '4s', '2s', 'Now'];
         const dataPoints = [currentTemp, currentTemp, currentTemp, currentTemp, currentTemp, currentTemp, currentTemp];
+
+        // Chart.js 인스턴스 생성
         const tempChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -305,9 +339,9 @@
                     label: 'Indoor Temp (°C)',
                     data: dataPoints,
                     borderColor: '#f87171',
-                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)', // 그라데이션 채우기 효과
                     borderWidth: 2,
-                    tension: 0.4,
+                    tension: 0.4, // 곡선을 부드럽게 (Bezier Curve)
                     fill: true,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#f87171'
@@ -324,25 +358,30 @@
             }
         });
 
-        // 초기 모드 실행
+        // 초기 로딩 시 모드 적용
         const checkedMode = document.querySelector('input[name="coolingMode"]:checked');
         if (checkedMode) {
             changeMode(checkedMode.value);
         } else {
-            // 기본값 처리
             changeMode('MANUAL');
         }
 
         updateTempAlert(currentTemp);
 
-        // 시뮬레이션용 인터벌
+        // [기술 포인트 5] 클라이언트 측 보간(Interpolation)
+        // 서버 부하를 줄이기 위해, 단순 변동(Noise)은 클라이언트 JS에서 처리하여
+        // 대시보드가 끊김 없이 살아있는 것처럼 보이게 만듭니다.
         setInterval(() => {
             const randomFluctuation = (Math.random() - 0.5) * 0.4;
             currentTemp = parseFloat((currentTemp + randomFluctuation).toFixed(1));
+
+            // DOM 업데이트
             tempElem.innerText = currentTemp;
             updateTempAlert(currentTemp);
+
+            // 차트 데이터 시프트(Queue) 처리
             tempChart.data.datasets[0].data.push(currentTemp);
-            tempChart.data.datasets[0].data.shift();
+            tempChart.data.datasets[0].data.shift(); // 오래된 데이터 제거
             tempChart.update();
         }, 2000);
     });
