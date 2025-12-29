@@ -53,10 +53,13 @@ public class MemberController {
 
     // 회원 등록
     @PostMapping
-    public String createMember(@ModelAttribute MemberCreateRequest member, Model model) {
+    public String createMember(@ModelAttribute MemberCreateRequest member, Model model,
+                               RedirectAttributes rtt) {
         try {
             memberService.addMember(member);
-            model.addAttribute("message", "회원가입 성공");
+//            model.addAttribute("message", "회원가입 성공");
+            // [변경] 리다이렉트 후에도 유지되는 데이터 전달 (FlashAttribute)
+            rtt.addFlashAttribute("signupSuccess", true);
             return "redirect:/members/login";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());

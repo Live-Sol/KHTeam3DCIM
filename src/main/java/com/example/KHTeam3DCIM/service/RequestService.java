@@ -2,6 +2,7 @@ package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.*;
 import com.example.KHTeam3DCIM.dto.Request.RequestDTO;
+import com.example.KHTeam3DCIM.dto.Request.RequestResponseDTO; // [NEW] DTO import
 import com.example.KHTeam3DCIM.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,20 +34,46 @@ public class RequestService {
         requestRepository.save(request);
     }
 
-    // 2. 대기 중인 신청 목록 조회 (관리자용)
+    // 2. [기존] 대기 중인 신청 목록 조회 (Entity 반환) - 필요 시 유지
     @Transactional(readOnly = true)
     public List<Request> findWaitingRequests(String keyword, String emsStatus) {
-        // 1. 빈 문자열 처리 (검색어가 없으면 null로)
+        if (keyword != null && keyword.trim().isEmpty()) keyword = null;
+        if ("ALL".equals(emsStatus) || (emsStatus != null && emsStatus.trim().isEmpty())) emsStatus = null;
+        return requestRepository.searchWaitingRequests(keyword, emsStatus);
+    }
+
+    // ⭐️ [NEW] 대기 중인 신청 목록 조회 (DTO 반환 + 탈퇴 회원 체크 포함) ⭐️
+    // 기존의 검색 기능(keyword, emsStatus)을 그대로 살리면서 DTO로 변환합니다.
+    @Transactional(readOnly = true)
+    public List<RequestResponseDTO> findWaitingRequestsDto(String keyword, String emsStatus) {
+        // 1. 검색어 정리 (기존 로직 동일)
         if (keyword != null && keyword.trim().isEmpty()) {
             keyword = null;
         }
-
-        // 2. "전체" 선택 시 null로 처리하여 필터 해제
         if ("ALL".equals(emsStatus) || (emsStatus != null && emsStatus.trim().isEmpty())) {
             emsStatus = null;
         }
 
-        return requestRepository.searchWaitingRequests(keyword, emsStatus);
+        // 2. DB에서 Request Entity 리스트 검색 (기존 Repository 메서드 재사용)
+        List<Request> requests = requestRepository.searchWaitingRequests(keyword, emsStatus);
+
+        // 3. DTO 리스트로 변환 (Member 정보 포함)
+        List<RequestResponseDTO> dtoList = new ArrayList<>();
+
+        for (Request req : requests) {
+            // 작성자(Member) 정보 조회
+            Member member = memberRepository.findById(req.getMemberId())
+                    .orElse(Member.builder()
+                            .memberId(req.getMemberId())
+                            .name("알수없음")
+                            .deleted(true) // DB에 없으면 완전 삭제된 것으로 간주
+                            .build());
+
+            // DTO 생성 및 리스트 추가
+            dtoList.add(new RequestResponseDTO(req, member));
+        }
+
+        return dtoList;
     }
 
     // 3. 내 신청 이력 조회 (사용자용)
@@ -92,15 +120,18 @@ public class RequestService {
         Member requester = memberRepository.findByMemberId(request.getMemberId())
                 .orElseThrow(() -> new IllegalStateException("신청자 정보를 찾을 수 없습니다. (ID: " + request.getMemberId() + ")"));
 
-        // 3. 랙 정보 가져오기
+        // [★ 추가된 코드] 탈퇴한 회원인지 확인하고 예외 발생
+        if (requester.isDeleted()) {
+            throw new IllegalStateException("탈퇴한 회원의 요청은 승인할 수 없습니다.");
+            // 이 메시지가 Controller를 통해 화면의 붉은색 에러 배너로 뜹니다.
+        }
+
         Rack rack = rackRepository.findById(rackId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 랙을 찾을 수 없습니다. ID: " + rackId));
 
-        // 3-1. Request의 String cateId를 사용하여 실제 Category 엔티티 조회
         Category category = categoryRepository.findById(request.getCateId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 ID입니다: " + request.getCateId()));
 
-        // 3-2. 랙 높이 초과 검증
         int heightUnit = request.getHeightUnit();
         int endUnit = startUnit + heightUnit - 1;
 
@@ -112,7 +143,6 @@ public class RequestService {
             );
         }
 
-        // 3-3. 기존 장비와 위치 충돌 검사
         boolean overlap = deviceRepository.existsOverlappingDevice(rack, startUnit, endUnit);
 
         if (overlap) {
@@ -122,11 +152,9 @@ public class RequestService {
             );
         }
 
-        // 시리얼 번호 생성
         String generatedSerial = "SR-" +
                 java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd")) + reqId;
 
-        // 4. 장비 객체 생성
         Device device = Device.builder()
                 .member(requester)
                 .rack(rack)
@@ -148,17 +176,13 @@ public class RequestService {
                 .contractMonth(request.getTermMonth())
                 .build();
 
-        // 5. 장비 저장
         deviceRepository.save(device);
 
-        // 6. 신청서 상태 완료 처리 및 시리얼 번호 기록
         request.setStatus("APPROVED");
         request.setSerialNum(generatedSerial);
 
-        // 7. 로그 기록 추가
         String currentMemberId = SecurityContextHolder.getContext().getAuthentication().getName();
-        auditLogService.saveLog(currentMemberId,"입고 승인 및 장비 등록: " + generatedSerial,LogType.DEVICE_OPERATION);
-
+        auditLogService.saveLog(currentMemberId, "입고 승인 및 장비 등록: " + generatedSerial, LogType.DEVICE_OPERATION);
     }
 
     // 8. 요청 삭제 또는 숨김 처리 (사용자용)

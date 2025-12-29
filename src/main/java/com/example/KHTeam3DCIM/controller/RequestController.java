@@ -4,6 +4,7 @@ package com.example.KHTeam3DCIM.controller;
 import com.example.KHTeam3DCIM.domain.Member;
 import com.example.KHTeam3DCIM.domain.Request;
 import com.example.KHTeam3DCIM.dto.Request.RequestDTO;
+import com.example.KHTeam3DCIM.dto.Request.RequestResponseDTO;
 import com.example.KHTeam3DCIM.service.CategoryService;
 import com.example.KHTeam3DCIM.service.MemberService;
 import com.example.KHTeam3DCIM.service.RequestService;
@@ -182,28 +183,49 @@ public class RequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("fail");
         }
     }
-
-
     // =======================================
-    // 3. [관리자] 대기 중인 신청 목록 확인
+    // 3. [관리자] 대기 중인 신청 목록 확인 (수정됨)
     // =======================================
     @GetMapping
     public String requestList(Model model, HttpServletRequest request,
                               @RequestParam(required = false) String keyword,        // 검색어
                               @RequestParam(required = false, defaultValue = "ALL") String emsStatus) { // 필터
 
-        // 서비스 호출 시 파라미터 전달
-        List<Request> waitingRequests = requestService.findWaitingRequests(keyword, emsStatus);
+        // [변경 포인트]
+        // 기존: List<Request> waitingRequests = requestService.findWaitingRequests(keyword, emsStatus);
+        // 변경: Service에서 DTO로 변환된 리스트를 받아옵니다. (탈퇴 회원 정보 포함)
+        List<RequestResponseDTO> waitingRequests = requestService.findWaitingRequestsDto(keyword, emsStatus);
 
         model.addAttribute("request", request);
-        model.addAttribute("requests", waitingRequests);
+        model.addAttribute("requests", waitingRequests); // HTML에서 req.deleted, req.role 등을 사용할 수 있게 됨
 
-        // ⭐ 검색 조건 유지 (화면의 input value에 다시 넣어주기 위함)
+        // ⭐ 검색 조건 유지
         model.addAttribute("paramKeyword", keyword);
         model.addAttribute("paramEmsStatus", emsStatus);
 
         return "request/RequestList";
     }
+
+//    // =======================================
+//    // 3. [관리자] 대기 중인 신청 목록 확인
+//    // =======================================
+//    @GetMapping
+//    public String requestList(Model model, HttpServletRequest request,
+//                              @RequestParam(required = false) String keyword,        // 검색어
+//                              @RequestParam(required = false, defaultValue = "ALL") String emsStatus) { // 필터
+//
+//        // 서비스 호출 시 파라미터 전달
+//        List<Request> waitingRequests = requestService.findWaitingRequests(keyword, emsStatus);
+//
+//        model.addAttribute("request", request);
+//        model.addAttribute("requests", waitingRequests);
+//
+//        // ⭐ 검색 조건 유지 (화면의 input value에 다시 넣어주기 위함)
+//        model.addAttribute("paramKeyword", keyword);
+//        model.addAttribute("paramEmsStatus", emsStatus);
+//
+//        return "request/RequestList";
+//    }
 
     // =======================================
     // 4. [관리자] 신청 반려 처리

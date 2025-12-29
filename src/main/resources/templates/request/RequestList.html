@@ -8,11 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <!-- [수정됨] 통합된 admin.css 하나만 사용 -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 
     <style>
-        /* 반려 모달 전용 다크 테마 스타일 (페이지 고유 스타일은 유지) */
+        /* 반려 모달 전용 다크 테마 스타일 */
         #rejectModal .modal-content {
             background-color: #212529;
             color: #ffffff;
@@ -122,9 +121,9 @@
                             <span class="badge bg-dark custom-badge me-1">대기 중</span>
                             <strong>No. [[${req.id}]]</strong>
 
-                            <!-- [수정됨] 회원 상세 정보 모달 트리거 -->
-                            <!-- 페이지 이동(@{...}) 대신 href="#" 및 data 속성 사용 -->
-                            <a href="#" class="text-info"
+                            <a href="#"
+                               class="text-decoration-none"
+                               th:classappend="${req.deleted} ? 'text-danger fw-bold' : 'text-info'"
                                data-bs-toggle="modal"
                                data-bs-target="#memberDetailModal"
                                th:data-id="${req.memberId}"
@@ -133,8 +132,10 @@
                                th:data-cphone="${req.companyPhone}"
                                th:data-contact="${req.contact}"
                                th:data-email="${req.email}"
-                               data-role="USER"> <!-- 수정됨: th:data-role="${req.role}" 삭제하고 고정값 'USER' 사용 -->
-                                <i class="bi bi-search"></i> [[${req.memberId}]]
+                               th:data-role="${req.role}"
+                               th:data-is-deleted="${req.deleted}"> <i th:class="${req.deleted} ? 'bi bi-person-x-fill me-1' : 'bi bi-search me-1'"></i>
+                                [[${req.memberId}]]
+                                <span th:if="${req.deleted}" class="badge bg-danger ms-1" style="font-size: 0.7em;">탈퇴</span>
                             </a>
                         </div>
                         <small class="text-white-50">신청일: [[${#temporals.format(req.reqDate, 'yyyy-MM-dd')}]]</small>
@@ -165,12 +166,12 @@
                         <p class="card-text custom-purpose-box p-2 rounded">[[${req.purpose}]]</p>
 
                         <div class="d-flex gap-2 mt-3">
-                            <a th:href="@{/racks(reqId=${req.id})}" class="btn custom-btn-primary flex-grow-1 approve-btn">
-                                <i class="bi bi-check-lg"></i>
+                            <a th:href="@{/racks(reqId=${req.id})}"
+                               class="btn custom-btn-primary flex-grow-1 approve-btn"
+                               th:data-is-deleted="${req.deleted}"> <i class="bi bi-check-lg"></i>
                                 승인(자리 배정)
                             </a>
 
-                            <!-- 반려 모달 트리거 버튼 -->
                             <button type="button"
                                     class="btn custom-btn-outline-danger flex-grow-1"
                                     data-bs-toggle="modal"
@@ -187,7 +188,6 @@
     </main>
 </div>
 
-<!-- [추가됨] 회원 상세 정보 Modal (findMembersAdmin.html과 동일한 구조) -->
 <div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -240,7 +240,6 @@
     </div>
 </div>
 
-<!-- 반려 모달 (기존 코드 유지) -->
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -296,50 +295,67 @@
         if (errorMessage) Toast.fire({ icon: 'error', title: errorMessage });
 
         // ---------------------------------------------------------
-        // [기능 0] 회원 상세 정보 모달 데이터 바인딩 (추가됨)
+        // [기능 0] 회원 상세 정보 모달 데이터 바인딩 (수정됨: 탈퇴 회원 표시 로직 추가)
         // ---------------------------------------------------------
         const memberDetailModal = document.getElementById('memberDetailModal');
         if (memberDetailModal) {
             memberDetailModal.addEventListener('show.bs.modal', event => {
-                // 클릭된 링크(버튼) 요소 가져오기
+                // 1. 클릭된 버튼(링크) 요소 가져오기
                 const button = event.relatedTarget;
 
-                // data-* 속성 값 읽기
+                // 2. data-* 속성 값 읽기
                 const id = button.getAttribute('data-id');
-                const name = button.getAttribute('data-name');
-                const company = button.getAttribute('data-company');
-                const cphone = button.getAttribute('data-cphone');
-                const email = button.getAttribute('data-email');
-                const contact = button.getAttribute('data-contact');
-                const role = button.getAttribute('data-role');
+                // 'true' 문자열인지 확인하여 boolean으로 변환
+                const isDeleted = button.getAttribute('data-is-deleted') === 'true';
 
-                // 모달 내부 요소에 값 넣기
+                let name = button.getAttribute('data-name');
+                let email = button.getAttribute('data-email');
+                let company = button.getAttribute('data-company');
+                let contact = button.getAttribute('data-contact');
+                let cphone = button.getAttribute('data-cphone');
+                let role = button.getAttribute('data-role');
+
+                // 3. [핵심 로직] 탈퇴한 회원일 경우 표시 정보 덮어쓰기
+                const modalRoleBadge = document.getElementById('modalRole');
+                const modalName = document.getElementById('modalName');
+
+                if (isDeleted) {
+                    // (1) 탈퇴 회원용 스타일 및 텍스트 적용
+                    modalRoleBadge.textContent = '탈퇴 회원';
+                    modalRoleBadge.className = 'badge bg-danger ms-2 align-middle'; // 빨간색 뱃지
+
+                    modalName.textContent = name + " (탈퇴)";
+                    modalName.className = 'text-danger fw-bold'; // 빨간색 텍스트
+
+                    document.getElementById('modalEmail').textContent = email + " (계정 삭제됨)";
+                    document.getElementById('modalEmail').className = 'text-white-50 text-decoration-line-through';
+                } else {
+                    // (2) 일반 회원용 스타일 적용 (원상복구)
+                    modalRoleBadge.textContent = role ? role : 'USER';
+                    if (role === 'ADMIN') {
+                        modalRoleBadge.className = 'badge bg-danger ms-2 align-middle';
+                    } else {
+                        modalRoleBadge.className = 'badge bg-secondary ms-2 align-middle';
+                    }
+
+                    modalName.textContent = name;
+                    modalName.className = 'text-white';
+
+                    document.getElementById('modalEmail').textContent = email ? email : '-';
+                    document.getElementById('modalEmail').className = 'text-white';
+                }
+
+                // 4. 나머지 공통 데이터 바인딩
                 document.getElementById('modalId').textContent = id;
-                document.getElementById('modalName').textContent = name;
                 document.getElementById('modalCompany').textContent = company;
                 document.getElementById('modalCPhone').textContent = cphone;
-                document.getElementById('modalEmail').textContent = email ? email : '-'; // 값이 없으면 '-' 표시
                 document.getElementById('modalContact').textContent = contact;
-
-                // 역할 배지 스타일링
-                const roleBadge = document.getElementById('modalRole');
-                if (role) {
-                    roleBadge.textContent = role;
-                    if (role === 'ADMIN') {
-                        roleBadge.className = 'badge bg-danger ms-2 align-middle';
-                    } else {
-                        roleBadge.className = 'badge bg-secondary ms-2 align-middle';
-                    }
-                } else {
-                    roleBadge.textContent = 'USER'; // 값이 없으면 기본값
-                    roleBadge.className = 'badge bg-secondary ms-2 align-middle';
-                }
             });
         }
 
 
         // ---------------------------------------------------------
-        // [기능 1] 반려(Reject) 관련 로직 (모달 + AJAX)
+        // [기능 1] 반려(Reject) 관련 로직
         // ---------------------------------------------------------
         const rejectModal = document.getElementById('rejectModal');
         const rejectForm = document.getElementById('rejectForm');
@@ -388,33 +404,49 @@
                 headers: { 'X-CSRF-TOKEN': csrfToken },
                 body: formData
             })
-            .then(response => {
-                if (response.ok) {
-                    const modalInstance = bootstrap.Modal.getInstance(rejectModal);
-                    modalInstance.hide();
-                    Toast.fire({ icon: 'success', title: '반려 처리가 완료되었습니다.' }).then(() => location.reload());
-                } else {
-                    throw new Error('Server Error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-                Swal.fire({ icon: 'error', title: '처리 실패', text: '서버 통신 중 오류가 발생했습니다.' });
-            });
+                .then(response => {
+                    if (response.ok) {
+                        const modalInstance = bootstrap.Modal.getInstance(rejectModal);
+                        modalInstance.hide();
+                        Toast.fire({ icon: 'success', title: '반려 처리가 완료되었습니다.' }).then(() => location.reload());
+                    } else {
+                        throw new Error('Server Error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    Swal.fire({ icon: 'error', title: '처리 실패', text: '서버 통신 중 오류가 발생했습니다.' });
+                });
         }
 
 
         // ---------------------------------------------------------
-        // [기능 2] 승인(Approve) 버튼 안전장치
+        // [기능 2] 승인(Approve) 버튼 안전장치 (수정됨)
         // ---------------------------------------------------------
         const approveBtns = document.querySelectorAll('.approve-btn');
 
         approveBtns.forEach(btn => {
             btn.addEventListener('click', function(e) {
-                e.preventDefault();
+                e.preventDefault(); // 일단 링크 이동 막기
 
+                // 1. 탈퇴 여부 확인
+                const isDeleted = this.getAttribute('data-is-deleted') === 'true';
+
+                // [★ 추가된 로직] 탈퇴한 회원이면 경고창 띄우고 중단
+                if (isDeleted) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '승인 불가',
+                        text: '탈퇴한 회원의 요청은 승인할 수 없습니다.',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: '확인'
+                    });
+                    return; // 함수 종료 (페이지 이동 안 함)
+                }
+
+                // 2. 정상 회원이면 기존 승인 프로세스 진행
                 const targetUrl = this.getAttribute('href');
 
                 Swal.fire({

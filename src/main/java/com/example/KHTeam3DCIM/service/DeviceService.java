@@ -2,6 +2,7 @@ package com.example.KHTeam3DCIM.service;
 
 import com.example.KHTeam3DCIM.domain.*;
 import com.example.KHTeam3DCIM.dto.Rack.RackDetailDto;
+import com.example.KHTeam3DCIM.dto.device.DeviceResponseDTO;
 import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.CategoryRepository;
 import com.example.KHTeam3DCIM.repository.DeviceRepository;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -465,5 +467,16 @@ public class DeviceService {
         if (device.getContractDate() == null) return false;
         // contractDate(시작일)에 contractMonth(기간)을 더한 날짜와 오늘 비교
         return device.getContractDate().plusMonths(device.getContractMonth()).isBefore(LocalDate.now());
+    }
+
+    // [추가] DTO 반환용 검색 메서드 (Controller에서 호출)
+    public List<DeviceResponseDTO> searchDevicesDto(String keyword, String sortOption, String sortDir) {
+        // 1. 기존 로직으로 Entity 리스트 조회
+        List<Device> devices = searchDevices(keyword, sortOption, sortDir);
+
+        // 2. Entity -> DTO 변환
+        return devices.stream()
+                .map(DeviceResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }

@@ -6,6 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <!-- [수정됨] 통합된 admin.css 하나만 사용 -->
@@ -82,9 +83,11 @@
                             <a th:href="@{/racks/{id}/edit(id=${rack.id})}"
                                class="btn btn-sm btn-outline-warning">수정</a>
 
-                            <a th:href="@{/racks/{id}/delete(id=${rack.id})}"
-                               class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('정말 이 랙을 삭제하시겠습니까?');">삭제</a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    th:onclick="'confirmDelete(' + ${rack.id} + ')'">
+                                삭제
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -100,5 +103,48 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // 1. Controller에서 전달받은 msg가 있으면 알림창 띄우기
+    const msg = [[${msg}]];
+    const msgType = [[${msgType}]]; // success, error 등
+
+    if (msg) {
+        Swal.fire({
+            icon: msgType || 'info',
+            title: msgType === 'error' ? '오류' : '완료',
+            text: msg,
+            confirmButtonText: '확인',
+            background: '#1f2937', // 다크모드 배경색
+            color: '#fff'
+        });
+    }
+
+    // 2. 삭제 확인창 함수
+    function confirmDelete(rackId) {
+        Swal.fire({
+            title: '정말 삭제하시겠습니까?',
+            text: "장비가 없는 랙만 삭제 가능합니다. 삭제 후 복구할 수 없습니다.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33', // 빨간색
+            cancelButtonColor: '#6c757d', // 회색
+            confirmButtonText: '삭제하기',
+            cancelButtonText: '취소',
+            background: '#1f2937',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 확인 버튼 누르면 실제 삭제 URL로 이동
+                location.href = '/racks/' + rackId + '/delete';
+            }
+        });
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

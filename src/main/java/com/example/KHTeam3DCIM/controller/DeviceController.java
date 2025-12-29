@@ -5,6 +5,7 @@ package com.example.KHTeam3DCIM.controller;
 
 import com.example.KHTeam3DCIM.domain.*;
 import com.example.KHTeam3DCIM.dto.device.DeviceResponse;
+import com.example.KHTeam3DCIM.dto.device.DeviceResponseDTO;
 import com.example.KHTeam3DCIM.dto.device.deviceDTO;
 import com.example.KHTeam3DCIM.repository.MemberRepository;
 import com.example.KHTeam3DCIM.repository.RackRepository;
@@ -49,7 +50,9 @@ public class DeviceController {
                        @RequestParam(required = false, defaultValue = "asc") String sortDir,
                        HttpServletRequest request) {
 
-        List<Device> devices = deviceService.searchDevices(keyword, sort, sortDir);
+        // List<Device> devices = deviceService.searchDevices(keyword, sort, sortDir);
+        // [수정] searchDevices -> searchDevicesDto 호출로 변경
+        List<DeviceResponseDTO> devices = deviceService.searchDevicesDto(keyword, sort, sortDir);
         model.addAttribute("request", request);
         model.addAttribute("devices", devices);
         model.addAttribute("keyword", keyword);

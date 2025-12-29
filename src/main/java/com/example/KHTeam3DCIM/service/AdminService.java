@@ -95,7 +95,7 @@ public class AdminService {
 
         // 3. 로그 기록
         String logDescription = String.format(
-                "회원 [%s (%s)] 정보 수정 by [%s]: 이름 (%s -> %s), 역할 (%s -> %s), " +
+                "회원 [%s (%s)] 정보 수정 by [%s]: 이름 (%s -> %s), 권한 (%s -> %s), " +
                         "이메일 (%s -> %s), 연락처 (%s -> %s)",
                 memberId, member.getName(), adminActorId,
                 oldName, updateRequest.getName(),

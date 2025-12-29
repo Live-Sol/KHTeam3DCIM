@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
     <link href="/css/index.css" rel="stylesheet">
     <link href="/css/memberStyle.css" rel="stylesheet">
 </head>
@@ -106,6 +106,27 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const signupSuccess = [[${signupSuccess}]];
+
+    if (signupSuccess) {
+        Swal.fire({
+            title: '회원가입 완료! 🎉',
+            text: 'StarRoot에 오신 것을 환영합니다. 로그인해주세요.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#ffffff',
+            confirmButtonColor: '#00d2d3',
+            confirmButtonText: '로그인 하러가기',
+            allowOutsideClick: false
+        });
+    }
+    /*]]>*/
+</script>
 
 <!-- [추가됨] 아이디 저장 스크립트 (쿠키 활용) -->
 <script>
