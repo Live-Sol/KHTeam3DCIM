@@ -23,17 +23,17 @@
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${requestURI != null && requestURI.startsWith('/devices') ? 'active' : ''}"
-                   href="/devices">
-                    <i class="bi bi-hdd-stack me-2 text-primary"></i> 장비 관리
+                   th:classappend="${requestURI != null && requestURI.startsWith('/racks') ? 'active' : ''}"
+                   href="/racks">
+                    <i class="bi bi-terminal-split me-2 text-success"></i> 랙 관리
                 </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link"
-                   th:classappend="${requestURI != null && requestURI.startsWith('/racks') ? 'active' : ''}"
-                   href="/racks">
-                    <i class="bi bi-terminal-split me-2 text-success"></i> 랙 관리
+                   th:classappend="${requestURI != null && requestURI.startsWith('/devices') ? 'active' : ''}"
+                   href="/devices">
+                    <i class="bi bi-hdd-stack me-2 text-primary"></i> 장비 관리
                 </a>
             </li>
 

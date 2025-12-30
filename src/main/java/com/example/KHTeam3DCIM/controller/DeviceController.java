@@ -320,7 +320,13 @@ public class DeviceController {
                 throw new IllegalArgumentException("올바른 시작 유닛 번호를 입력해주세요.");
             if (device.getHeightUnit() == null || device.getHeightUnit() < 1)
                 throw new IllegalArgumentException("장비 높이는 최소 1U 이상이어야 합니다.");
-
+            if (device.getIpAddr() == null || device.getIpAddr().isBlank()) {
+                throw new IllegalArgumentException("관리 IP는 필수 입력 항목입니다.");
+            }
+            String ipRegex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+            if (!device.getIpAddr().matches(ipRegex)) {
+                throw new IllegalArgumentException("관리 IP 형식이 올바르지 않습니다. (예: 192.168.0.1)");
+            }
             if (deviceService.isSerialDuplicate(device.getSerialNum(), id))
                 throw new IllegalStateException("이미 다른 장비에서 사용 중인 시리얼 번호입니다.");
             deviceService.checkRackOverlap(rackId, device.getStartUnit(), device.getHeightUnit(), id);

@@ -136,21 +136,7 @@
                 </div>
             </div>
 
-            <!-- 2. 총 등록 장비 카드 -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card border-primary mb-3 shadow-sm h-100">
-                    <div class="card-header"><i class="bi bi-hdd-stack me-2"></i> 전체 등록 장비</div>
-                    <div class="card-body">
-                        <h1 class="card-title fw-bold"><span th:text="${totalDeviceCount}">0</span> 대</h1>
-                        <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
-                        <a href="/devices" class="card-link-text text-info stretched-link">
-                            장비 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. 총 등록 Rack 카드 -->
+            <!-- 2. 총 등록 Rack 카드 -->
             <div class="col-md-6 col-lg-3">
                 <div class="card border-success mb-3 shadow-sm h-100">
                     <div class="card-header"><i class="bi bi-terminal-split me-2"></i> 전체 등록 랙</div>
@@ -159,6 +145,20 @@
                         <p class="card-text">현재 시스템에 등록된 전체 Rack의 수입니다.</p>
                         <a href="/racks" class="card-link-text text-success stretched-link">
                             랙 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 총 등록 장비 카드 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card border-primary mb-3 shadow-sm h-100">
+                    <div class="card-header"><i class="bi bi-hdd-stack me-2"></i> 전체 등록 장비</div>
+                    <div class="card-body">
+                        <h1 class="card-title fw-bold"><span th:text="${totalDeviceCount}">0</span> 대</h1>
+                        <p class="card-text">현재 시스템에 등록된 전체 장비 수입니다.</p>
+                        <a href="/devices" class="card-link-text text-info stretched-link">
+                            장비 관리로 이동 <i class="bi bi-arrow-right ms-2"></i>
                         </a>
                     </div>
                 </div>
