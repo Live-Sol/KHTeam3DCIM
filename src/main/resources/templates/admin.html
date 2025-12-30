@@ -202,10 +202,10 @@
                     </div>
                     <div class="text-end">
                         <div class="monitor-value">
-                            <span th:text="${env.currentPue}">1.52</span>
+                            <span th:text="${env.currentPue}">1.52</span><span class="monitor-unit">PUE</span>
                         </div>
                         <!-- stretched-link 클래스를 사용하여 카드 전체를 클릭 가능하게 만듦 -->
-                        <a href="/admin/pue" class="btn btn-sm mt-2 rounded-pill px-3 stretched-link"
+                        <a href="/admin/pue" class="btn btn-sm mt-4 rounded-pill px-3 stretched-link"
                            style="border-color: #facc15; color: #facc15; background: transparent;">
                             상세 보기 <i class="bi bi-arrow-right"></i>
                         </a>
@@ -236,7 +236,7 @@
                             <span th:text="${env.currentTemp}">24.5</span><span class="monitor-unit">°C</span>
                         </div>
                         <!-- stretched-link 클래스를 사용하여 카드 전체를 클릭 가능하게 만듦 -->
-                        <a href="/admin/cooling" class="btn btn-sm rounded-pill mt-2 px-3 stretched-link"
+                        <a href="/admin/cooling" class="btn btn-sm rounded-pill mt-4 px-3 stretched-link"
                            style="border-color: #38bdf8; color: #38bdf8; background: transparent;">
                             제어 이동 <i class="bi bi-arrow-right"></i>
                         </a>
