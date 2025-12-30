@@ -84,7 +84,7 @@ public class KhTeam3DcimApplication {
                     .memberId("user")
                     .password(passwordEncoder.encode("1234"))
                     .name("김운영")
-                    .email("user@kh.co.kr")
+                    .email("team3starroot@gmail.com")
                     .contact("010-0000-0000")
                     .companyName("KH")
                     .companyPhone("052-123-4567")
