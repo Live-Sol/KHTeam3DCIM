@@ -1,12 +1,14 @@
     package com.example.KHTeam3DCIM.controller;
 
     import com.example.KHTeam3DCIM.domain.AuditLog;
+    import com.example.KHTeam3DCIM.domain.DcimEnvironment;
     import com.example.KHTeam3DCIM.domain.Member;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminResponse;
     import com.example.KHTeam3DCIM.dto.admin.MemberAdminUpdateRequest;
     import com.example.KHTeam3DCIM.dto.admin.MemberFindByIdAdmin;
     import com.example.KHTeam3DCIM.repository.RequestRepository;
     import com.example.KHTeam3DCIM.service.AdminService;
+    import com.example.KHTeam3DCIM.service.EnvironmentService; // [추가] 환경 서비스
     import com.example.KHTeam3DCIM.service.AuditLogService;
     import com.example.KHTeam3DCIM.service.MemberService;
     import jakarta.validation.Valid;
@@ -34,14 +36,7 @@
         private final AdminService adminService;
         private final MemberService memberService;
         private final RequestRepository requestRepository;
-
-//        public AdminController(AuditLogService auditLogService, AdminService adminService,
-//                               MemberService memberService, RequestRepository requestRepository) {
-//            this.auditLogService = auditLogService;
-//            this.adminService = adminService;
-//            this.memberService = memberService;
-//            this.requestRepository = requestRepository;
-//        }
+        private final EnvironmentService envService; // [추가] DI 주입
 
         @GetMapping
         public String adminDashboard(Model model, HttpServletRequest request) { // ⭐️ HttpSession 제거 ⭐️
@@ -59,12 +54,17 @@
             int logLimit = 8;
             List<AuditLog> recentLogs = auditLogService.getRecentActivityLogs(logLimit);
 
+            // 3. [NEW] 환경 데이터 (PUE, 온도) 가져오기 & 시뮬레이션 최신화
+            DcimEnvironment env = envService.getEnvironment();
+            env = envService.calculateSimulation(env);
+
             model.addAttribute("pageTitle", "관리자 페이지");
             model.addAttribute("pendingRequestCount", pendingRequestCount);
             model.addAttribute("totalDeviceCount", totalDeviceCount);
             model.addAttribute("totalMemberCount", totalMemberCount);
             model.addAttribute("totalRackCount", totalRackCount);
             model.addAttribute("recentLogs", recentLogs);
+            model.addAttribute("env", env); // [추가] 뷰로 전달
             model.addAttribute("request", request);
 
             return "admin"; // templates/admin.html
