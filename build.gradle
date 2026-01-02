@@ -45,10 +45,6 @@ dependencies {
     // Spring Boot Validation (Jakarta Bean Validation API 및 Hibernate Validator 구현체)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // Spring Boot Mail Starter 추가(구글 이메일 인증 번호)
-    // ID: team3starroot@gmail.com
-    // PW: starroot3#
-    // App PW: abot boys ggez icsu
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
