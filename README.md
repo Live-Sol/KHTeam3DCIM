@@ -88,19 +88,19 @@ src/main/java
       │    ├── RequestController.java    
       │    ├── SolutionController.java
       │    └── SpecController.java
-      │        
+      │         
       ├── 📂 domain
       │    ├── AuditLog.java  
-      │    ├── Category.java      
+      │    ├── Category.java       
       │    ├── DcimEnvironment.java
       │    ├── Device.java  
       │    ├── LogType.java         
-      │    ├── Member.java      
+      │    ├── Member.java       
       │    ├── Rack.java        
-      │    ├── Request.java   
-      │    └── Role.java       
+      │    ├── Request.java    
+      │    └── Role.java        
       │
-      ├── 📂 dto           
+      ├── 📂 dto            
       │    ├── 📂 admin
       │    │    ├── MemberAdminResponse.java
       │    │    ├── MemberAdminUpdateRequest.java
@@ -130,10 +130,10 @@ src/main/java
       │    ├── AuditLogRepository.java
       │    ├── CategoryRepository.java
       │    ├── DcimEnvironmentRepository.java
-      │    ├── DeviceRepository.java      
+      │    ├── DeviceRepository.java       
       │    ├── MemberRepository.java
       │    ├── RackRepository.java
-      │    └── RequestRepository.java      
+      │    └── RequestRepository.java       
       │
       ├── 📂 service
       │    ├── AdminService.java
@@ -153,26 +153,25 @@ src/main/java
 src/main/resources
  ├── application.properties    (DB 접속 정보 설정)
  │
- ├── 📂 static              
+ ├── 📂 static               
  │    ├── 📂css
  │    │    ├── memberStyle.css
  │    │    └── rack_view.css
-
  │    └── 📂js
  │         ├── device_form.js
  │         └── rack_view.js 
  │
  └── 📂 templates
       ├── 📂 device
-      │    ├── device_list.html      
-      │    └── device_form.html       
+      │    ├── device_list.html       
+      │    └── device_form.html        
       │      
       ├── 📂 fragments        
       │    ├── header.html    
-      │    └── layout.html   
+      │    └── layout.html    
       │
       ├── 📂 member
-      │    ├── adminEditMember.html      
+      │    ├── adminEditMember.html       
       │    ├── deleteMember.html
       │    ├── editMember.html
       │    ├── findMemberById.html
@@ -182,65 +181,12 @@ src/main/resources
       │    └── signup.html
       │
       ├── 📂 rack
-      │    ├── rack_list.html       
-      │    ├── rack_form.html       
-      │    └── rack_view.html      
+      │    ├── rack_list.html        
+      │    ├── rack_form.html        
+      │    └── rack_view.html       
       │
       ├── 📂 request
       │    ├── RequestForm.html
       │    └── RequestList.html
-      ├── admin.html      
-      └── index.html      
----
-
-## 📊 Entity Relationship Diagram (ERD)
-> 프로젝트의 실제 데이터베이스 구조를 반영한 ERD입니다.
-
-```mermaid
-erDiagram
-    %% 1. 핵심 관계 (Key Relationships)
-    MEMBER ||--o{ DEVICE : "소유 (1:N)"
-    MEMBER ||--o{ REQUEST : "신청 (1:N)"
-    RACK ||--o{ DEVICE : "설치 (1:N)"
-    CATEGORY ||--o{ DEVICE : "분류 (1:N)"
-    CATEGORY ||--o{ REQUEST : "분류 (1:N)"
-
-    %% 2. Entity Attributes (엔티티 속성)
-    MEMBER {
-        String memberId PK
-        String name
-        String role "ADMIN/USER"
-    }
-    RACK {
-        Long id PK
-        String rackName
-        Long totalUnit
-    }
-    DEVICE {
-        Long id PK
-        Long rack_id FK
-        String cate_id FK
-        String member_id FK
-        String serialNum
-        String status
-    }
-    REQUEST {
-        Long id PK
-        String memberId FK
-        String cateId FK
-        String status
-    }
-    CATEGORY {
-        String id PK "SVR, NET..."
-        String name
-    }
-    DC_ENVIRONMENT {
-        Long id PK
-        Double currentPue
-        Double currentTemp
-    }
-    AUDIT_LOG {
-        Long id PK
-        String actor
-        String actionDescription
-    }
+      ├── admin.html       
+      └── index.html
