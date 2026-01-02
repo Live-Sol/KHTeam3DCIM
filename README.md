@@ -191,3 +191,7 @@ src/main/resources
       │    └── RequestList.html
       ├── admin.html      
       └── index.html      
+---
+
+## 엔티티간의 관계 (Entity Attributes)
+<img width="2613" height="1602" alt="mermaid-diagram-2026-01-02-162837" src="https://github.com/user-attachments/assets/8e09a627-4ad1-420a-95a9-85469a4a3b11" />
