@@ -193,5 +193,54 @@ src/main/resources
       └── index.html      
 ---
 
-## 엔티티간의 관계 (Entity Attributes)
-<img width="2613" height="1602" alt="mermaid-diagram-2026-01-02-162837" src="https://github.com/user-attachments/assets/8e09a627-4ad1-420a-95a9-85469a4a3b11" />
+## 📊 Entity Relationship Diagram (ERD)
+> 프로젝트의 실제 데이터베이스 구조를 반영한 ERD입니다.
+
+```mermaid
+erDiagram
+    %% 1. 핵심 관계 (Key Relationships)
+    MEMBER ||--o{ DEVICE : "소유 (1:N)"
+    MEMBER ||--o{ REQUEST : "신청 (1:N)"
+    RACK ||--o{ DEVICE : "설치 (1:N)"
+    CATEGORY ||--o{ DEVICE : "분류 (1:N)"
+    CATEGORY ||--o{ REQUEST : "분류 (1:N)"
+
+    %% 2. Entity Attributes (엔티티 속성)
+    MEMBER {
+        String memberId PK
+        String name
+        String role "ADMIN/USER"
+    }
+    RACK {
+        Long id PK
+        String rackName
+        Long totalUnit
+    }
+    DEVICE {
+        Long id PK
+        Long rack_id FK
+        String cate_id FK
+        String member_id FK
+        String serialNum
+        String status
+    }
+    REQUEST {
+        Long id PK
+        String memberId FK
+        String cateId FK
+        String status
+    }
+    CATEGORY {
+        String id PK "SVR, NET..."
+        String name
+    }
+    DC_ENVIRONMENT {
+        Long id PK
+        Double currentPue
+        Double currentTemp
+    }
+    AUDIT_LOG {
+        Long id PK
+        String actor
+        String actionDescription
+    }
