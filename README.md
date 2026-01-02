@@ -68,10 +68,126 @@
 ## 📂 프로젝트 구조 (Project Structure)
 
 ```text
-src/main/java/com/example/KHTeam3DCIM
-├── controller      # 웹 요청 처리 (Admin, Device, Rack, Request, Member 등)
-├── service         # 핵심 비즈니스 로직 및 트랜잭션 처리
-├── domain          # JPA Entity (DB 테이블 매핑)
-├── dto             # 데이터 전송 객체 (Request/Response DTO)
-├── repository      # Data Access Layer (Spring Data JPA)
-└── security        # Spring Security 설정 및 인증 로직
+src/main/java
+ └── com.example.KHTeam3DCIM
+      │
+      ├── 📂 config
+      │    ├── FilterConfig.java
+      │    ├── GlobalDataAdvice.java
+      │    ├── SecurityConfig.java
+      │    └── WebConfig.java   
+      │    
+      ├── 📂 controller 
+      │    ├── AdminController.java  
+      │    ├── DeviceController.java 
+      │    ├── EnvironmentController.java
+      │    ├── infoController.java
+      │    ├── MainController.java    
+      │    ├── MemberController.java 
+      │    ├── RackController.java    
+      │    ├── RequestController.java    
+      │    ├── SolutionController.java
+      │    └── SpecController.java
+      │        
+      ├── 📂 domain
+      │    ├── AuditLog.java  
+      │    ├── Category.java      
+      │    ├── DcimEnvironment.java
+      │    ├── Device.java  
+      │    ├── LogType.java         
+      │    ├── Member.java      
+      │    ├── Rack.java        
+      │    ├── Request.java   
+      │    └── Role.java       
+      │
+      ├── 📂 dto           
+      │    ├── 📂 admin
+      │    │    ├── MemberAdminResponse.java
+      │    │    ├── MemberAdminUpdateRequest.java
+      │    │    └── MemberFindByIdAdmin.java
+      │    ├── 📂 device
+      │    │    ├── deviceDTO.java
+      │    │    └── DeviceResponse.java
+      │    ├── 📂 Member
+      │    │    ├── MemberAdminResponse.java
+      │    │    ├── MemberAdminUpdateRequest.java
+      │    │    ├── MemberCreateRequest.java
+      │    │    ├── MemberLoginRequest.java
+      │    │    ├── MemberResponse.java
+      │    │    └── MemberUpdateRequest.java
+      │    ├── 📂 Rack
+      │    │    ├── RackCreateRequest.java
+      │    │    ├── RackDetailDto.java
+      │    │    ├── RackResponse.java
+      │    │    └── RackUpdateRequest.java
+      │    └── 📂 Request
+      │         └── RequestDTO.java
+      │
+      ├── 📂 filter
+      │    └── LogFilter.java
+      │
+      ├── 📂 repository
+      │    ├── AuditLogRepository.java
+      │    ├── CategoryRepository.java
+      │    ├── DcimEnvironmentRepository.java
+      │    ├── DeviceRepository.java      
+      │    ├── MemberRepository.java
+      │    ├── RackRepository.java
+      │    └── RequestRepository.java      
+      │
+      ├── 📂 service
+      │    ├── AdminService.java
+      │    ├── AuditLogService.java
+      │    ├── CategoryService.java 
+      │    ├── CustomUserDetailsService.java
+      │    ├── DeviceService.java
+      │    ├── EnvironmentService.java
+      │    ├── MailService.java
+      │    ├── MemberService.java  
+      │    ├── RackService.java
+      │    └── RequestService.java
+      │
+      ├── KhTeam3DcimApplication.java
+      └── DeviceScheduler.java
+
+src/main/resources
+ ├── application.properties    (DB 접속 정보 설정)
+ │
+ ├── 📂 static              
+ │    ├── 📂css
+ │    │    ├── memberStyle.css
+ │    │    └── rack_view.css
+
+ │    └── 📂js
+ │         ├── device_form.js
+ │         └── rack_view.js 
+ │
+ └── 📂 templates
+      ├── 📂 device
+      │    ├── device_list.html      
+      │    └── device_form.html       
+      │      
+      ├── 📂 fragments        
+      │    ├── header.html    
+      │    └── layout.html   
+      │
+      ├── 📂 member
+      │    ├── adminEditMember.html      
+      │    ├── deleteMember.html
+      │    ├── editMember.html
+      │    ├── findMemberById.html
+      │    ├── findMembersAdmin.html
+      │    ├── findMembersUser.html
+      │    ├── login.html 
+      │    └── signup.html
+      │
+      ├── 📂 rack
+      │    ├── rack_list.html       
+      │    ├── rack_form.html       
+      │    └── rack_view.html      
+      │
+      ├── 📂 request
+      │    ├── RequestForm.html
+      │    └── RequestList.html
+      ├── admin.html      
+      └── index.html      
