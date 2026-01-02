@@ -190,8 +190,3 @@ src/main/resources
       │    └── RequestList.html
       ├── admin.html       
       └── index.html
-
-## 📊 Entity Relationship Diagram (ERD)
-> 프로젝트의 실제 데이터베이스 구조를 반영한 ERD입니다.
-
-![ERD Diagram](https://mermaid.ink/img/pako:eNq1VFuL2kAY_SvDwIILmibRqJs3a9JFXOM2XqBFkNlkVkNzkckE1rpCS6Uv9rGlfejDPrRvLZTeaP_SbvY_dBIvXTXiUrYfecjMOfOdyTmTGUHDMzGUISaKhXoEOR0XsNrbA5l_rWUHgQPXb36E00_g8vuzy28TkKriIdCxjajluX7fGvj7dyE361FTa_dVHZyfZzLeCChqu1JWgQw6MHz5Knx_AVKCrO13YBJZVx-21EZzxp5ehF8_r7L1Urma1HjyIfz9bpVaLjXVw7r-KIF-9XNy9XEH_eZO1vl3mIzIgfDt6-vpF_aA8MXzcPILpFSXWnQIFEyRZf-HZEazUVQNSiy3BxzsnGBSMcFxdQNzkYM3JolnY-ZMSalVtHuthqovfBwvtOKobigdeWyZlahAkPFEW1GJydSjyG65Fl3rPE9yR-94LurcZcCDTVEDUbwFmrmxBfQxsZCtBc4mQhEN_HUb5ufodk4sc9iy4WQkUXh5oDfTjrVZeo22ngaa2uQ4bhFfYu5_nS93Va1d0etaTdV2fpPiBSfslBgBIdilxwHeBjWxM1hTKrWUSrN7VD-8pXHIoB5JmmX3m4J9g1iD6HWuAtOwRywTypQEOA0dTBwUDWEs1oG0j9m3w-jfN_EpCmwa-RMtGyD3sec5i5XEC3p9KJ8i22ejYGCyjObX95KCXROTshe4FMpCNm4B5RE8g3JWOuCEgpQVxaIgFkWegUMoSzzH58WclBcKfIEXBGGchk9jTZ4rFiSelXSQ53P5XK44_gM6_77T?type=png)
